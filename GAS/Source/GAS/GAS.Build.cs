@@ -15,11 +15,16 @@ public class GAS : ModuleRules
 			"Engine", 
 			"InputCore",
 			"EnhancedInput",
+			"GameplayAbilities",
+			"GameplayTags",
+			"GameplayTasks",
+			"UMG",
 		});
 		
 		PrivateIncludePaths.AddRange(new string[]
 		{
 			"GAS/",
+			"GAS/AbilitySystem/",
 			"GAS/Controller/",
 			"GAS/Creature/",
 			"GAS/Game/",

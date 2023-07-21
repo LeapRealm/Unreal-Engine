@@ -1,7 +1,15 @@
 #include "Creature/GASMonster.h"
 
+#include "GASAbilitySystemComponent.h"
+#include "GASAttributeSet.h"
+
 AGASMonster::AGASMonster()
 {
+	AbilitySystemComponent = CreateDefaultSubobject<UGASAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+
+	AttributeSet = CreateDefaultSubobject<UGASAttributeSet>(TEXT("AttributeSet"));
 }
 
 void AGASMonster::BeginPlay()
@@ -9,6 +17,8 @@ void AGASMonster::BeginPlay()
 	Super::BeginPlay();
 
 	UnHighlightActor();
+
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
 void AGASMonster::HighlightActor()

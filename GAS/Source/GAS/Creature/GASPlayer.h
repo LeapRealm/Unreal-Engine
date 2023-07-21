@@ -15,6 +15,12 @@ class GAS_API AGASPlayer : public AGASCreature
 public:
 	AGASPlayer();
 
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+
+private:
+	void InitAbilityActorInfo();
+	
 protected:
 	UPROPERTY(EditAnywhere, Category=Camera)
 	TObjectPtr<USpringArmComponent> CameraBoom;
