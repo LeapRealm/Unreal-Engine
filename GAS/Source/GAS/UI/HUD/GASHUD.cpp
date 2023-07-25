@@ -14,6 +14,7 @@ UOverlayWidgetController* AGASHUD::GetOverlayWidgetController(const FWidgetContr
 	{
 		OverlayWidgetControllerRef = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
 		OverlayWidgetControllerRef->SetWidgetControllerParams(WCParams);
+		OverlayWidgetControllerRef->BindCallbacksToDependencies();
 	}
 
 	return OverlayWidgetControllerRef;

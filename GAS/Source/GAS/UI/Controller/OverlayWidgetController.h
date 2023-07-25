@@ -4,10 +4,7 @@
 #include "UI/Controller/GASWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float, NewValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChangedSignature, float, NewValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnManaChangedSignature, float, NewValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxManaChangedSignature, float, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 
 UCLASS(BlueprintType, Blueprintable)
 class GAS_API UOverlayWidgetController : public UGASWidgetController
@@ -16,16 +13,17 @@ class GAS_API UOverlayWidgetController : public UGASWidgetController
 
 public:
 	virtual void BroadcastInitialValues() override;
+	virtual void BindCallbacksToDependencies() override;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
-	FOnHealthChangedSignature OnHealthChanged;
+	FOnAttributeChangedSignature OnHealthChanged;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
-	FOnMaxHealthChangedSignature OnMaxHealthChanged;
+	FOnAttributeChangedSignature OnMaxHealthChanged;
 	
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
-	FOnManaChangedSignature OnManaChanged;
+	FOnAttributeChangedSignature OnManaChanged;
     	
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
-	FOnMaxManaChangedSignature OnMaxManaChanged;
+	FOnAttributeChangedSignature OnMaxManaChanged;
 };
