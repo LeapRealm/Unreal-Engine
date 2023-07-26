@@ -18,7 +18,7 @@ void AGASMonster::BeginPlay()
 
 	UnHighlightActor();
 
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	InitAbilityActorInfo();
 }
 
 void AGASMonster::HighlightActor()
@@ -38,4 +38,12 @@ void AGASMonster::UnHighlightActor()
 
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
+}
+
+void AGASMonster::InitAbilityActorInfo()
+{
+	Super::InitAbilityActorInfo();
+
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	Cast<UGASAbilitySystemComponent>(AbilitySystemComponent)->OnSetAbilityActorInto();
 }

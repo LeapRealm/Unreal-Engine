@@ -1,5 +1,6 @@
 #include "UI/Controller/OverlayWidgetController.h"
 
+#include "GASAbilitySystemComponent.h"
 #include "GASAttributeSet.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
@@ -45,6 +46,21 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		[this](const FOnAttributeChangeData& Data)
 		{
 			OnMaxManaChanged.Broadcast(Data.NewValue);
+		}
+	);
+
+	Cast<UGASAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
+		[this](const FGameplayTagContainer& TagContainer)
+		{
+			for (const FGameplayTag& Tag : TagContainer)
+			{
+				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+				if (Tag.MatchesTag(MessageTag))
+				{
+					const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag);
+					MessageWidgetRowDelegate.Broadcast(*Row);
+				}
+			}
 		}
 	);
 }

@@ -7,11 +7,7 @@
 
 UGASAttributeSet::UGASAttributeSet()
 {
-	// TODO: TEMP
-	InitHealth(30.f);
-	InitMaxHealth(100.f);
-	InitMana(30.f);
-	InitMaxMana(100.f);
+
 }
 
 void UGASAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -22,6 +18,11 @@ void UGASAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION_NOTIFY(UGASAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UGASAttributeSet, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UGASAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(UGASAttributeSet, Strength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UGASAttributeSet, Intelligence, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UGASAttributeSet, Resilience, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UGASAttributeSet, Vigor, COND_None, REPNOTIFY_Always);
 }
 
 void UGASAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -104,4 +105,24 @@ void UGASAttributeSet::OnRep_Mana(const FGameplayAttributeData& OldValue) const
 void UGASAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UGASAttributeSet, MaxMana, OldValue);
+}
+
+void UGASAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGASAttributeSet, Strength, OldValue);
+}
+
+void UGASAttributeSet::OnRep_Intelligence(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGASAttributeSet, Intelligence, OldValue);
+}
+
+void UGASAttributeSet::OnRep_Resilience(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGASAttributeSet, Resilience, OldValue);
+}
+
+void UGASAttributeSet::OnRep_Vigor(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGASAttributeSet, Vigor, OldValue);
 }

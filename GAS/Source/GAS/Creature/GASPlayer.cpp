@@ -1,6 +1,7 @@
 #include "Creature/GASPlayer.h"
 
 #include "AbilitySystemComponent.h"
+#include "GASAbilitySystemComponent.h"
 #include "GASPlayerController.h"
 #include "GASPlayerState.h"
 #include "Camera/CameraComponent.h"
@@ -54,11 +55,14 @@ void AGASPlayer::OnRep_PlayerState()
 
 void AGASPlayer::InitAbilityActorInfo()
 {
+	Super::InitAbilityActorInfo();
+	
 	AGASPlayerState* GASPlayerState = GetPlayerState<AGASPlayerState>();
 	check(GASPlayerState);
 	GASPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(GASPlayerState, this);
 
 	AbilitySystemComponent = GASPlayerState->GetAbilitySystemComponent();
+	Cast<UGASAbilitySystemComponent>(AbilitySystemComponent)->OnSetAbilityActorInto();
 	AttributeSet = GASPlayerState->GetAttributeSet();
 
 	if (AGASPlayerController* GASPlayerController = Cast<AGASPlayerController>(GetController()))
@@ -68,4 +72,6 @@ void AGASPlayer::InitAbilityActorInfo()
 			GASHUD->InitOverlay(GASPlayerController, GASPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+
+	InitializePrimaryAttributes();
 }

@@ -1,5 +1,7 @@
 #include "Creature/GASCreature.h"
 
+#include "AbilitySystemComponent.h"
+
 AGASCreature::AGASCreature()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -22,4 +24,14 @@ void AGASCreature::Tick(float DeltaTime)
 void AGASCreature::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void AGASCreature::InitializePrimaryAttributes()
+{
+	check(IsValid(GetAbilitySystemComponent()));
+	check(DefaultPrimaryAttributes);
+
+	FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(DefaultPrimaryAttributes, 1.f, ContextHandle);
+	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
 }

@@ -5,6 +5,7 @@
 #include "AbilitySystemInterface.h"
 #include "GASCreature.generated.h"
 
+class UGameplayEffect;
 class UAttributeSet;
 class UAbilitySystemComponent;
 
@@ -22,10 +23,13 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	virtual void InitAbilityActorInfo() { }
+	
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+
+	void InitializePrimaryAttributes();
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat)
@@ -36,4 +40,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attributes)
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
 };

@@ -34,6 +34,9 @@ void AGASEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGame
 		FActiveGameplayEffectHandles& ActiveEffectHandles = ActiveEffectHandlesMap.FindOrAdd(TargetASC);
 		ActiveEffectHandles.Handles.Add(ActiveEffectHandle);
 	}
+	
+	if (bDestroyOnEffectApplied)
+		Destroy();
 }
 
 void AGASEffectActor::OnOverlap(AActor* TargetActor)
@@ -71,7 +74,6 @@ void AGASEffectActor::OnEndOverlap(AActor* TargetActor)
 				TargetASC->RemoveActiveGameplayEffect(Handle, 1);
 
 			ActiveEffectHandlesMap.Remove(TargetASC);
-			// ActiveEffectHandles->Handles.Empty();
 		}
 	}
 }
