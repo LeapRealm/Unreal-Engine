@@ -73,5 +73,12 @@ void AGASPlayer::InitAbilityActorInfo()
 		}
 	}
 
-	InitializePrimaryAttributes();
+	InitializeDefaultAttributes();
+}
+
+int32 AGASPlayer::GetPlayerLevel()
+{
+	AGASPlayerState* PS = GetPlayerState<AGASPlayerState>();
+	check(PS);
+	return PS->GetPlayerLevel();
 }

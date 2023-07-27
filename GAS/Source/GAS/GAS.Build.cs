@@ -25,10 +25,16 @@ public class GAS : ModuleRules
 		{
 			"GAS/",
 			"GAS/AbilitySystem/",
+			"GAS/Actor/",
 			"GAS/Controller/",
 			"GAS/Creature/",
 			"GAS/Game/",
-			"GAS/Interface/"
+			"GAS/Interface/",
+			"GAS/MMC/",
+			"GAS/UI/",
+			"GAS/UI/Controller/",
+			"GAS/UI/HUD/",
+			"GAS/UI/Widget/",
 		});
 	}
 }

@@ -14,12 +14,18 @@ public:
 	AGASMonster();
 
 	virtual void BeginPlay() override;
+	
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
 
 	virtual void InitAbilityActorInfo() override;
+
+	virtual int32 GetPlayerLevel() override { return Level; }
 	
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bHighlighted = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character")
+	int32 Level = 1;
 };
