@@ -176,4 +176,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_ManaRegeneration, Category="Secondary Attributes")
 	FGameplayAttributeData ManaRegeneration;
 	ATTRIBUTE_ACCESSORS(UGASAttributeSet, ManaRegeneration);
+
+	template<class T>
+	using TStackFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+
+	TMap<FGameplayTag, TStackFuncPtr<FGameplayAttribute()>> TagsToAttributes;
 };

@@ -1,5 +1,6 @@
 #include "UI/HUD/GASHUD.h"
 
+#include "AttributeMenuWidgetController.h"
 #include "UI/Controller/OverlayWidgetController.h"
 #include "UI/Widget/GASUserWidget.h"
 
@@ -18,6 +19,18 @@ UOverlayWidgetController* AGASHUD::GetOverlayWidgetController(const FWidgetContr
 	}
 
 	return OverlayWidgetControllerRef;
+}
+
+UAttributeMenuWidgetController* AGASHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (AttributeMenuWidgetControllerRef == nullptr)
+	{
+		AttributeMenuWidgetControllerRef = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
+		AttributeMenuWidgetControllerRef->SetWidgetControllerParams(WCParams);
+		AttributeMenuWidgetControllerRef->BindCallbacksToDependencies();
+	}
+
+	return AttributeMenuWidgetControllerRef;
 }
 
 void AGASHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
