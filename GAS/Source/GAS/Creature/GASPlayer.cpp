@@ -43,6 +43,7 @@ void AGASPlayer::PossessedBy(AController* NewController)
 
 	// Server
 	InitAbilityActorInfo();
+	AddCharacterAbilities();
 }
 
 void AGASPlayer::OnRep_PlayerState()

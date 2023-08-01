@@ -1,6 +1,7 @@
 #include "Creature/GASCreature.h"
 
 #include "AbilitySystemComponent.h"
+#include "GASAbilitySystemComponent.h"
 
 AGASCreature::AGASCreature()
 {
@@ -42,4 +43,19 @@ void AGASCreature::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GamePlayEffect
 	ContextHandle.AddSourceObject(this);
 	FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GamePlayEffectClass, Level, ContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
+}
+
+void AGASCreature::AddCharacterAbilities()
+{
+	UGASAbilitySystemComponent* ASC = CastChecked<UGASAbilitySystemComponent>(AbilitySystemComponent);
+	if (HasAuthority() == false)
+		return;
+	
+	ASC->AddCharacterAbilities(StartupAbilities);
+}
+
+FVector AGASCreature::GetCombatSocketLocation()
+{
+	check(Weapon);
+	return Weapon->GetSocketLocation(WeaponTipSocketName);
 }

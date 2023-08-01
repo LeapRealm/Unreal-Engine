@@ -16,4 +16,5 @@ class GAS_API ICombatInterface
 
 public:
 	virtual int32 GetPlayerLevel() { return 0; }
+	virtual FVector GetCombatSocketLocation() { return FVector(); }
 };

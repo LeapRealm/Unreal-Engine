@@ -6,6 +6,7 @@
 #include "CombatInterface.h"
 #include "GASCreature.generated.h"
 
+class UGameplayAbility;
 class UGameplayEffect;
 class UAttributeSet;
 class UAbilitySystemComponent;
@@ -51,4 +52,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attributes)
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+
+public:
+	void AddCharacterAbilities();
+	
+	UPROPERTY(EditAnywhere, Category="Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+	virtual FVector GetCombatSocketLocation() override;
+
+	UPROPERTY(EditAnywhere, Category="Combat")
+	FName WeaponTipSocketName;
 };

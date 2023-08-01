@@ -19,6 +19,7 @@ public class GAS : ModuleRules
 			"GameplayTags",
 			"GameplayTasks",
 			"UMG",
+			"NavigationSystem",
 		});
 		
 		PrivateIncludePaths.AddRange(new string[]
@@ -30,7 +31,6 @@ public class GAS : ModuleRules
 			"GAS/Creature/",
 			"GAS/Game/",
 			"GAS/Interface/",
-			"GAS/MMC/",
 			"GAS/UI/",
 			"GAS/UI/Controller/",
 			"GAS/UI/HUD/",
