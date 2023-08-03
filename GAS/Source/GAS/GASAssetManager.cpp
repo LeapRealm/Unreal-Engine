@@ -1,5 +1,6 @@
 #include "GASAssetManager.h"
 
+#include "AbilitySystemGlobals.h"
 #include "GASGameplayTags.h"
 
 UGASAssetManager& UGASAssetManager::Get()
@@ -15,4 +16,6 @@ void UGASAssetManager::StartInitialLoading()
 	Super::StartInitialLoading();
 
 	FGASGameplayTags::InitializeNativeGameplayTags();
+
+	UAbilitySystemGlobals::Get().InitGlobalData();
 }

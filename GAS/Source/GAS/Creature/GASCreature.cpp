@@ -1,7 +1,9 @@
 #include "Creature/GASCreature.h"
 
 #include "AbilitySystemComponent.h"
+#include "GAS.h"
 #include "GASAbilitySystemComponent.h"
+#include "Components/CapsuleComponent.h"
 
 AGASCreature::AGASCreature()
 {
@@ -10,6 +12,12 @@ AGASCreature::AGASCreature()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh(), FName(TEXT("WeaponHandSocket")));
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 void AGASCreature::BeginPlay()

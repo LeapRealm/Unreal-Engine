@@ -46,6 +46,10 @@ void AGASPlayerController::SetupInputComponent()
 	if (UGASInputComponent* GASInputComponent = CastChecked<UGASInputComponent>(InputComponent))
 	{
 		GASInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGASPlayerController::Move);
+
+		GASInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AGASPlayerController::ShiftPressed);
+		GASInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AGASPlayerController::ShiftReleased);
+		
 		GASInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 	}
 }
@@ -128,7 +132,7 @@ void AGASPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	}
 	
 	// LMB
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetASC())
 			GetASC()->AbilityInputTagHeld(InputTag);
@@ -159,14 +163,11 @@ void AGASPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 			GetASC()->AbilityInputTagReleased(InputTag);
 		return;
 	}
+
+	if (GetASC())
+		GetASC()->AbilityInputTagReleased(InputTag);
 	
-	// LMB
-	if (bTargeting)
-	{
-		if (GetASC())
-			GetASC()->AbilityInputTagReleased(InputTag);
-	}
-	else
+	if (bTargeting == false && bShiftKeyDown == false)
 	{
 		APawn* ControlledPawn = GetPawn();
 		if (FollowTime <= ShortPressThreshold && ControlledPawn)
@@ -184,6 +185,7 @@ void AGASPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 			}
 		}
 		FollowTime = 0.f;
+		bTargeting = false;
 	}
 }
 

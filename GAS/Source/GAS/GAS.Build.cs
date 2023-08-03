@@ -20,6 +20,7 @@ public class GAS : ModuleRules
 			"GameplayTasks",
 			"UMG",
 			"NavigationSystem",
+			"Niagara",
 		});
 		
 		PrivateIncludePaths.AddRange(new string[]
