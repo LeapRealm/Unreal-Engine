@@ -4,7 +4,9 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Util.generated.h"
 
+class UResourceManager;
 class USceneManager;
+class UUIManager;
 
 UCLASS()
 class FRAMEWORK_API UUtil : public UBlueprintFunctionLibrary
@@ -13,5 +15,11 @@ class FRAMEWORK_API UUtil : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category="Manager")
-	static USceneManager* GetSceneManager();
+	static UResourceManager* GetResourceManager(UObject* WorldContextObject);
+	
+	UFUNCTION(BlueprintCallable, Category="Manager")
+	static USceneManager* GetSceneManager(UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable, Category="Manager")
+	static UUIManager* GetUIManager(UObject* WorldContextObject);
 };

@@ -17,6 +17,8 @@ public class Framework : ModuleRules
 			"EnhancedInput",
 			"GameplayTags",
 			"UMG",
+			"Slate",
+			"SlateCore",
 			"Niagara",
 		});
 		

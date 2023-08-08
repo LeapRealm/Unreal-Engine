@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "UObject/NoExportTypes.h"
 #include "SceneManager.generated.h"
 
 UCLASS()
