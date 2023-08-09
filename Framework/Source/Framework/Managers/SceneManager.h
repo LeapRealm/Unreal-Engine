@@ -13,5 +13,5 @@ public:
 	void ChangeScene(const FGameplayTag& SceneTag);
 
 private:
-	static FName TagToSceneName(const FGameplayTag& SceneTag);
+	FName TagToSceneName(const FGameplayTag& SceneTag);
 };

@@ -7,5 +7,7 @@ UCLASS()
 class FRAMEWORK_API UUIManager : public UObject
 {
 	GENERATED_BODY()
-	
+
+public:
+	void Clear();
 };

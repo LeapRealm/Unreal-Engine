@@ -13,6 +13,6 @@ namespace Tag
 	/*--------------------
 		   Resource
 	--------------------*/
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Blueprint_WallSconce);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Native_TestActor);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_StaticMesh_WallDoor400x300);
 }

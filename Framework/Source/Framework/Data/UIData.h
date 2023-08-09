@@ -3,17 +3,19 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
-#include "ResourceData.generated.h"
+#include "UIData.generated.h"
+
+class UUI_Base;
 
 UCLASS()
-class FRAMEWORK_API UResourceData : public UPrimaryDataAsset
+class FRAMEWORK_API UUIData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	FSoftObjectPath FindResourcePathForTag(const FGameplayTag& ResourceTag);
+	UClass* FindUIClassForTag(const FGameplayTag& UITag);
 	
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
-	TMap<FGameplayTag, TSoftObjectPtr<UObject>> ResourcePaths;
+	TMap<FGameplayTag, TSoftClassPtr<UUI_Base>> UIClasses;
 };

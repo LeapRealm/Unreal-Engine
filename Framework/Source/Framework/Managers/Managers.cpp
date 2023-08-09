@@ -1,11 +1,15 @@
 #include "Managers/Managers.h"
 
-#include "SceneManager.h"
+#include "ActorManager.h"
+#include "DataManager.h"
 #include "ResourceManager.h"
+#include "SceneManager.h"
 #include "UIManager.h"
 
 UManagers::UManagers()
 {
+	ActorManager = CreateDefaultSubobject<UActorManager>(TEXT("ActorManager"));
+	DataManager = CreateDefaultSubobject<UDataManager>(TEXT("DataManager"));
 	ResourceManager = CreateDefaultSubobject<UResourceManager>(TEXT("ResourceManager"));
 	SceneManager = CreateDefaultSubobject<USceneManager>(TEXT("SceneManager"));
 	UIManager = CreateDefaultSubobject<UUIManager>(TEXT("UIManager"));
@@ -14,8 +18,6 @@ UManagers::UManagers()
 void UManagers::Init()
 {
 	Super::Init();
-
-	ResourceManager->Init(ResourceData);
 }
 
 void UManagers::Tick(float DeltaTime)

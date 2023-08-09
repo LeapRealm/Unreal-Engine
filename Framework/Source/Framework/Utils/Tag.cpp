@@ -10,6 +10,6 @@ namespace Tag
 	/*--------------------
 	       Resource
 	--------------------*/
-	UE_DEFINE_GAMEPLAY_TAG(Asset_Blueprint_WallSconce, "Asset.Blueprint.WallSconce");
+	UE_DEFINE_GAMEPLAY_TAG(Asset_Native_TestActor, "Asset.Native.TestActor");
 	UE_DEFINE_GAMEPLAY_TAG(Asset_StaticMesh_WallDoor400x300, "Asset.StaticMesh.WallDoor400x300");
 }
