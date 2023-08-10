@@ -2,7 +2,7 @@
 
 #include "Data/ActorData.h"
 #include "Data/ResourceData.h"
-#include "..\Data\UIData.h"
+#include "Data/UIData.h"
 
 UDataManager::UDataManager()
 {

@@ -2,7 +2,6 @@
 
 #include "UIManager.h"
 #include "ActorManager.h"
-#include "ResourceManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Utils/Util.h"
 
@@ -10,7 +9,6 @@ void USceneManager::ChangeScene(const FGameplayTag& SceneTag)
 {
 	UUtil::GetUIManager(this)->Clear();
 	UUtil::GetActorManager(this)->Clear();
-	UUtil::GetResourceManager(this)->Clear();
 	
 	UGameplayStatics::OpenLevel(GetWorld(), TagToSceneName(SceneTag));
 }

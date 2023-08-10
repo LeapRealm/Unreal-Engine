@@ -32,7 +32,7 @@ void UActorManager::AddActor(AActorBase* Actor)
 	if (IsValid(Actor) == false)
 		return;
 
-	Actor->SetInstanceID(NextInstanceID++);
+	Actor->SetInstanceID(InstanceID++);
 	InstanceIDToActor.Add(Actor->GetInstanceID(), Actor);
 }
 

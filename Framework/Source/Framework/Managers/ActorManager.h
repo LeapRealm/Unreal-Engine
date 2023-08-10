@@ -26,7 +26,7 @@ private:
 	void RemoveActor(AActorBase* Actor);
 	
 private:
-	int64 NextInstanceID = 0;
+	int64 InstanceID = 0;
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<int64, TObjectPtr<AActorBase>> InstanceIDToActor;

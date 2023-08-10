@@ -8,5 +8,9 @@ UCLASS()
 class FRAMEWORK_API UUI_PopupBase : public UUI_Base
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void NativeConstruct() override;
+	virtual void RefreshUI() override { }
+	virtual void ClosePopupUI();
 };

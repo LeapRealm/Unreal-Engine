@@ -8,5 +8,8 @@ UCLASS()
 class FRAMEWORK_API UUI_SceneBase : public UUI_Base
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void NativeConstruct() override;
+	virtual void RefreshUI() override { }
 };
