@@ -1,6 +1,6 @@
 #include "Data/ActorData.h"
 
-#include "Actors/ActorBase.h"
+#include "Actor/ActorBase.h"
 
 UClass* UActorData::FindActorClassForTag(const FGameplayTag& ActorTag)
 {
