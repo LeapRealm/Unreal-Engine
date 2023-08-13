@@ -1,11 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/AssetDataEx.h"
 #include "DataManager.generated.h"
 
-class UActorData;
-class UResourceData;
-class UWidgetData;
+class UAssetDataEx;
 
 UCLASS()
 class FRAMEWORK_API UDataManager : public UObject
@@ -15,17 +14,12 @@ class FRAMEWORK_API UDataManager : public UObject
 public:
 	UDataManager();
 
-	FORCEINLINE UActorData* GetActorData() const { return ActorData; }
-	FORCEINLINE UResourceData* GetResourceData() const { return ResourceData; }
-	FORCEINLINE UWidgetData* GetWidgetData() const { return WidgetData; }
+public:
+	FORCEINLINE UClass* FindActorClassForTag(const FGameplayTag& ActorTag) const { return AssetData->FindActorClassForTag(ActorTag); }
+	FORCEINLINE FSoftObjectPath FindResourcePathForTag(const FGameplayTag& ResourceTag) const { return AssetData->FindResourcePathForTag(ResourceTag); }
+	FORCEINLINE UClass* FindWidgetClassForTag(const FGameplayTag& WidgetTag) const { return AssetData->FindWidgetClassForTag(WidgetTag); }
 	
 private:
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UActorData> ActorData;
-
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UResourceData> ResourceData;
-
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UWidgetData> WidgetData;
+	TObjectPtr<UAssetDataEx> AssetData;
 };

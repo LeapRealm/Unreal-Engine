@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "DataManager.h"
-#include "Data/ResourceData.h"
 #include "Engine/StreamableManager.h"
 #include "Util/Util.h"
 #include "Util/Define.h"
@@ -33,11 +32,10 @@ void UResourceManager::LoadAsync(const FGameplayTag& ResourceTag, TFunction<void
 		return;
 	}
 	
-	UResourceData* ResourceData = UUtil::GetDataManager(this)->GetResourceData();
-	const FSoftObjectPath& ResourcePath = ResourceData->FindResourcePathForTag(ResourceTag);
+	const FSoftObjectPath& ResourcePath = UUtil::GetDataManager(this)->FindResourcePathForTag(ResourceTag);
 	if (ResourcePath.IsValid() == false)
 	{
-		LOG_ERROR(TEXT("Can't Find Resource Path on Resource Data"));
+		LOG_ERROR(TEXT("Can't Find Resource Path on Asset Data"));
 		return;
 	}
 	

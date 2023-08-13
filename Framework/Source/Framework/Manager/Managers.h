@@ -4,9 +4,6 @@
 #include "Engine/GameInstance.h"
 #include "Managers.generated.h"
 
-class UActorData;
-class UResourceData;
-class UWidgetData;
 class UActorManager;
 class UDataManager;
 class UResourceManager;

@@ -13,7 +13,7 @@ namespace Tag
 	/*--------------------
 		   Resource
 	--------------------*/
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Native_TestActor);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_StaticMesh_Chair);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_UI_TestPopup);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Actor_TestActor);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_SkeletalMesh_Manny);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Widget_TestPopup);
 }

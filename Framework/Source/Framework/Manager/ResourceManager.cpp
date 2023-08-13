@@ -11,12 +11,11 @@ void UResourceManager::Release(const FGameplayTag& ResourceTag)
 		LOG_ERROR(TEXT("Invaild Resource Tag"));
 		return;
 	}
-
-	UResourceData* ResourceData = UUtil::GetDataManager(this)->GetResourceData();
-	const FSoftObjectPath& ResourcePath = ResourceData->FindResourcePathForTag(ResourceTag);
+	
+	const FSoftObjectPath& ResourcePath = UUtil::GetDataManager(this)->FindResourcePathForTag(ResourceTag);
 	if (ResourcePath.IsValid() == false)
 	{
-		LOG_ERROR(TEXT("Can't Find Resource Path on Resource Data"));
+		LOG_ERROR(TEXT("Can't Find Resource Path on Asset Data"));
 		return;
 	}
 

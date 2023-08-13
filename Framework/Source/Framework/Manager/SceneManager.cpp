@@ -7,7 +7,7 @@
 
 void USceneManager::ChangeScene(const FGameplayTag& SceneTag)
 {
-	UUtil::GetUIManager(this)->Clear();
+	UUtil::GetWidgetManager(this)->Clear();
 	UUtil::GetActorManager(this)->Clear();
 	
 	UGameplayStatics::OpenLevel(GetWorld(), TagToSceneName(SceneTag));

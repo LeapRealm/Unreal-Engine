@@ -12,5 +12,5 @@ void UWidget_PopupBase::NativeConstruct()
 
 void UWidget_PopupBase::ClosePopupUI()
 {
-	UUtil::GetUIManager(this)->ClosePopupUI(this);
+	UUtil::GetWidgetManager(this)->ClosePopupWidget(this);
 }

@@ -12,7 +12,8 @@ class FRAMEWORK_API AActorBase : public AActor
 public:	
 	AActorBase();
 
-	FORCEINLINE int64 GetInstanceID() { return InstanceID; }
+public:
+	FORCEINLINE int64 GetInstanceID() const { return InstanceID; }
 	FORCEINLINE void SetInstanceID(int64 InInstanceID) { InstanceID = InInstanceID; }
 
 private:

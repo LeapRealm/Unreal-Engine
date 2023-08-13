@@ -10,7 +10,7 @@ namespace Tag
 	/*--------------------
 	       Resource
 	--------------------*/
-	UE_DEFINE_GAMEPLAY_TAG(Asset_Native_TestActor, "Asset.Native.TestActor");
-	UE_DEFINE_GAMEPLAY_TAG(Asset_StaticMesh_Chair, "Asset.StaticMesh.Chair");
-	UE_DEFINE_GAMEPLAY_TAG(Asset_UI_TestPopup, "Asset.UI.TestPopup");
+	UE_DEFINE_GAMEPLAY_TAG(Asset_Actor_TestActor, "Asset.Actor.TestActor");
+	UE_DEFINE_GAMEPLAY_TAG(Asset_SkeletalMesh_Manny, "Asset.SkeletalMesh.Manny");
+	UE_DEFINE_GAMEPLAY_TAG(Asset_Widget_TestPopup, "Asset.Widget.TestPopup");
 }

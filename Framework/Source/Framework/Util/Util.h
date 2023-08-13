@@ -33,5 +33,5 @@ public:
 	static USceneManager* GetSceneManager(UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, Category="Manager")
-	static UWidgetManager* GetUIManager(UObject* WorldContextObject);
+	static UWidgetManager* GetWidgetManager(UObject* WorldContextObject);
 };

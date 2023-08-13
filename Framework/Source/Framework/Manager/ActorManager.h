@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "DataManager.h"
 #include "GameplayTagContainer.h"
-#include "Data/ActorData.h"
+#include "Data/AssetDataEx.h"
 #include "Util/Define.h"
 #include "Util/Util.h"
 #include "ActorManager.generated.h"
@@ -40,12 +40,11 @@ T* UActorManager::SpawnActor(const FGameplayTag& ActorTag, const FVector& Locati
 		LOG_ERROR(TEXT("Invaild Actor Tag"));
 		return nullptr;
 	}
-
-	UActorData* ActorData = UUtil::GetDataManager(this)->GetActorData();
-	UClass* ActorClass = ActorData->FindActorClassForTag(ActorTag);
+	
+	UClass* ActorClass = UUtil::GetDataManager(this)->FindActorClassForTag(ActorTag);
 	if (ActorClass == nullptr)
 	{
-		LOG_ERROR(TEXT("Can't Find Actor Class on Actor Data"));
+		LOG_ERROR(TEXT("Can't Find Actor Class on Asset Data"));
 		return nullptr;
 	}
 

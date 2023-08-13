@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "DataManager.h"
-#include "Data/WidgetData.h"
 #include "Util/Define.h"
 #include "Util/Util.h"
 #include "GameplayTagContainer.h"
@@ -21,15 +20,15 @@ class FRAMEWORK_API UWidgetManager : public UObject
 
 public:
 	template<typename T>
-	T* ShowSceneUI(const FGameplayTag& UITag);
+	T* ShowSceneWidget(const FGameplayTag& WidgetTag);
 
 	template<typename T>
-	T* ShowPopupUI(const FGameplayTag& UITag);
+	T* ShowPopupWidget(const FGameplayTag& WidgetTag);
 	
-	UWidget_PopupBase* PeekPopupUI();
-	void ClosePopupUI(UWidget_PopupBase* Popup);
-	void ClosePopupUI();
-	void CloseAllPopupUI();
+	UWidget_PopupBase* PeekPopupWidget();
+	void ClosePopupWidget(UWidget_PopupBase* Popup);
+	void ClosePopupWidget();
+	void CloseAllPopupWidget();
 	void Clear();
 
 private:
@@ -37,54 +36,52 @@ private:
 	int32 popupOrder = 1;
 	
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UWidget_SceneBase> SceneUI;
+	TObjectPtr<UWidget_SceneBase> SceneWidget;
 	
 	UPROPERTY(VisibleAnywhere)
 	TArray<TObjectPtr<UWidget_PopupBase>> popupStack;
 };
 
 template <typename T>
-T* UWidgetManager::ShowSceneUI(const FGameplayTag& UITag)
+T* UWidgetManager::ShowSceneWidget(const FGameplayTag& WidgetTag)
 {
-	if (UITag.IsValid() == false)
+	if (WidgetTag.IsValid() == false)
 	{
-		LOG_ERROR(TEXT("Invaild UI Tag"));
+		LOG_ERROR(TEXT("Invaild Widget Tag"));
+		return nullptr;
+	}
+	
+	const UClass* WidgetClass = UUtil::GetDataManager(this)->FindWidgetClassForTag(WidgetTag);
+	if (WidgetClass == nullptr)
+	{
+		LOG_ERROR(TEXT("Can't Find Widget Class on Asset Data"));
 		return nullptr;
 	}
 
-	UWidgetData* UIData = UUtil::GetDataManager(this)->GetWidgetData();
-	const UClass* UIClass = UIData->FindWidgetClassForTag(UITag);
-	if (UIClass == nullptr)
-	{
-		LOG_ERROR(TEXT("Can't Find UI Class on UI Data"));
-		return nullptr;
-	}
-
-	T* Widget = CreateWidget<T>(GetWorld(), UIClass);
+	T* Widget = CreateWidget<T>(GetWorld(), WidgetClass);
 	Widget->AddToViewport(0);
-	SceneUI = Widget;
+	SceneWidget = Widget;
 
 	return Widget;
 }
 
 template <typename T>
-T* UWidgetManager::ShowPopupUI(const FGameplayTag& UITag)
+T* UWidgetManager::ShowPopupWidget(const FGameplayTag& WidgetTag)
 {
-	if (UITag.IsValid() == false)
+	if (WidgetTag.IsValid() == false)
 	{
-		LOG_ERROR(TEXT("Invaild UI Tag"));
+		LOG_ERROR(TEXT("Invaild Widget Tag"));
 		return nullptr;
 	}
 
-	UWidgetData* UIData = UUtil::GetDataManager(this)->GetWidgetData();
-	UClass* UIClass = UIData->FindWidgetClassForTag(UITag);
-	if (UIClass == nullptr)
+	UClass* WidgetClass = UUtil::GetDataManager(this)->FindWidgetClassForTag(WidgetTag);
+	if (WidgetClass == nullptr)
 	{
-		LOG_ERROR(TEXT("Can't Find UI Class on UI Data"));
+		LOG_ERROR(TEXT("Can't Find Widget Class on Asset Data"));
 		return nullptr;
 	}
 
-	T* Widget = CreateWidget<T>(GetWorld(), TSubclassOf<T>(UIClass));
+	T* Widget = CreateWidget<T>(GetWorld(), TSubclassOf<T>(WidgetClass));
 	Widget->AddToViewport(popupOrder++);
 	popupStack.Push(Widget);
 

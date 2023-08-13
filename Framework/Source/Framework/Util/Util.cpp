@@ -38,9 +38,9 @@ USceneManager* UUtil::GetSceneManager(UObject* WorldContextObject)
 	return SceneManager;
 }
 
-UWidgetManager* UUtil::GetUIManager(UObject* WorldContextObject)
+UWidgetManager* UUtil::GetWidgetManager(UObject* WorldContextObject)
 {
-	UWidgetManager* UIManager = GetManagers(WorldContextObject)->GetWidgetManager();
-	check(UIManager);
-	return UIManager;
+	UWidgetManager* WidgetManager = GetManagers(WorldContextObject)->GetWidgetManager();
+	check(WidgetManager);
+	return WidgetManager;
 }

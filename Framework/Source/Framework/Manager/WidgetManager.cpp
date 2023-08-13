@@ -4,28 +4,28 @@
 #include "Widget/Popup/Widget_PopupBase.h"
 #include "Widget/Scene/Widget_SceneBase.h"
 
-UWidget_PopupBase* UWidgetManager::PeekPopupUI()
+UWidget_PopupBase* UWidgetManager::PeekPopupWidget()
 {
 	if (popupStack.Num() == 0)
 		return nullptr;
 	return popupStack.Top();
 }
 
-void UWidgetManager::ClosePopupUI(UWidget_PopupBase* Popup)
+void UWidgetManager::ClosePopupWidget(UWidget_PopupBase* Popup)
 {
 	if (popupStack.Num() == 0)
 		return;
 
 	if (popupStack.Top() != Popup)
 	{
-		LOG_ERROR(TEXT("Can't Close Popup"))
+		LOG_ERROR(TEXT("Can't Close Popup Widget"))
 		return;
 	}
 
-	ClosePopupUI();
+	ClosePopupWidget();
 }
 
-void UWidgetManager::ClosePopupUI()
+void UWidgetManager::ClosePopupWidget()
 {
 	if (popupStack.Num() == 0)
 		return;
@@ -35,19 +35,19 @@ void UWidgetManager::ClosePopupUI()
 	popupOrder--;
 }
 
-void UWidgetManager::CloseAllPopupUI()
+void UWidgetManager::CloseAllPopupWidget()
 {
 	while (popupStack.Num() > 0)
-		ClosePopupUI();
+		ClosePopupWidget();
 }
 
 void UWidgetManager::Clear()
 {
-	CloseAllPopupUI();
+	CloseAllPopupWidget();
 
-	if (SceneUI)
+	if (SceneWidget)
 	{
-		SceneUI->RemoveFromParent();
-		SceneUI = nullptr;
+		SceneWidget->RemoveFromParent();
+		SceneWidget = nullptr;
 	}
 }
