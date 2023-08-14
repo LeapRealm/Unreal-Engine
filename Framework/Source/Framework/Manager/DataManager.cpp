@@ -1,6 +1,6 @@
 #include "Manager/DataManager.h"
 
-#include "..\Data\AssetDataEx.h"
+#include "Data/AssetDataEx.h"
 
 UDataManager::UDataManager()
 {

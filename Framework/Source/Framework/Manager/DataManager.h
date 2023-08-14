@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Data/AssetDataEx.h"
+#include "Data/GameData.h"
 #include "DataManager.generated.h"
 
 class UAssetDataEx;
@@ -15,11 +16,15 @@ public:
 	UDataManager();
 
 public:
-	FORCEINLINE UClass* FindActorClassForTag(const FGameplayTag& ActorTag) const { return AssetData->FindActorClassForTag(ActorTag); }
-	FORCEINLINE FSoftObjectPath FindResourcePathForTag(const FGameplayTag& ResourceTag) const { return AssetData->FindResourcePathForTag(ResourceTag); }
-	FORCEINLINE UClass* FindWidgetClassForTag(const FGameplayTag& WidgetTag) const { return AssetData->FindWidgetClassForTag(WidgetTag); }
+	UClass* FindObjectClassForTag(const FGameplayTag& ObjectTag) const { return AssetData->FindObjectClassForTag(ObjectTag); }
+	FSoftObjectPath FindResourcePathForTag(const FGameplayTag& ResourceTag) const { return AssetData->FindResourcePathForTag(ResourceTag); }
+	UClass* FindWidgetClassForTag(const FGameplayTag& WidgetTag) const { return AssetData->FindWidgetClassForTag(WidgetTag); }
+	const TMap<FGameplayTag, FStatData>& GetInitialStats() const { return GameData->GetInitialStats(); }
 	
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAssetDataEx> AssetData;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UGameData> GameData;
 };

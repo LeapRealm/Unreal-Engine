@@ -1,11 +1,10 @@
 #include "AssetDataEx.h"
 
-#include "Actor/ActorBase.h"
 #include "Widget/Widget_Base.h"
 
-UClass* UAssetDataEx::FindActorClassForTag(const FGameplayTag& ActorTag) const
+UClass* UAssetDataEx::FindObjectClassForTag(const FGameplayTag& ObjectTag) const
 {
-	const TSoftClassPtr<AActorBase>* ClassPtr = ActorClasses.Find(ActorTag);
+	const TSoftClassPtr<UObject>* ClassPtr = ObjectClasses.Find(ObjectTag);
 	if (ClassPtr == nullptr)
 		return nullptr;
 	

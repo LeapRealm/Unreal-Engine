@@ -5,7 +5,6 @@
 #include "Util.generated.h"
 
 class UManagers;
-class UActorManager;
 class UDataManager;
 class UResourceManager;
 class USceneManager;
@@ -19,9 +18,6 @@ class FRAMEWORK_API UUtil : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, Category="Manager")
 	static UManagers* GetManagers(UObject* WorldContextObject);
-	
-	UFUNCTION(BlueprintCallable, Category="Manager")
-	static UActorManager* GetActorManager(UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, Category="Manager")
 	static UDataManager* GetDataManager(UObject* WorldContextObject);

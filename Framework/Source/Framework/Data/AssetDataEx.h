@@ -5,22 +5,21 @@
 #include "Engine/DataAsset.h"
 #include "AssetDataEx.generated.h"
 
-class AActorBase;
 class UWidget_Base;
 
 UCLASS()
-class FRAMEWORK_API UAssetDataEx : public UPrimaryDataAsset
+class FRAMEWORK_API UAssetDataEx : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UClass* FindActorClassForTag(const FGameplayTag& ActorTag) const;
+	UClass* FindObjectClassForTag(const FGameplayTag& ObjectTag) const;
 	FSoftObjectPath FindResourcePathForTag(const FGameplayTag& ResourceTag) const;
 	UClass* FindWidgetClassForTag(const FGameplayTag& WidgetTag) const;
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
-	TMap<FGameplayTag, TSoftClassPtr<AActorBase>> ActorClasses;
+	TMap<FGameplayTag, TSoftClassPtr<UObject>> ObjectClasses;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	TMap<FGameplayTag, TSoftObjectPtr<UObject>> ResourcePaths;

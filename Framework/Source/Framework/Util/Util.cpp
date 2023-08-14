@@ -10,13 +10,6 @@ UManagers* UUtil::GetManagers(UObject* WorldContextObject)
 	return Managers;
 }
 
-UActorManager* UUtil::GetActorManager(UObject* WorldContextObject)
-{
-	UActorManager* ActorManager = GetManagers(WorldContextObject)->GetActorManager();
-	check(ActorManager);
-	return ActorManager;
-}
-
 UDataManager* UUtil::GetDataManager(UObject* WorldContextObject)
 {
 	UDataManager* DataManager = GetManagers(WorldContextObject)->GetDataManager();

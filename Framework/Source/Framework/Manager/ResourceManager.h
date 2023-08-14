@@ -17,6 +17,10 @@ class FRAMEWORK_API UResourceManager : public UObject
 public:
 	template<typename T>
 	void LoadAsync(const FGameplayTag& ResourceTag, TFunction<void(T*)> Callback, bool bAutoRelease = true);
+
+	template<typename T>
+	T* LoadSync(const FGameplayTag& ResourceTag, bool bAutoRelease = true);
+	
 	void Release(const FGameplayTag& ResourceTag);
 
 private:
@@ -55,4 +59,29 @@ void UResourceManager::LoadAsync(const FGameplayTag& ResourceTag, TFunction<void
 		}
 		Callback(Cast<T>(Object));
 	}, FStreamableManager::DefaultAsyncLoadPriority, !bAutoRelease);
+}
+
+template <typename T>
+T* UResourceManager::LoadSync(const FGameplayTag& ResourceTag, bool bAutoRelease)
+{
+	if (ResourceTag.IsValid() == false)
+	{
+		LOG_ERROR(TEXT("Invaild Resource Tag"));
+		return nullptr;
+	}
+	
+	const FSoftObjectPath& ResourcePath = UUtil::GetDataManager(this)->FindResourcePathForTag(ResourceTag);
+	if (ResourcePath.IsValid() == false)
+	{
+		LOG_ERROR(TEXT("Can't Find Resource Path on Asset Data"));
+		return nullptr;
+	}
+	
+	if (UObject* Resource = ResourcePath.ResolveObject())
+	{
+		return Cast<T>(Resource);
+	}
+
+	TSharedPtr<FStreamableHandle> Handle = StreamableManager.RequestSyncLoad(ResourcePath, !bAutoRelease);
+	return Cast<T>(Handle->GetLoadedAsset());
 }

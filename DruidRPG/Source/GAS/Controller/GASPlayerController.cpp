@@ -185,7 +185,6 @@ void AGASPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 			}
 		}
 		FollowTime = 0.f;
-		bTargeting = false;
 	}
 }
 
