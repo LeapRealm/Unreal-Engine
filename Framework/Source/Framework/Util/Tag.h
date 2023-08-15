@@ -23,6 +23,8 @@ namespace Tag
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_SkeletalMesh_Skeleton);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_AnimBP_Skeleton);
+	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Widget_Nameplate);
 
 	/*--------------------
 			Skill

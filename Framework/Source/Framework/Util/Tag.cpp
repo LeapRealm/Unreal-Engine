@@ -21,6 +21,8 @@ namespace Tag
 	UE_DEFINE_GAMEPLAY_TAG(Asset_SkeletalMesh_Skeleton, "Asset.SkeletalMesh.Skeleton");
 	UE_DEFINE_GAMEPLAY_TAG(Asset_AnimBP_Skeleton, "Asset.AnimBP.Skeleton");
 	
+	UE_DEFINE_GAMEPLAY_TAG(Asset_Widget_Nameplate, "Asset.Widget.Nameplate");
+	
 	/*--------------------
 			Skill
 	--------------------*/

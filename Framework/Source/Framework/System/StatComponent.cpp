@@ -21,11 +21,6 @@ void UStatComponent::Init(const FGameplayTag& CreatureTag)
 	Stats = InitialStatData.InitialStats;
 }
 
-FOnChangedStatData& UStatComponent::GetDelegate(const FGameplayTag& StatTag)
-{
-	return Delegates.FindOrAdd(StatTag);
-}
-
 FStatData UStatComponent::GetStat(const FGameplayTag& StatTag)
 {
 	if (StatTag.IsValid() == false)
@@ -77,7 +72,7 @@ void UStatComponent::AddValue(const FGameplayTag& StatTag, float Value)
 	StatData->Value = FMath::Clamp(StatData->Value + Value, StatData->MinValue, StatData->MaxValue);
 	
 	if (FOnChangedStatData* OnChangedStatData = Delegates.Find(StatTag))
-		(*OnChangedStatData).Broadcast((*StatData));
+		(*OnChangedStatData).Broadcast(StatTag, (*StatData));
 }
 
 void UStatComponent::AddMinValue(const FGameplayTag& StatTag, float Value)
@@ -99,7 +94,7 @@ void UStatComponent::AddMinValue(const FGameplayTag& StatTag, float Value)
 	StatData->Value = FMath::Max(StatData->MinValue, StatData->Value);
 
 	if (FOnChangedStatData* OnChangedStatData = Delegates.Find(StatTag))
-		(*OnChangedStatData).Broadcast((*StatData));
+		(*OnChangedStatData).Broadcast(StatTag, (*StatData));
 }
 
 void UStatComponent::AddMaxValue(const FGameplayTag& StatTag, float Value)
@@ -121,5 +116,5 @@ void UStatComponent::AddMaxValue(const FGameplayTag& StatTag, float Value)
 	StatData->Value = FMath::Min(StatData->Value, StatData->MaxValue);
 	
 	if (FOnChangedStatData* OnChangedStatData = Delegates.Find(StatTag))
-		(*OnChangedStatData).Broadcast((*StatData));
+		(*OnChangedStatData).Broadcast(StatTag, (*StatData));
 }

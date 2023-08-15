@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "StatComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangedStatData, const FStatData&)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChangedStatData, const FGameplayTag&, const FStatData&)
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class FRAMEWORK_API UStatComponent : public UActorComponent
@@ -19,7 +19,8 @@ public:
 public:
 	void Init(const FGameplayTag& CreatureTag);
 
-	FOnChangedStatData& GetDelegate(const FGameplayTag& StatTag);
+	template <typename UserClass, typename FuncType>
+	void AddDelegate(const FGameplayTag& StatTag, UserClass* Object, FuncType Func);
 	
 	FStatData GetStat(const FGameplayTag& StatTag);
 	float GetValue(const FGameplayTag& StatTag);
@@ -34,3 +35,11 @@ private:
 	TMap<FGameplayTag, FStatData> Stats;
 	TMap<FGameplayTag, FOnChangedStatData> Delegates;
 };
+
+template <typename UserClass, typename FuncType>
+void UStatComponent::AddDelegate(const FGameplayTag& StatTag, UserClass* Object, FuncType Func)
+{
+	FOnChangedStatData& Delegate = Delegates.FindOrAdd(StatTag);
+	Delegate.AddUObject(Object, Func);
+	(Object->*Func)(StatTag, GetStat(StatTag));
+}
