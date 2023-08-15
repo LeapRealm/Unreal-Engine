@@ -21,15 +21,15 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 public:
-	UDataManager* GetDataManager() const { return DataManager; }
-	UResourceManager* GetResourceManager() const { return ResourceManager; }
-	USceneManager* GetSceneManager() const { return SceneManager; }
-	UWidgetManager* GetWidgetManager() const { return WidgetManager; }
+	FORCEINLINE UDataManager* GetDataManager() const { return DataManager; }
+	FORCEINLINE UResourceManager* GetResourceManager() const { return ResourceManager; }
+	FORCEINLINE USceneManager* GetSceneManager() const { return SceneManager; }
+	FORCEINLINE UWidgetManager* GetWidgetManager() const { return WidgetManager; }
 	
-	virtual TStatId GetStatId() const override { return Super::GetStatID(); }
-	virtual UWorld* GetTickableGameObjectWorld() const override { return GetWorld(); }
-	virtual ETickableTickType GetTickableTickType() const override { return IsTemplate() ? ETickableTickType::Never : FTickableGameObject::GetTickableTickType(); }
-	virtual bool IsAllowedToTick() const override { return IsTemplate() == false; }
+	FORCEINLINE virtual TStatId GetStatId() const override { return Super::GetStatID(); }
+	FORCEINLINE virtual UWorld* GetTickableGameObjectWorld() const override { return GetWorld(); }
+	FORCEINLINE virtual ETickableTickType GetTickableTickType() const override { return IsTemplate() ? ETickableTickType::Never : FTickableGameObject::GetTickableTickType(); }
+	FORCEINLINE virtual bool IsAllowedToTick() const override { return IsTemplate() == false; }
 
 private:
 	UPROPERTY(BlueprintReadOnly, Category="Manager", meta=(AllowPrivateAccess="true"))

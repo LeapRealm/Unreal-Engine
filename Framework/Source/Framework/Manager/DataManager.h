@@ -5,8 +5,6 @@
 #include "Data/GameData.h"
 #include "DataManager.generated.h"
 
-class UAssetDataEx;
-
 UCLASS()
 class FRAMEWORK_API UDataManager : public UObject
 {
@@ -16,10 +14,10 @@ public:
 	UDataManager();
 
 public:
-	UClass* FindObjectClassForTag(const FGameplayTag& ObjectTag) const { return AssetData->FindObjectClassForTag(ObjectTag); }
-	FSoftObjectPath FindResourcePathForTag(const FGameplayTag& ResourceTag) const { return AssetData->FindResourcePathForTag(ResourceTag); }
-	UClass* FindWidgetClassForTag(const FGameplayTag& WidgetTag) const { return AssetData->FindWidgetClassForTag(WidgetTag); }
-	const TMap<FGameplayTag, FStatData>& GetInitialStats() const { return GameData->GetInitialStats(); }
+	FORCEINLINE UClass* FindObjectClassForTag(const FGameplayTag& ObjectTag) const { return AssetData->FindObjectClassForTag(ObjectTag); }
+	FORCEINLINE UClass* FindWidgetClassForTag(const FGameplayTag& WidgetTag) const { return AssetData->FindWidgetClassForTag(WidgetTag); }
+	FORCEINLINE FSoftObjectPath FindResourcePathForTag(const FGameplayTag& ResourceTag) const { return AssetData->FindResourcePathForTag(ResourceTag); }
+	FORCEINLINE const FInitialStatData& FindInitialStat(const FGameplayTag& CreatureTag) const { return GameData->FindInitialStat(CreatureTag); }
 	
 private:
 	UPROPERTY(VisibleAnywhere)

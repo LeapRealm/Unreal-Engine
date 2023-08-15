@@ -1,16 +1,20 @@
 #include "Creature/CreatureBase.h"
 
+#include "System/SkillComponent.h"
+#include "System/StatComponent.h"
+
 ACreatureBase::ACreatureBase()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+
+	StatComponent = CreateDefaultSubobject<UStatComponent>(TEXT("StatComponent"));
+	SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
 }
 
-void ACreatureBase::BeginPlay()
+void ACreatureBase::PostInitializeComponents()
 {
-	Super::BeginPlay();
-}
+	Super::PostInitializeComponents();
 
-void ACreatureBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	check(CreatureTag.IsValid());
+	StatComponent->Init(CreatureTag);
 }

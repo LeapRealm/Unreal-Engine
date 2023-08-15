@@ -1,19 +1,24 @@
 #include "System/StatComponent.h"
 
 #include "Manager/DataManager.h"
-#include "Util/Util.h"
 #include "Util/Define.h"
+#include "Util/Util.h"
 
 UStatComponent::UStatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UStatComponent::InitializeComponent()
+void UStatComponent::Init(const FGameplayTag& CreatureTag)
 {
-	Super::InitializeComponent();
+	if (CreatureTag.IsValid() == false)
+	{
+		LOG_ERROR(TEXT("Invaild CreatureTag"));
+		return;
+	}
 
-	LoadStats();
+	const FInitialStatData& InitialStatData = UUtil::GetDataManager(this)->FindInitialStat(CreatureTag);
+	Stats = InitialStatData.InitialStats;
 }
 
 FOnChangedStatData& UStatComponent::GetDelegate(const FGameplayTag& StatTag)
@@ -117,9 +122,4 @@ void UStatComponent::AddMaxValue(const FGameplayTag& StatTag, float Value)
 	
 	if (FOnChangedStatData* OnChangedStatData = Delegates.Find(StatTag))
 		(*OnChangedStatData).Broadcast((*StatData));
-}
-
-void UStatComponent::LoadStats()
-{
-	Stats = UUtil::GetDataManager(this)->GetInitialStats();
 }

@@ -9,10 +9,15 @@
 
 APlayerBase::APlayerBase()
 {
+	PrimaryActorTick.bCanEverTick = false;
+
+	CreatureTag = Tag::Creature_Player;
+	
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -88.f), FRotator(0.f, -90.f, 0.f));
 	
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComponent->SetupAttachment(GetRootComponent());
+	SpringArmComponent->bDoCollisionTest = false;
 	SpringArmComponent->TargetArmLength = 750.f;
 	SpringArmComponent->SetRelativeRotation((FRotator(-45.f, 0.f, 0.f)));
 	SpringArmComponent->bUsePawnControlRotation = false;
@@ -26,7 +31,7 @@ APlayerBase::APlayerBase()
 	CameraComponent->bUsePawnControlRotation = false;
 	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 800.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
@@ -42,6 +47,6 @@ void APlayerBase::PostInitializeComponents()
 	UUtil::GetResourceManager(this)->LoadAsync<USkeletalMesh>(Tag::Asset_SkeletalMesh_Player, [this](USkeletalMesh* SkeletalMesh)
 	{
 		GetMesh()->SetSkeletalMesh(SkeletalMesh);
-		GetMesh()->SetAnimClass(UUtil::GetDataManager(this)->FindObjectClassForTag(Tag::Asset_AnimBP_Player));
+		GetMesh()->SetAnimInstanceClass(UUtil::GetDataManager(this)->FindObjectClassForTag(Tag::Asset_AnimBP_Player));
 	});
 }

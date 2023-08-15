@@ -17,9 +17,8 @@ public:
 	UStatComponent();
 
 public:
-	virtual void InitializeComponent() override;
-	
-public:
+	void Init(const FGameplayTag& CreatureTag);
+
 	FOnChangedStatData& GetDelegate(const FGameplayTag& StatTag);
 	
 	FStatData GetStat(const FGameplayTag& StatTag);
@@ -30,9 +29,6 @@ public:
 	void AddValue(const FGameplayTag& StatTag, float Value);
 	void AddMinValue(const FGameplayTag& StatTag, float Value);
 	void AddMaxValue(const FGameplayTag& StatTag, float Value);
-
-private:
-	void LoadStats();
 	
 private:
 	TMap<FGameplayTag, FStatData> Stats;

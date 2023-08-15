@@ -4,8 +4,13 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "MonsterBase.h"
+#include "PlayerBase.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
 #include "Interface/TargetInterface.h"
 #include "Manager/ResourceManager.h"
+#include "System/SkillComponent.h"
 #include "Util/Tag.h"
 #include "Util/Util.h"
 
@@ -15,8 +20,25 @@ void APlayerControllerBase::PostInitializeComponents()
 
 	DefaultMappingContext	= UUtil::GetResourceManager(this)->LoadSync<UInputMappingContext>(Tag::Asset_Input_DefaultMappingContext);
 	MoveKeyboardAction		= UUtil::GetResourceManager(this)->LoadSync<UInputAction>(Tag::Asset_Input_MoveKeyboardAction);
-	MoveMouseAction			= UUtil::GetResourceManager(this)->LoadSync<UInputAction>(Tag::Asset_Input_MoveMouseAction);
+	LeftMouseAction			= UUtil::GetResourceManager(this)->LoadSync<UInputAction>(Tag::Asset_Input_LeftMouseAction);
 	HoldAction				= UUtil::GetResourceManager(this)->LoadSync<UInputAction>(Tag::Asset_Input_HoldAction);
+}
+
+void APlayerControllerBase::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
+	{
+		EnhancedInputComponent->BindAction(MoveKeyboardAction, ETriggerEvent::Triggered, this, &APlayerControllerBase::MoveKeyboard);
+		
+		EnhancedInputComponent->BindAction(LeftMouseAction, ETriggerEvent::Started, this, &APlayerControllerBase::LeftMousePressed);
+		EnhancedInputComponent->BindAction(LeftMouseAction, ETriggerEvent::Triggered, this, &APlayerControllerBase::LeftMouseHeld);
+		EnhancedInputComponent->BindAction(LeftMouseAction, ETriggerEvent::Completed, this, &APlayerControllerBase::LeftMouseReleased);
+		
+		EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Started, this, &APlayerControllerBase::HoldPressed);
+		EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Completed, this, &APlayerControllerBase::HoldReleased);
+	}
 }
 
 void APlayerControllerBase::BeginPlay()
@@ -43,23 +65,6 @@ void APlayerControllerBase::Tick(float DeltaSeconds)
 	AutoRunning();
 }
 
-void APlayerControllerBase::SetupInputComponent()
-{
-	Super::SetupInputComponent();
-
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
-	{
-		EnhancedInputComponent->BindAction(MoveKeyboardAction, ETriggerEvent::Triggered, this, &APlayerControllerBase::MoveKeyboard);
-		
-		EnhancedInputComponent->BindAction(MoveMouseAction, ETriggerEvent::Started, this, &APlayerControllerBase::MoveMousePressed);
-		EnhancedInputComponent->BindAction(MoveMouseAction, ETriggerEvent::Triggered, this, &APlayerControllerBase::MoveMouseHeld);
-		EnhancedInputComponent->BindAction(MoveMouseAction, ETriggerEvent::Completed, this, &APlayerControllerBase::MoveMouseReleased);
-		
-		EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Started, this, &APlayerControllerBase::HoldPressed);
-		EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Completed, this, &APlayerControllerBase::HoldReleased);
-	}
-}
-
 void APlayerControllerBase::MoveKeyboard(const FInputActionValue& Value)
 {
 	const FVector2D InputVector = Value.Get<FVector2D>();
@@ -70,45 +75,68 @@ void APlayerControllerBase::MoveKeyboard(const FInputActionValue& Value)
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	if (APawn* ControlledPawn = GetPawn())
+	if (APlayerBase* PlayerBase = Cast<APlayerBase>(GetCharacter()))
 	{
-		ControlledPawn->AddMovementInput(ForwardDirection, InputVector.X);
-		ControlledPawn->AddMovementInput(RightDirection, InputVector.Y);
+		bAutoMoving = false;
+		PlayerBase->AddMovementInput(ForwardDirection, InputVector.X);
+		PlayerBase->AddMovementInput(RightDirection, InputVector.Y);
 	}
 }
 
-void APlayerControllerBase::MoveMousePressed(const FInputActionValue& Value)
+void APlayerControllerBase::LeftMousePressed(const FInputActionValue& Value)
 {
-	bAutoRunning = false;
+	PressTime = 0.f;
+	bAutoMoving = false;
+	bShouldAttacking = false;
 }
 
-void APlayerControllerBase::MoveMouseHeld(const FInputActionValue& Value)
+void APlayerControllerBase::LeftMouseHeld(const FInputActionValue& Value)
 {
-	if (bHoldKeyDown)
-		return;
-	
 	PressTime += GetWorld()->GetDeltaSeconds();
 
-	FHitResult HitResult;
-	if (GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
-		Destination = HitResult.ImpactPoint;
-
-	if (APawn* ControlledPawn = GetPawn())
+	if (TargetActor || bHoldKeyDown)
+		return;
+	
+	if (APlayerBase* PlayerBase = Cast<APlayerBase>(GetCharacter()))
 	{
-		const FVector WorldDirection = (Destination - ControlledPawn->GetActorLocation()).GetSafeNormal();
-		ControlledPawn->AddMovementInput(WorldDirection);
+		FHitResult HitResult;
+		if (GetHitResultUnderCursor(ECC_GameTraceChannel1, false, HitResult))
+		{
+			Destination = HitResult.ImpactPoint + FVector(0.f, 0.f, PlayerBase->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+			const FVector WorldDirection = (Destination - PlayerBase->GetActorLocation()).GetSafeNormal();
+			PlayerBase->AddMovementInput(WorldDirection);
+		}
 	}
 }
 
-void APlayerControllerBase::MoveMouseReleased(const FInputActionValue& Value)
+void APlayerControllerBase::LeftMouseReleased(const FInputActionValue& Value)
 {
-	if (bHoldKeyDown)
+	if (PressTime > PressThreshold)
 		return;
 	
-	APawn* ControlledPawn = GetPawn();
-	if (PressTime <= ShortPressThreshold && ControlledPawn)
-		bAutoRunning = true;
-	PressTime = 0.f;
+	if (bHoldKeyDown)
+	{
+		if (APlayerBase* PlayerBase = Cast<APlayerBase>(GetCharacter()))
+		{
+			if (USkillComponent* SkillComponent = PlayerBase->GetSkillComponent())
+				SkillComponent->Execute(Tag::Asset_Skill_Slash);
+		}
+	}
+	else
+	{
+		if (AMonsterBase* MonsterBase = Cast<AMonsterBase>(TargetActor))
+		{
+			bAutoMoving = true;
+			bShouldAttacking = true;
+			Destination = MonsterBase->GetActorLocation();
+			AutoRunAcceptanceRadius = 150.f;
+		}
+		else
+		{
+			bAutoMoving = true;
+			AutoRunAcceptanceRadius = 50.f;
+		}
+	}
 }
 
 void APlayerControllerBase::TickCursorTrace()
@@ -116,7 +144,7 @@ void APlayerControllerBase::TickCursorTrace()
 	FHitResult HitResult;
 	if (GetHitResultUnderCursor(ECC_Visibility, false, OUT HitResult) == false)
 		return;
-
+	
 	ITargetInterface* NewTargetActor = Cast<ITargetInterface>(HitResult.GetActor());
 	if (NewTargetActor)
 	{
@@ -144,5 +172,26 @@ void APlayerControllerBase::TickCursorTrace()
 
 void APlayerControllerBase::AutoRunning()
 {
-	
+	if (bAutoMoving == false)
+		return;
+
+	if (APlayerBase* PlayerBase = Cast<APlayerBase>(GetCharacter()))
+	{
+		const FVector WorldDirection = (Destination - PlayerBase->GetActorLocation()).GetSafeNormal();
+		PlayerBase->AddMovementInput(WorldDirection);
+
+		const float DistanceToDestination = (Destination - PlayerBase->GetActorLocation()).Length();
+		if (DistanceToDestination <= AutoRunAcceptanceRadius)
+		{
+			bAutoMoving = false;
+
+			if (bShouldAttacking)
+			{
+				if (USkillComponent* SkillComponent = PlayerBase->GetSkillComponent())
+					SkillComponent->Execute(Tag::Asset_Skill_Slash);
+				
+				bShouldAttacking = false;
+			}
+		}
+	}
 }
