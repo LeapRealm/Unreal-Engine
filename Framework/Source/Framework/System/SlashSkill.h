@@ -10,5 +10,9 @@ class FRAMEWORK_API USlashSkill : public USkillBase
 	GENERATED_BODY()
 
 public:
-	virtual bool Execute() override;
+	USlashSkill();
+	
+public:
+	virtual bool CanExecute() override;
+	virtual bool TryExecute() override;
 };

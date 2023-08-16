@@ -5,6 +5,15 @@
 #include "Interface/TargetInterface.h"
 #include "MonsterBase.generated.h"
 
+UENUM(BlueprintType)
+enum class EMonsterState : uint8
+{
+	Idle,
+	Patrol,
+	Chase,
+	Attack,
+};
+
 class UWidgetComponent;
 
 UCLASS()
@@ -26,4 +35,7 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWidgetComponent> WidgetComponent;
+		
+	UPROPERTY(VisibleAnywhere)
+	EMonsterState State = EMonsterState::Idle;
 };

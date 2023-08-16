@@ -4,6 +4,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Manager/ResourceManager.h"
+#include "System/SkillComponent.h"
+#include "System/SlashSkill.h"
 #include "Util/Tag.h"
 #include "Util/Util.h"
 
@@ -49,4 +51,6 @@ void APlayerBase::PostInitializeComponents()
 		GetMesh()->SetSkeletalMesh(SkeletalMesh);
 		GetMesh()->SetAnimInstanceClass(UUtil::GetDataManager(this)->FindObjectClassForTag(Tag::Asset_AnimBP_Player));
 	});
+	
+	GetSkillComponent()->AddSkill<USlashSkill>(Tag::Skill_Slash);
 }

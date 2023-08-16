@@ -1,44 +1,12 @@
 #include "System/SkillComponent.h"
 
 #include "SkillBase.h"
-#include "Manager/DataManager.h"
+#include "Creature/CreatureBase.h"
 #include "Util/Define.h"
-#include "Util/Util.h"
 
 USkillComponent::USkillComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-}
-
-void USkillComponent::AddSkill(const FGameplayTag& SkillTag)
-{
-	if (SkillTag.IsValid() == false)
-	{
-		LOG_ERROR(TEXT("Invaild Resource Tag"));
-		return;
-	}
-
-	if (Skills.Contains(SkillTag))
-	{
-		LOG_WARNING(TEXT("This Skill has Already been Added"));
-		return;
-	}
-
-	UClass* SkillClass = UUtil::GetDataManager(this)->FindObjectClassForTag(SkillTag);
-	if (SkillClass == nullptr)
-	{
-		LOG_ERROR(TEXT("Can't Find Skill Class on Asset Data"));
-		return;
-	}
-
-	USkillBase* SkillBase = NewObject<USkillBase>(SkillClass);
-	if (SkillBase == nullptr)
-	{
-		LOG_ERROR(TEXT("Can't Create Skill Class"));
-		return;
-	}
-
-	Skills.Add(SkillTag, SkillBase);
 }
 
 void USkillComponent::RemoveSkill(const FGameplayTag& SkillTag)
@@ -58,7 +26,7 @@ void USkillComponent::RemoveSkill(const FGameplayTag& SkillTag)
 	Skills.Remove(SkillTag);
 }
 
-bool USkillComponent::Execute(const FGameplayTag& SkillTag)
+bool USkillComponent::CanExecute(const FGameplayTag& SkillTag)
 {
 	if (SkillTag.IsValid() == false)
 	{
@@ -72,5 +40,22 @@ bool USkillComponent::Execute(const FGameplayTag& SkillTag)
 		return false;
 	}
 	
-	return (*Skills.Find(SkillTag))->Execute();
+	return (*Skills.Find(SkillTag))->CanExecute();
+}
+
+bool USkillComponent::TryExecute(const FGameplayTag& SkillTag)
+{
+	if (SkillTag.IsValid() == false)
+	{
+		LOG_ERROR(TEXT("Invaild Resource Tag"));
+		return false;
+	}
+
+	if (Skills.Contains(SkillTag) == false)
+	{
+		LOG_WARNING(TEXT("Can't Use Skill for SkillTag"));
+		return false;
+	}
+	
+	return (*Skills.Find(SkillTag))->TryExecute();
 }

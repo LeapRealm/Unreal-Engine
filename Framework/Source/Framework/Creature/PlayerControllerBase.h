@@ -29,21 +29,23 @@ private:
 	
 	void HoldPressed() { bHoldKeyDown = true; }
 	void HoldReleased() { bHoldKeyDown = false; }
-
-	void TickCursorTrace();
+	
+	void HighlightTrace();
 	void AutoRunning();
 
 private:
-	bool bHoldKeyDown = false;
-	bool bAutoMoving = false;
-	bool bShouldAttacking = false;
-
 	float PressTime = 0.f;
 	float PressThreshold = 0.5;
 	float AutoRunAcceptanceRadius = 50.f;
+	
+	bool bHoldKeyDown = false;
+	bool bAutoMoving = false;
 
-	ITargetInterface* TargetActor;
-	FVector Destination = FVector::ZeroVector;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<AActor> TargetActor;
+	
+	ITargetInterface* HighlightActor;
+	FVector TargetLocation = FVector::ZeroVector;
 	
 private:
 	UPROPERTY(EditDefaultsOnly)

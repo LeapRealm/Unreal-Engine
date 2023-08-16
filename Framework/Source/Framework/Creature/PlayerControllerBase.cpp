@@ -7,8 +7,8 @@
 #include "MonsterBase.h"
 #include "PlayerBase.h"
 #include "Components/CapsuleComponent.h"
-#include "GameFramework/Character.h"
 #include "Interface/TargetInterface.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Manager/ResourceManager.h"
 #include "System/SkillComponent.h"
 #include "Util/Tag.h"
@@ -60,8 +60,8 @@ void APlayerControllerBase::BeginPlay()
 void APlayerControllerBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	TickCursorTrace();
+	
+	HighlightTrace();
 	AutoRunning();
 }
 
@@ -87,7 +87,14 @@ void APlayerControllerBase::LeftMousePressed(const FInputActionValue& Value)
 {
 	PressTime = 0.f;
 	bAutoMoving = false;
-	bShouldAttacking = false;
+	TargetActor = nullptr;
+
+	FHitResult HitResult;
+	if (GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
+	{
+		if (Cast<ITargetInterface>(HitResult.GetActor()))
+			TargetActor = HitResult.GetActor();
+	}
 }
 
 void APlayerControllerBase::LeftMouseHeld(const FInputActionValue& Value)
@@ -102,8 +109,8 @@ void APlayerControllerBase::LeftMouseHeld(const FInputActionValue& Value)
 		FHitResult HitResult;
 		if (GetHitResultUnderCursor(ECC_GameTraceChannel1, false, HitResult))
 		{
-			Destination = HitResult.ImpactPoint + FVector(0.f, 0.f, PlayerBase->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-			const FVector WorldDirection = (Destination - PlayerBase->GetActorLocation()).GetSafeNormal();
+			TargetLocation = HitResult.ImpactPoint + FVector(0.f, 0.f, PlayerBase->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+			const FVector WorldDirection = (TargetLocation - PlayerBase->GetActorLocation()).GetSafeNormal();
 			PlayerBase->AddMovementInput(WorldDirection);
 		}
 	}
@@ -114,22 +121,38 @@ void APlayerControllerBase::LeftMouseReleased(const FInputActionValue& Value)
 	if (PressTime > PressThreshold)
 		return;
 	
+	APlayerBase* PlayerBase = Cast<APlayerBase>(GetCharacter());
+	if (PlayerBase == nullptr)
+		return;
+	
 	if (bHoldKeyDown)
 	{
-		if (APlayerBase* PlayerBase = Cast<APlayerBase>(GetCharacter()))
+		if (USkillComponent* SkillComponent = PlayerBase->GetSkillComponent())
 		{
-			if (USkillComponent* SkillComponent = PlayerBase->GetSkillComponent())
-				SkillComponent->Execute(Tag::Asset_Skill_Slash);
+			FHitResult HitResult;
+			if (GetHitResultUnderCursor(ECC_GameTraceChannel1, false, HitResult))
+			{
+				if (SkillComponent->CanExecute(Tag::Skill_Slash))
+				{
+					FRotator Rotation = PlayerBase->GetActorRotation();
+					Rotation.Yaw = UKismetMathLibrary::FindLookAtRotation(PlayerBase->GetActorLocation(), HitResult.ImpactPoint).Yaw;
+					PlayerBase->SetActorRotation(Rotation);
+
+					SkillComponent->TryExecute(Tag::Skill_Slash);
+				}
+			}
 		}
 	}
 	else
 	{
 		if (AMonsterBase* MonsterBase = Cast<AMonsterBase>(TargetActor))
 		{
-			bAutoMoving = true;
-			bShouldAttacking = true;
-			Destination = MonsterBase->GetActorLocation();
-			AutoRunAcceptanceRadius = 150.f;
+			if (PlayerBase->GetSkillComponent()->CanExecute(Tag::Skill_Slash))
+			{
+				bAutoMoving = true;
+				TargetLocation = MonsterBase->GetActorLocation();
+				AutoRunAcceptanceRadius = 150.f;
+			}
 		}
 		else
 		{
@@ -139,58 +162,68 @@ void APlayerControllerBase::LeftMouseReleased(const FInputActionValue& Value)
 	}
 }
 
-void APlayerControllerBase::TickCursorTrace()
+void APlayerControllerBase::HighlightTrace()
 {
 	FHitResult HitResult;
 	if (GetHitResultUnderCursor(ECC_Visibility, false, OUT HitResult) == false)
 		return;
 	
-	ITargetInterface* NewTargetActor = Cast<ITargetInterface>(HitResult.GetActor());
-	if (NewTargetActor)
+	ITargetInterface* NewHighlightActor = Cast<ITargetInterface>(HitResult.GetActor());
+	if (NewHighlightActor)
 	{
-		if (TargetActor)
+		if (HighlightActor)
 		{
-			if (TargetActor != NewTargetActor)
+			if (HighlightActor != NewHighlightActor)
 			{
-				TargetActor->UnHighlightActor();
-				NewTargetActor->HighlightActor();
+				HighlightActor->UnHighlightActor();
+				NewHighlightActor->HighlightActor();
 			}
 		}
 		else
 		{
-			NewTargetActor->HighlightActor();
+			NewHighlightActor->HighlightActor();
 		}
 	}
 	else
 	{
-		if (TargetActor)
-			TargetActor->UnHighlightActor();
+		if (HighlightActor)
+			HighlightActor->UnHighlightActor();
 	}
 
-	TargetActor = NewTargetActor;
+	HighlightActor = NewHighlightActor;
 }
 
 void APlayerControllerBase::AutoRunning()
 {
 	if (bAutoMoving == false)
 		return;
-
+	
 	if (APlayerBase* PlayerBase = Cast<APlayerBase>(GetCharacter()))
 	{
-		const FVector WorldDirection = (Destination - PlayerBase->GetActorLocation()).GetSafeNormal();
+		if (AMonsterBase* MonsterBase = Cast<AMonsterBase>(TargetActor))
+			TargetLocation = MonsterBase->GetActorLocation();
+		
+		const FVector WorldDirection = (TargetLocation - PlayerBase->GetActorLocation()).GetSafeNormal();
 		PlayerBase->AddMovementInput(WorldDirection);
-
-		const float DistanceToDestination = (Destination - PlayerBase->GetActorLocation()).Length();
+		
+		const float DistanceToDestination = (TargetLocation - PlayerBase->GetActorLocation()).Length();
 		if (DistanceToDestination <= AutoRunAcceptanceRadius)
 		{
 			bAutoMoving = false;
-
-			if (bShouldAttacking)
+			if (AMonsterBase* MonsterBase = Cast<AMonsterBase>(TargetActor))
 			{
 				if (USkillComponent* SkillComponent = PlayerBase->GetSkillComponent())
-					SkillComponent->Execute(Tag::Asset_Skill_Slash);
-				
-				bShouldAttacking = false;
+				{
+					if (SkillComponent->CanExecute(Tag::Skill_Slash))
+					{
+						FRotator Rotation = PlayerBase->GetActorRotation();
+						Rotation.Yaw = UKismetMathLibrary::FindLookAtRotation(PlayerBase->GetActorLocation(), MonsterBase->GetActorLocation()).Yaw;
+						PlayerBase->SetActorRotation(Rotation);
+
+						SkillComponent->TryExecute(Tag::Skill_Slash);
+					}
+				}
+				TargetActor = nullptr;
 			}
 		}
 	}

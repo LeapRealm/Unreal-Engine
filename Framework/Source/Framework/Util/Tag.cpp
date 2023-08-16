@@ -17,6 +17,7 @@ namespace Tag
 	
 	UE_DEFINE_GAMEPLAY_TAG(Asset_SkeletalMesh_Player, "Asset.SkeletalMesh.Player");
 	UE_DEFINE_GAMEPLAY_TAG(Asset_AnimBP_Player, "Asset.AnimBP.Player");
+	UE_DEFINE_GAMEPLAY_TAG(Asset_Montage_PlayerSlash, "Asset.Montage.PlayerSlash");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Asset_SkeletalMesh_Skeleton, "Asset.SkeletalMesh.Skeleton");
 	UE_DEFINE_GAMEPLAY_TAG(Asset_AnimBP_Skeleton, "Asset.AnimBP.Skeleton");
@@ -26,7 +27,7 @@ namespace Tag
 	/*--------------------
 			Skill
 	--------------------*/
-	UE_DEFINE_GAMEPLAY_TAG(Asset_Skill_Slash, "Asset.Skill.Slash");
+	UE_DEFINE_GAMEPLAY_TAG(Skill_Slash, "Skill.Slash");
 
 	/*--------------------
 			 Stat
