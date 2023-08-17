@@ -27,6 +27,7 @@ public:
 
 	bool CanExecute(const FGameplayTag& SkillTag);
 	bool TryExecute(const FGameplayTag& SkillTag);
+	void Execute(const FGameplayTag& SkillTag);
 
 public:
 	FORCEINLINE void SetAttacking(bool NewAttacking) { bAttacking = NewAttacking; }

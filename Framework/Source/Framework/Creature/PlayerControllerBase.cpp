@@ -62,7 +62,7 @@ void APlayerControllerBase::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	
 	HighlightTrace();
-	AutoRunning();
+	AutoMoving();
 }
 
 void APlayerControllerBase::MoveKeyboard(const FInputActionValue& Value)
@@ -127,32 +127,27 @@ void APlayerControllerBase::LeftMouseReleased(const FInputActionValue& Value)
 	
 	if (bHoldKeyDown)
 	{
-		if (USkillComponent* SkillComponent = PlayerBase->GetSkillComponent())
+		FHitResult HitResult;
+		if (GetHitResultUnderCursor(ECC_GameTraceChannel1, false, HitResult))
 		{
-			FHitResult HitResult;
-			if (GetHitResultUnderCursor(ECC_GameTraceChannel1, false, HitResult))
+			if (USkillComponent* SkillComponent = PlayerBase->GetSkillComponent())
 			{
 				if (SkillComponent->CanExecute(Tag::Skill_Slash))
 				{
 					FRotator Rotation = PlayerBase->GetActorRotation();
 					Rotation.Yaw = UKismetMathLibrary::FindLookAtRotation(PlayerBase->GetActorLocation(), HitResult.ImpactPoint).Yaw;
 					PlayerBase->SetActorRotation(Rotation);
-
-					SkillComponent->TryExecute(Tag::Skill_Slash);
+					SkillComponent->Execute(Tag::Skill_Slash);
 				}
 			}
 		}
 	}
 	else
 	{
-		if (AMonsterBase* MonsterBase = Cast<AMonsterBase>(TargetActor))
+		if (Cast<AMonsterBase>(TargetActor))
 		{
-			if (PlayerBase->GetSkillComponent()->CanExecute(Tag::Skill_Slash))
-			{
-				bAutoMoving = true;
-				TargetLocation = MonsterBase->GetActorLocation();
-				AutoRunAcceptanceRadius = 150.f;
-			}
+			bAutoMoving = true;
+			AutoRunAcceptanceRadius = 150.f;
 		}
 		else
 		{
@@ -193,7 +188,7 @@ void APlayerControllerBase::HighlightTrace()
 	HighlightActor = NewHighlightActor;
 }
 
-void APlayerControllerBase::AutoRunning()
+void APlayerControllerBase::AutoMoving()
 {
 	if (bAutoMoving == false)
 		return;
@@ -219,11 +214,14 @@ void APlayerControllerBase::AutoRunning()
 						FRotator Rotation = PlayerBase->GetActorRotation();
 						Rotation.Yaw = UKismetMathLibrary::FindLookAtRotation(PlayerBase->GetActorLocation(), MonsterBase->GetActorLocation()).Yaw;
 						PlayerBase->SetActorRotation(Rotation);
-
-						SkillComponent->TryExecute(Tag::Skill_Slash);
+						SkillComponent->Execute(Tag::Skill_Slash);
+						TargetActor = nullptr;
+					}
+					else
+					{
+						bAutoMoving = true;
 					}
 				}
-				TargetActor = nullptr;
 			}
 		}
 	}

@@ -15,6 +15,7 @@ public:
 	
 	virtual bool CanExecute();
 	virtual bool TryExecute();
+	virtual void Execute();
 
 public:
 	FORCEINLINE void SetOwner(ACreatureBase* NewOwner) { Owner = NewOwner; }

@@ -35,3 +35,8 @@ bool USkillBase::TryExecute()
 	LeftCoolTime = CoolTime;
 	return true;
 }
+
+void USkillBase::Execute()
+{
+	LeftCoolTime = CoolTime;
+}

@@ -20,7 +20,6 @@ namespace Tag
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_SkeletalMesh_Player);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_AnimBP_Player);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Montage_PlayerSlash);
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_SkeletalMesh_Skeleton);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_AnimBP_Skeleton);
@@ -31,6 +30,10 @@ namespace Tag
 			Skill
 	--------------------*/
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Skill_Slash);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Montage_SlashDown);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Montage_SlashUp);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Effect_Slash);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Effect_SlashImpact);
 	
 	/*--------------------
     		 Stat

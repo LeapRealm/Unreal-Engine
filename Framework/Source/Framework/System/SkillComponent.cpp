@@ -59,3 +59,20 @@ bool USkillComponent::TryExecute(const FGameplayTag& SkillTag)
 	
 	return (*Skills.Find(SkillTag))->TryExecute();
 }
+
+void USkillComponent::Execute(const FGameplayTag& SkillTag)
+{
+	if (SkillTag.IsValid() == false)
+	{
+		LOG_ERROR(TEXT("Invaild Resource Tag"));
+		return;
+	}
+
+	if (Skills.Contains(SkillTag) == false)
+	{
+		LOG_WARNING(TEXT("Can't Use Skill for SkillTag"));
+		return;
+	}
+	
+	(*Skills.Find(SkillTag))->Execute();
+}

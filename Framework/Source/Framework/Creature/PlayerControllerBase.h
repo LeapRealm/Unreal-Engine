@@ -31,7 +31,7 @@ private:
 	void HoldReleased() { bHoldKeyDown = false; }
 	
 	void HighlightTrace();
-	void AutoRunning();
+	void AutoMoving();
 
 private:
 	float PressTime = 0.f;

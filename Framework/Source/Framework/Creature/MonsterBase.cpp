@@ -1,5 +1,6 @@
 #include "Creature/MonsterBase.h"
 
+#include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Manager/ResourceManager.h"
@@ -27,6 +28,8 @@ AMonsterBase::AMonsterBase()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 }
 
 void AMonsterBase::PostInitializeComponents()

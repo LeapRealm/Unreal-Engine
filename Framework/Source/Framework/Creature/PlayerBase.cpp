@@ -1,6 +1,7 @@
 #include "Creature/PlayerBase.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Manager/ResourceManager.h"
@@ -40,6 +41,9 @@ APlayerBase::APlayerBase()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 }
 
 void APlayerBase::PostInitializeComponents()
