@@ -14,7 +14,7 @@
 
 USlashSkill::USlashSkill()
 {
-	CoolTime = 2.f;
+	CoolTime = 1.5f;
 }
 
 bool USlashSkill::CanExecute()
@@ -23,6 +23,9 @@ bool USlashSkill::CanExecute()
 		return false;
 	
 	if (Owner->GetSkillComponent()->GetAttacking())
+		return false;
+
+	if (Owner->GetStatComponent()->GetValue(Tag::Stat_Mana) < RequiredMana)
 		return false;
 	
 	return true;
@@ -40,6 +43,8 @@ bool USlashSkill::TryExecute()
 void USlashSkill::Execute()
 {
 	Owner->GetSkillComponent()->SetAttacking(true);
+
+	Owner->GetStatComponent()->AddValue(Tag::Stat_Mana, -RequiredMana);
 	
 	Owner->GetMovementComponent()->StopMovementImmediately();
 	Owner->GetController()->SetIgnoreMoveInput(true);

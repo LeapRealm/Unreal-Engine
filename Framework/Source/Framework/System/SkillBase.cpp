@@ -27,6 +27,17 @@ bool USkillBase::CanExecute()
 	return true;
 }
 
+void USkillBase::TryInfinite()
+{
+	if (InfiniteHandle.IsValid())
+		return;
+	
+	Owner->GetWorld()->GetTimerManager().SetTimer(InfiniteHandle, [this]()
+	{
+		TryExecute();
+	}, LoopTime, true);
+}
+
 bool USkillBase::TryExecute()
 {
 	if (CanExecute() == false)

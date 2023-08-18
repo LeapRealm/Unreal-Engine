@@ -26,6 +26,7 @@ public:
 	void RemoveSkill(const FGameplayTag& SkillTag);
 
 	bool CanExecute(const FGameplayTag& SkillTag);
+	void TryInfinite(const FGameplayTag& SkillTag);
 	bool TryExecute(const FGameplayTag& SkillTag);
 	void Execute(const FGameplayTag& SkillTag);
 

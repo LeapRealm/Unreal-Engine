@@ -62,3 +62,22 @@ void AMonsterBase::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 }
+
+void AMonsterBase::OnDead(const FGameplayTag& StatTag, const FStatData& StatData)
+{
+	Super::OnDead(StatTag, StatData);
+
+	if (StatTag != Tag::Stat_Health || StatData.Value > StatData.MinValue)
+		return;
+
+	UUtil::GetResourceManager(this)->LoadAsync<UAnimMontage>(Tag::Asset_Montage_SkeletonDead, [this](UAnimMontage* AnimMontage) 
+	{
+		float Duration = GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage, 1.f, EMontagePlayReturnType::Duration);
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this](){ Destroy(); }, Duration + 2.f, false);
+	});
+	
+	GetController()->SetIgnoreMoveInput(true);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}

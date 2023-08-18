@@ -5,6 +5,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Manager/ResourceManager.h"
+#include "System/ManaRegenSkill.h"
 #include "System/SkillComponent.h"
 #include "System/SlashSkill.h"
 #include "Util/Tag.h"
@@ -57,4 +58,6 @@ void APlayerBase::PostInitializeComponents()
 	});
 	
 	GetSkillComponent()->AddSkill<USlashSkill>(Tag::Skill_Slash);
+	GetSkillComponent()->AddSkill<UManaRegenSkill>(Tag::Skill_ManaRegen);
+	GetSkillComponent()->TryInfinite(Tag::Skill_ManaRegen);
 }

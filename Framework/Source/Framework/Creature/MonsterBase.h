@@ -32,6 +32,8 @@ public:
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
 
+	virtual void OnDead(const FGameplayTag& StatTag, const FStatData& StatData) override;
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWidgetComponent> WidgetComponent;

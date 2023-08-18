@@ -20,13 +20,19 @@ namespace Tag
 	
 	UE_DEFINE_GAMEPLAY_TAG(Asset_SkeletalMesh_Skeleton, "Asset.SkeletalMesh.Skeleton");
 	UE_DEFINE_GAMEPLAY_TAG(Asset_AnimBP_Skeleton, "Asset.AnimBP.Skeleton");
-	
+	UE_DEFINE_GAMEPLAY_TAG(Asset_Montage_SkeletonDead, "Asset.Montage.SkeletonDead");
+
+	/*--------------------
+			Widget
+	--------------------*/		
 	UE_DEFINE_GAMEPLAY_TAG(Asset_Widget_Nameplate, "Asset.Widget.Nameplate");
+	UE_DEFINE_GAMEPLAY_TAG(Asset_Widget_Scene, "Asset.Widget.Scene");
 	
 	/*--------------------
 			Skill
 	--------------------*/
 	UE_DEFINE_GAMEPLAY_TAG(Skill_Slash, "Skill.Slash");
+	UE_DEFINE_GAMEPLAY_TAG(Skill_ManaRegen, "Skill.ManaRegen");
 	UE_DEFINE_GAMEPLAY_TAG(Asset_Montage_SlashDown, "Asset.Montage.SlashDown");
 	UE_DEFINE_GAMEPLAY_TAG(Asset_Montage_SlashUp, "Asset.Montage.SlashUp");
 	UE_DEFINE_GAMEPLAY_TAG(Asset_Effect_Slash, "Asset.Effect.Slash");

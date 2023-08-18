@@ -10,9 +10,12 @@
 #include "Interface/TargetInterface.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Manager/ResourceManager.h"
+#include "Manager/WidgetManager.h"
 #include "System/SkillComponent.h"
+#include "System/StatComponent.h"
 #include "Util/Tag.h"
 #include "Util/Util.h"
+#include "Widget/Scene/Widget_Scene.h"
 
 void APlayerControllerBase::PostInitializeComponents()
 {
@@ -55,6 +58,13 @@ void APlayerControllerBase::BeginPlay()
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	InputModeData.SetHideCursorDuringCapture(false);
 	SetInputMode(InputModeData);
+
+	UWidget_Scene* SceneWidget = UUtil::GetWidgetManager(this)->ShowSceneWidget<UWidget_Scene>(Tag::Asset_Widget_Scene);
+	if (APlayerBase* PlayerBase = Cast<APlayerBase>(GetCharacter()))
+	{
+		PlayerBase->GetStatComponent()->AddDelegate(Tag::Stat_Health, SceneWidget, &UWidget_Scene::RefreshUI);
+		PlayerBase->GetStatComponent()->AddDelegate(Tag::Stat_Mana, SceneWidget, &UWidget_Scene::RefreshUI);
+	}
 }
 
 void APlayerControllerBase::Tick(float DeltaSeconds)

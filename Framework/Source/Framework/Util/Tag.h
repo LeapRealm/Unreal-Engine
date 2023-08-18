@@ -23,13 +23,19 @@ namespace Tag
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_SkeletalMesh_Skeleton);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_AnimBP_Skeleton);
-	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Montage_SkeletonDead);
+
+	/*--------------------
+			Widget
+	--------------------*/	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Widget_Nameplate);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Widget_Scene);
 
 	/*--------------------
 			Skill
 	--------------------*/
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Skill_Slash);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Skill_ManaRegen);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Montage_SlashDown);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Montage_SlashUp);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Asset_Effect_Slash);

@@ -43,6 +43,23 @@ bool USkillComponent::CanExecute(const FGameplayTag& SkillTag)
 	return (*Skills.Find(SkillTag))->CanExecute();
 }
 
+void USkillComponent::TryInfinite(const FGameplayTag& SkillTag)
+{
+	if (SkillTag.IsValid() == false)
+	{
+		LOG_ERROR(TEXT("Invaild Resource Tag"));
+		return;
+	}
+
+	if (Skills.Contains(SkillTag) == false)
+	{
+		LOG_WARNING(TEXT("Can't Use Skill for SkillTag"));
+		return;
+	}
+	
+	(*Skills.Find(SkillTag))->TryInfinite();
+}
+
 bool USkillComponent::TryExecute(const FGameplayTag& SkillTag)
 {
 	if (SkillTag.IsValid() == false)

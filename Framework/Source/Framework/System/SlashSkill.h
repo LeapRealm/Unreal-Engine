@@ -22,4 +22,7 @@ public:
 private:
 	TArray<FGameplayTag> MontageTags = { Tag::Asset_Montage_SlashDown, Tag::Asset_Montage_SlashUp };
 	int MontageTagIdx = 0;
+
+	UPROPERTY(EditDefaultsOnly)
+	int RequiredMana = 15.f;
 };

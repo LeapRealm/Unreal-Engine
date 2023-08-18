@@ -23,6 +23,13 @@ void ACreatureBase::PostInitializeComponents()
 	StatComponent->Init(CreatureTag);
 }
 
+void ACreatureBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetStatComponent()->AddDelegate(Tag::Stat_Health, this, &ACreatureBase::OnDead);
+}
+
 float ACreatureBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	DamageAmount = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

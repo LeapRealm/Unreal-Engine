@@ -51,7 +51,7 @@ T* UWidgetManager::ShowSceneWidget(const FGameplayTag& WidgetTag)
 		return nullptr;
 	}
 	
-	const UClass* WidgetClass = UUtil::GetDataManager(this)->FindWidgetClassForTag(WidgetTag);
+	TSubclassOf<UUserWidget> WidgetClass = UUtil::GetDataManager(this)->FindWidgetClassForTag(WidgetTag);
 	if (WidgetClass == nullptr)
 	{
 		LOG_ERROR(TEXT("Can't Find Widget Class on Asset Data"));
@@ -74,7 +74,7 @@ T* UWidgetManager::ShowPopupWidget(const FGameplayTag& WidgetTag)
 		return nullptr;
 	}
 
-	UClass* WidgetClass = UUtil::GetDataManager(this)->FindWidgetClassForTag(WidgetTag);
+	TSubclassOf<UUserWidget> WidgetClass = UUtil::GetDataManager(this)->FindWidgetClassForTag(WidgetTag);
 	if (WidgetClass == nullptr)
 	{
 		LOG_ERROR(TEXT("Can't Find Widget Class on Asset Data"));

@@ -14,6 +14,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual bool CanExecute();
+	virtual void TryInfinite();
 	virtual bool TryExecute();
 	virtual void Execute();
 
@@ -28,7 +29,14 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<ACreatureBase> Owner;
-	
+
+	UPROPERTY(VisibleAnywhere)
+	FTimerHandle InfiniteHandle;
+
+	UPROPERTY(EditDefaultsOnly)
 	float CoolTime = 0.f;
 	float LeftCoolTime = 0.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float LoopTime = 0.f;
 };

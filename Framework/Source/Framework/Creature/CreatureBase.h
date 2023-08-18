@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "CreatureBase.generated.h"
 
+struct FStatData;
 class UStatComponent;
 class USkillComponent;
 
@@ -18,7 +19,11 @@ public:
 
 public:
 	virtual void PostInitializeComponents() override;
+	virtual void BeginPlay() override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+public:
+	virtual void OnDead(const FGameplayTag& StatTag, const FStatData& StatData) { }
 	
 public:
 	FORCEINLINE FGameplayTag GetCreatureTag() const { return CreatureTag; }
