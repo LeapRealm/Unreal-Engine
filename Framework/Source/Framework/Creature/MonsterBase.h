@@ -5,15 +5,6 @@
 #include "Interface/TargetInterface.h"
 #include "MonsterBase.generated.h"
 
-UENUM(BlueprintType)
-enum class EMonsterState : uint8
-{
-	Idle,
-	Patrol,
-	Chase,
-	Attack,
-};
-
 class UWidgetComponent;
 
 UCLASS()
@@ -32,12 +23,9 @@ public:
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
 
-	virtual void OnDead(const FGameplayTag& StatTag, const FStatData& StatData) override;
+	virtual void OnDamage(const FGameplayTag& StatTag, const FStatData& StatData) override;
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWidgetComponent> WidgetComponent;
-		
-	UPROPERTY(VisibleAnywhere)
-	EMonsterState State = EMonsterState::Idle;
 };

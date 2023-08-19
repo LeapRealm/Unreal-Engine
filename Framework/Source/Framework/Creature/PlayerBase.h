@@ -17,6 +17,9 @@ public:
 
 public:
 	virtual void PostInitializeComponents() override;
+
+public:
+	virtual void OnDamage(const FGameplayTag& StatTag, const FStatData& StatData) override;
 	
 private:
 	UPROPERTY(VisibleAnywhere)

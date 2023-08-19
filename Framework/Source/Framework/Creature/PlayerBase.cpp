@@ -51,7 +51,7 @@ void APlayerBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	UUtil::GetResourceManager(this)->LoadAsync<USkeletalMesh>(Tag::Asset_SkeletalMesh_Player, [this](USkeletalMesh* SkeletalMesh)
+	UUtil::GetResourceManager(this)->LoadAsync<USkeletalMesh>(Tag::Asset_SkeletalMesh_Paladin, [this](USkeletalMesh* SkeletalMesh)
 	{
 		GetMesh()->SetSkeletalMesh(SkeletalMesh);
 		GetMesh()->SetAnimInstanceClass(UUtil::GetDataManager(this)->FindObjectClassForTag(Tag::Asset_AnimBP_Player));
@@ -60,4 +60,24 @@ void APlayerBase::PostInitializeComponents()
 	GetSkillComponent()->AddSkill<USlashSkill>(Tag::Skill_Slash);
 	GetSkillComponent()->AddSkill<UManaRegenSkill>(Tag::Skill_ManaRegen);
 	GetSkillComponent()->TryInfinite(Tag::Skill_ManaRegen);
+}
+
+void APlayerBase::OnDamage(const FGameplayTag& StatTag, const FStatData& StatData)
+{
+	Super::OnDamage(StatTag, StatData);
+
+	if (StatTag != Tag::Stat_Health)
+		return;
+
+	if (StatData.Value <= StatData.MinValue)
+	{
+		UUtil::GetResourceManager(this)->LoadAsync<UAnimMontage>(Tag::Asset_Montage_Player_Dead, [this](UAnimMontage* AnimMontage) 
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage, 1.f, EMontagePlayReturnType::Duration);
+		});
+	
+		GetController()->SetIgnoreMoveInput(true);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }

@@ -83,7 +83,7 @@ void USlashSkill::Execute()
 	TArray<AActor*> IgnoreActors = { Owner };
 	FHitResult HitResult;
 	
-	if (UKismetSystemLibrary::SphereTraceSingleForObjects(Owner, Start, End, Radius, ObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForDuration, HitResult, true))
+	if (UKismetSystemLibrary::SphereTraceSingleForObjects(Owner, Start, End, Radius, ObjectTypes, false, IgnoreActors, EDrawDebugTrace::None, HitResult, true))
 	{
 		if (AMonsterBase* MonsterBase = Cast<AMonsterBase>(HitResult.GetActor()))
 		{

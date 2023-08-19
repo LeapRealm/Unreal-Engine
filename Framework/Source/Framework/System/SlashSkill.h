@@ -20,7 +20,7 @@ public:
 	virtual void Execute() override;
 
 private:
-	TArray<FGameplayTag> MontageTags = { Tag::Asset_Montage_SlashDown, Tag::Asset_Montage_SlashUp };
+	TArray<FGameplayTag> MontageTags = { Tag::Asset_Montage_Player_SlashDown, Tag::Asset_Montage_Player_SlashUp };
 	int MontageTagIdx = 0;
 
 	UPROPERTY(EditDefaultsOnly)
