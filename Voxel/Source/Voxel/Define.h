@@ -17,23 +17,25 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCustom, Log, All);
 UENUM(BlueprintType)
 enum class EBlockSide : uint8
 {
-	Forward,
-	Backward,
-	Down,
-	Up,
 	Left,
 	Right,
+	Backward,
+	Forward,
+	Down,
+	Up,
+	
+	Count
 };
 
 UENUM(BlueprintType)
 enum EBlockType
 {
-	GrassTop,
-	GrassSide,
+	Grass,
 	Dirt,
-	Water,
 	Stone,
 	Sand,
+	Water,
+	Air,
 };
 
 USTRUCT(BlueprintType)
@@ -41,6 +43,18 @@ struct FMesh
 {
 	GENERATED_BODY()
 
+public:
+	void Empty()
+	{
+		Vertices.Empty();
+		Triangles.Empty();
+		Normals.Empty();
+		UVs.Empty();
+		Tangents.Empty();
+		VertexColors.Empty();
+	}
+
+public:
 	UPROPERTY(VisibleAnywhere)
 	TArray<FVector> Vertices;
 
@@ -61,40 +75,11 @@ struct FMesh
 };
 
 USTRUCT(BlueprintType)
-struct FVertex
-{
-	GENERATED_BODY()
-
-	FVertex() { }
-	
-	FVertex(const FVector& InVertex, const FVector& InNormal, const FVector2D& InUV)
-		: Vertex(InVertex), Normal(InNormal), UV(InUV) { }
-
-	bool operator==(const FVertex& Other) const
-	{
-		return (Vertex == Other.Vertex) && (Normal == Other.Normal) && (UV == Other.UV);
-	}
-	
-	FORCEINLINE friend uint32 GetTypeHash(const FVertex& Vertex)
-	{
-		return FCrc::MemCrc32(&Vertex, sizeof(FVertex));
-	}
-	
-	UPROPERTY(VisibleAnywhere)
-	FVector Vertex = FVector::ZeroVector;
-
-	UPROPERTY(VisibleAnywhere)
-	FVector Normal = FVector::ZeroVector;
-
-	UPROPERTY(VisibleAnywhere)
-	FVector2D UV = FVector2D::ZeroVector;
-};
-
-USTRUCT(BlueprintType)
 struct FVoxel
 {
 	GENERATED_BODY()
 
+public:
 	static const FVector FLU;
 	static const FVector FRU;
 	static const FVector FLD;
@@ -103,6 +88,7 @@ struct FVoxel
 	static const FVector BRU;
 	static const FVector BLD;
 	static const FVector BRD;
-	
+
+public:
 	static const TArray<TArray<FVector2D>> BlockUVs;
 };

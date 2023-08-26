@@ -1,9 +1,10 @@
 #include "VoxelFunctionLibrary.h"
 
+#include "Chunk.h"
 #include "Define.h"
 #include "ProceduralMeshComponent.h"
 
-void UVoxelFunctionLibrary::BuildQuad(EBlockSide Side, EBlockType Type, const FVector& Offset, FMesh& OutMesh)
+void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide Side, EBlockType Type, const FVector& Offset, FMesh& OutMesh)
 {
 	const FVector FLU = FVoxel::FLU + Offset;
 	const FVector FRU = FVoxel::FRU + Offset;
@@ -13,12 +14,14 @@ void UVoxelFunctionLibrary::BuildQuad(EBlockSide Side, EBlockType Type, const FV
 	const FVector BRU = FVoxel::BRU + Offset;
 	const FVector BLD = FVoxel::BLD + Offset;
 	const FVector BRD = FVoxel::BRD + Offset;
-	
-	ClearMesh(OutMesh);
-	OutMesh.Vertices.Reserve(4);
-	OutMesh.Triangles.Reserve(6);
-	OutMesh.Normals.Reserve(4);
-	OutMesh.UVs.Reserve(4);
+
+	int32 VertexNum = OutMesh.Vertices.Num();
+	OutMesh.Triangles.Append({ VertexNum + 0, VertexNum + 2, VertexNum + 1, VertexNum + 1, VertexNum + 2, VertexNum + 3 });
+
+	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][0]);
+	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][1]);
+	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][2]);
+	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][3]);
 	
 	switch (Side)
 	{
@@ -89,74 +92,67 @@ void UVoxelFunctionLibrary::BuildQuad(EBlockSide Side, EBlockType Type, const FV
 		OutMesh.Normals.Add(FVector::RightVector);
 		break;
 	}
-
-	OutMesh.Triangles = { 0, 2, 1, 1, 2, 3 };
-
-	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][0]);
-	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][1]);
-	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][2]);
-	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][3]);
 }
 
-void UVoxelFunctionLibrary::MergeMeshes(const TArray<FMesh>& Meshes, FMesh& OutMesh)
+void UVoxelFunctionLibrary::BuildBlockMesh(AChunk* Chunk, EBlockType Type, const FIntVector& BlockIndex, const FVector& Offset)
 {
-	TMap<FVertex, int32> VertexToOrder;
-	TArray<int32> Triangles;
-
-	int Order = 0;
-	for (int32 i = 0; i < Meshes.Num(); i++)
-	{
-		if (Meshes[i].Triangles.IsEmpty())
-			continue;
-
-		for (int32 j = 0; j < Meshes[i].Vertices.Num(); j++)
-		{
-			FVertex Vertex = FVertex(Meshes[i].Vertices[j], Meshes[i].Normals[j], Meshes[i].UVs[j]);
-			if (VertexToOrder.Contains(Vertex) == false)
-			{
-				VertexToOrder.Add(Vertex, Order);
-				Order++;
-			}
-		}
-		
-		for (int32 k = 0; k < Meshes[i].Triangles.Num(); k++)
-		{
-			int32 Triangle = Meshes[i].Triangles[k];
-			FVertex Vertex = FVertex(Meshes[i].Vertices[Triangle], Meshes[i].Normals[Triangle], Meshes[i].UVs[Triangle]);
-			Triangles.Add(VertexToOrder[Vertex]);
-		}
-	}
-
-	ClearMesh(OutMesh);
-	ExtractArrays(VertexToOrder, OutMesh);
-	OutMesh.Triangles = MoveTemp(Triangles);
-}
-
-void UVoxelFunctionLibrary::ExtractArrays(const TMap<FVertex, int32>& VertexToOrder, FMesh& OutMesh)
-{
-	OutMesh.Vertices.SetNum(VertexToOrder.Num());
-	OutMesh.Normals.SetNum(VertexToOrder.Num());
-	OutMesh.UVs.SetNum(VertexToOrder.Num());
+	if (Type == Air)
+		return;
 	
-	for (const TTuple<FVertex, int32>& Tuple : VertexToOrder)
+	for (int32 i = 0; i < (int32)EBlockSide::Count; i++)
 	{
-		OutMesh.Vertices[Tuple.Value] = Tuple.Key.Vertex;
-		OutMesh.Normals[Tuple.Value] = Tuple.Key.Normal;
-		OutMesh.UVs[Tuple.Value] = Tuple.Key.UV;
+		EBlockSide Side = static_cast<EBlockSide>(i);
+		if (DoesNeedOptimization(Chunk, BlockIndex, Side) == false)
+			UVoxelFunctionLibrary::BuildQuadMesh(Side, Type, Offset, Chunk->ChunkMesh);
 	}
 }
 
-void UVoxelFunctionLibrary::ClearMesh(FMesh& OutMesh)
+bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FIntVector& BlockIndex, EBlockSide Side)
 {
-	OutMesh.Vertices.Empty();
-	OutMesh.Triangles.Empty();
-	OutMesh.Normals.Empty();
-	OutMesh.UVs.Empty();
-	OutMesh.Triangles.Empty();
-	OutMesh.VertexColors.Empty();
+	const int32 dx[] = { +0, +0, -1, +1, +0, +0 };
+	const int32 dy[] = { -1, +1, +0, +0, +0, +0 };
+	const int32 dz[] = { +0, +0, +0, +0, -1, +1 };
+	
+	FIntVector CheckIndex = FIntVector(BlockIndex.X + dx[(int32)Side], BlockIndex.Y + dy[(int32)Side], BlockIndex.Z + dz[(int32)Side]);
+	
+	if (CheckIndex.X < 0 || CheckIndex.X >= Chunk->BlockCount.X ||
+		CheckIndex.Y < 0 || CheckIndex.Y >= Chunk->BlockCount.Y ||
+		CheckIndex.Z < 0 || CheckIndex.Z >= Chunk->BlockCount.Z)
+		return false;
+
+	int32 Index = Index3DTo1D(CheckIndex, Chunk->BlockCount);
+	if (Chunk->ChunkData[Index] == Air || Chunk->ChunkData[Index] == Water)
+		return false;
+	return true;
 }
 
-void UVoxelFunctionLibrary::CreateMeshSection(UProceduralMeshComponent* Component, const FMesh& Mesh)
+void UVoxelFunctionLibrary::CreateMeshSection(int32 Index, UProceduralMeshComponent* Component, const FMesh& Mesh)
 {
-	Component->CreateMeshSection(0, Mesh.Vertices, Mesh.Triangles, Mesh.Normals, Mesh.UVs, Mesh.VertexColors, Mesh.Tangents, true);
+	Component->CreateMeshSection(Index, Mesh.Vertices, Mesh.Triangles, Mesh.Normals, Mesh.UVs, Mesh.VertexColors, Mesh.Tangents, true);
+}
+
+float UVoxelFunctionLibrary::FBMNoise(const FVector2D& Location, int32 Octaves, float Scale, float HeightScale, float HeightOffset)
+{
+	float Total = 0.f;
+	float Frequency = 1.f;
+	for (int32 i = 0; i < Octaves; i++)
+	{
+		Total += FMath::PerlinNoise2D(FVector2D(Location.X * Scale * Frequency, Location.Y * Scale * Frequency)) * HeightScale;
+		Frequency *= 2;
+	}
+	return Total + HeightOffset;
+}
+
+int32 UVoxelFunctionLibrary::Index3DTo1D(const FIntVector& Index, const FIntVector& BlockCount)
+{
+	return (Index.Z * BlockCount.X * BlockCount.Y) + (Index.Y * BlockCount.X) + Index.X;
+}
+
+FIntVector UVoxelFunctionLibrary::Index1DTo3D(int32 Index, const FIntVector& BlockCount)
+{
+	int32 Z = Index / (BlockCount.X * BlockCount.Y);
+	Index -= (Z * BlockCount.X * BlockCount.Y);
+	int32 Y = Index / BlockCount.X;
+	int32 X = Index % BlockCount.X;
+	return FIntVector(X, Y, Z);
 }

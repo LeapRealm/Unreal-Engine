@@ -13,12 +13,7 @@ const FVector FVoxel::BRD = FVector(-50.f, +50.f, -50.f);
 
 const TArray<TArray<FVector2D>> FVoxel::BlockUVs =
 {
-	// Grass Top
-	{
-		FVector2D(0.0625f * 1, 0.0625f * 9),	FVector2D(0.0625f * 2, 0.0625f * 9),
-		FVector2D(0.0625f * 1, 0.0625f * 10),	FVector2D(0.0625f * 2, 0.0625f * 10),
-	},
-	// Grass Side
+	// Grass
 	{
 		FVector2D(0.0625f * 3, 0.0625f * 0),	FVector2D(0.0625f * 4, 0.0625f * 0),
 		FVector2D(0.0625f * 3, 0.0625f * 1),	FVector2D(0.0625f * 4, 0.0625f * 1),
@@ -27,11 +22,6 @@ const TArray<TArray<FVector2D>> FVoxel::BlockUVs =
 	{
 		FVector2D(0.0625f * 2, 0.0625f * 0),	FVector2D(0.0625f * 3, 0.0625f * 0),
 		FVector2D(0.0625f * 2, 0.0625f * 1),	FVector2D(0.0625f * 3, 0.0625f * 1),
-	},
-	// Water
-	{
-		FVector2D(0.0625f * 14, 0.0625f * 12),	FVector2D(0.0625f * 15, 0.0625f * 12),
-		FVector2D(0.0625f * 14, 0.0625f * 13),	FVector2D(0.0625f * 15, 0.0625f * 13),
 	},
 	// Stone
 	{
@@ -42,5 +32,10 @@ const TArray<TArray<FVector2D>> FVoxel::BlockUVs =
 	{
 		FVector2D(0.0625f * 2, 0.0625f * 1),	FVector2D(0.0625f * 3, 0.0625f * 1),
 		FVector2D(0.0625f * 2, 0.0625f * 2),	FVector2D(0.0625f * 3, 0.0625f * 2),
+	},
+	// Water
+	{
+		FVector2D(0.0625f * 14, 0.0625f * 12),	FVector2D(0.0625f * 15, 0.0625f * 12),
+		FVector2D(0.0625f * 14, 0.0625f * 13),	FVector2D(0.0625f * 15, 0.0625f * 13),
 	},
 };
