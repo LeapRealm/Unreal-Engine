@@ -3,15 +3,15 @@
 #include "CoreMinimal.h"
 #include "Define.h"
 #include "GameFramework/Actor.h"
-#include "GraphRenderer.generated.h"
+#include "GraphRenderer2D.generated.h"
 
 UCLASS()
-class VOXEL_API AGraphRenderer : public AActor
+class VOXEL_API AGraphRenderer2D : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	AGraphRenderer();
+	AGraphRenderer2D();
 
 public:
 	virtual void OnConstruction(const FTransform& Transform) override;
@@ -28,7 +28,7 @@ public:
 	int32 PositionCount = 100;
 	
 	UPROPERTY(EditAnywhere)
-	FGraphSettings GraphSettings = { 0.001f, 5.887208f, 8, 20.f, 1.f };
+	FGraphSettings GraphSettings = { 0.001f, 5.887208f, 8, 20.f };
 
 	UPROPERTY(EditAnywhere)
 	FLinearColor Color = FLinearColor::Red;

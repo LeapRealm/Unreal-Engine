@@ -38,6 +38,31 @@ const TArray<TArray<FVector2D>> FVoxel::BlockTextureUVs =
 		FVector2D(0.0625f * 2, 0.0625f * 1),	FVector2D(0.0625f * 3, 0.0625f * 1),
 		FVector2D(0.0625f * 2, 0.0625f * 2),	FVector2D(0.0625f * 3, 0.0625f * 2),
 	},
+	// Coal
+	{
+		FVector2D(0.0625f * 2, 0.0625f * 2),	FVector2D(0.0625f * 3, 0.0625f * 2),
+		FVector2D(0.0625f * 2, 0.0625f * 3),	FVector2D(0.0625f * 3, 0.0625f * 3),
+	},
+	// Iron
+	{
+		FVector2D(0.0625f * 1, 0.0625f * 2),	FVector2D(0.0625f * 2, 0.0625f * 2),
+		FVector2D(0.0625f * 1, 0.0625f * 3),	FVector2D(0.0625f * 2, 0.0625f * 3),
+	},
+	// Gold
+	{
+		FVector2D(0.0625f * 0, 0.0625f * 2),	FVector2D(0.0625f * 1, 0.0625f * 2),
+		FVector2D(0.0625f * 0, 0.0625f * 3),	FVector2D(0.0625f * 1, 0.0625f * 3),
+	},
+	// Diamond
+	{
+		FVector2D(0.0625f * 2, 0.0625f * 3),	FVector2D(0.0625f * 3, 0.0625f * 3),
+		FVector2D(0.0625f * 2, 0.0625f * 4),	FVector2D(0.0625f * 3, 0.0625f * 4),
+	},
+	// BedRock
+	{
+		FVector2D(0.0625f * 1, 0.0625f * 1),	FVector2D(0.0625f * 2, 0.0625f * 1),
+		FVector2D(0.0625f * 1, 0.0625f * 2),	FVector2D(0.0625f * 2, 0.0625f * 2),
+	},
 	// Water
 	{
 		FVector2D(0.0625f * 14, 0.0625f * 12),	FVector2D(0.0625f * 15, 0.0625f * 12),
@@ -52,3 +77,8 @@ const float	FVoxel::BlockSize = 100.f;
 const int32 FVoxel::dx[] = { +0, +0, -1, +1, +0, +0 };
 const int32 FVoxel::dy[] = { -1, +1, +0, +0, +0, +0 };
 const int32 FVoxel::dz[] = { +0, +0, +0, +0, -1, +1 };
+
+const float FVoxel::CoalPercent = 15.f;
+const float FVoxel::IronPercent = 10.f;
+const float FVoxel::GoldPercent = 5.f;
+const float FVoxel::DiamondPercent = 2.5f;

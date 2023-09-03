@@ -1,9 +1,9 @@
-#include "GraphRenderer.h"
+#include "GraphRenderer2D.h"
 
 #include "VoxelFunctionLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-AGraphRenderer::AGraphRenderer()
+AGraphRenderer2D::AGraphRenderer2D()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -11,7 +11,7 @@ AGraphRenderer::AGraphRenderer()
 	SetRootComponent(SceneComponent);
 }
 
-void AGraphRenderer::OnConstruction(const FTransform& Transform)
+void AGraphRenderer2D::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
@@ -21,7 +21,7 @@ void AGraphRenderer::OnConstruction(const FTransform& Transform)
 #endif
 }
 
-void AGraphRenderer::BeginPlay()
+void AGraphRenderer2D::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -31,7 +31,7 @@ void AGraphRenderer::BeginPlay()
 #endif
 }
 
-void AGraphRenderer::DrawGraph()
+void AGraphRenderer2D::DrawGraph()
 {
 #if WITH_EDITOR
 	GetWorldTimerManager().SetTimer(TimerHandle, [this]()
@@ -42,7 +42,7 @@ void AGraphRenderer::DrawGraph()
 				
 		for (int32 X = 0; X < PositionCount; X++)
 		{
-			float Z = UVoxelFunctionLibrary::FBMNoise(FVector2D(X + 10, Y), GraphSettings.Octaves, GraphSettings.Scale, GraphSettings.HeightScale, GraphSettings.HeightOffset);
+			float Z = UVoxelFunctionLibrary::FBMNoise2D(FVector2D(X + 10, Y), GraphSettings.Octaves, GraphSettings.Scale, GraphSettings.HeightScale, GraphSettings.HeightOffset);
 			Positions.Add(FVector(X, Y, Z) * 100);
 		}
 

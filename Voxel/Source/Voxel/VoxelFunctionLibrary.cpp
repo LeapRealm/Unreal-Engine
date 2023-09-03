@@ -122,7 +122,7 @@ bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FInt
 		return false;
 
 	int32 Index = Index3DTo1D(CheckIndex, FVoxel::BlockCount);
-	if (Chunk->ChunkData[Index] == EBlockType::Air || Chunk->ChunkData[Index] == EBlockType::Water)
+	if (Chunk->BlockTypes[Index] == EBlockType::Air || Chunk->BlockTypes[Index] == EBlockType::Water)
 		return false;
 	return true;
 }
@@ -132,7 +132,7 @@ void UVoxelFunctionLibrary::CreateMeshSection(int32 Index, UProceduralMeshCompon
 	Component->CreateMeshSection(Index, Mesh.Vertices, Mesh.Triangles, Mesh.Normals, Mesh.UVs, Mesh.VertexColors, Mesh.Tangents, true);
 }
 
-float UVoxelFunctionLibrary::FBMNoise(const FVector2D& Location, int32 Octaves, float Scale, float HeightScale, float HeightOffset)
+float UVoxelFunctionLibrary::FBMNoise2D(const FVector2D& Location, int32 Octaves, float Scale, float HeightScale, float HeightOffset)
 {
 	float Total = 0.f;
 	float Frequency = 1.f;
@@ -180,21 +180,20 @@ EBlockTextureType UVoxelFunctionLibrary::GetTextureType(EBlockSide BlockSide, EB
 			break;
 		}
 	}
-	else if (BlockType == EBlockType::Dirt)
+	else
 	{
-		TextureType = EBlockTextureType::Dirt;
-	}
-	else if (BlockType == EBlockType::Stone)
-	{
-		TextureType = EBlockTextureType::Stone;
-	}
-	else if (BlockType == EBlockType::Sand)
-	{
-		TextureType = EBlockTextureType::Sand;
-	}
-	else if (BlockType == EBlockType::Water)
-	{
-		TextureType = EBlockTextureType::Water;
+		switch (BlockType)
+		{
+		case EBlockType::Dirt:		TextureType = EBlockTextureType::Dirt;		break;
+		case EBlockType::Stone:		TextureType = EBlockTextureType::Stone;		break;
+		case EBlockType::Sand:		TextureType = EBlockTextureType::Sand;		break;
+		case EBlockType::Coal:		TextureType = EBlockTextureType::Coal;		break;
+		case EBlockType::Iron:		TextureType = EBlockTextureType::Iron;		break;
+		case EBlockType::Gold:		TextureType = EBlockTextureType::Gold;		break;
+		case EBlockType::Diamond:	TextureType = EBlockTextureType::Diamond;	break;
+		case EBlockType::BedRock:	TextureType = EBlockTextureType::BedRock;	break;
+		case EBlockType::Water:		TextureType = EBlockTextureType::Water;		break;
+		}
 	}
 
 	return TextureType;

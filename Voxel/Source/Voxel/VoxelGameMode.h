@@ -5,7 +5,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "VoxelGameMode.generated.h"
 
-class AGraphRenderer;
+class AGraphRenderer2D;
 class AChunk;
 
 UCLASS()
@@ -21,8 +21,9 @@ public:
 	
 public:
 	inline static FGraphSettings SurfaceGraphSettings;
-	inline static FGraphSettings MixedGraphSettings;
 	inline static FGraphSettings StoneGraphSettings;
+	inline static FGraphSettings DiamondTopGraphSettings;
+	inline static FGraphSettings DiamondBottomGraphSettings;
 	
 public:
 	UPROPERTY(VisibleAnywhere)

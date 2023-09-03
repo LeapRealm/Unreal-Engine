@@ -34,8 +34,23 @@ enum class EBlockType : uint8
 	Dirt,
 	Stone,
 	Sand,
+	Coal,
+	Iron,
+	Gold,
+	Diamond,
+	BedRock,
 	Water,
 	Air,
+};
+
+UENUM(BlueprintType)
+enum class EBlockState : uint8
+{
+	NoCrack,
+	Crack1,
+	Crack2,
+	Crack3,
+	Crack4,
 };
 
 UENUM(BlueprintType)
@@ -46,6 +61,11 @@ enum class EBlockTextureType : uint8
 	Dirt,
 	Stone,
 	Sand,
+	Coal,
+	Iron,
+	Gold,
+	Diamond,
+	BedRock,
 	Water,
 };
 
@@ -54,8 +74,9 @@ enum class EGraphRendererType : uint8
 {
 	None,
 	Surface,
-	Mixed,
 	Stone,
+	DiamondTop,
+	DiamondBottom,
 };
 
 USTRUCT(BlueprintType)
@@ -111,9 +132,6 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	float HeightOffset = 0.f;
-
-	UPROPERTY(EditAnywhere, meta=(ClampMin=0.f, ClampMax=1.f))
-	float Probability = 0.f;
 };
 
 USTRUCT(BlueprintType)
@@ -143,4 +161,10 @@ public:
 	static const int32 dx[];
 	static const int32 dy[];
 	static const int32 dz[];
+
+public:
+	static const float CoalPercent;
+	static const float IronPercent;
+	static const float GoldPercent;
+	static const float DiamondPercent;
 };

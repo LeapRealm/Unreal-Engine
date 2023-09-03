@@ -24,7 +24,8 @@ private:
 
 public:
 	FMesh ChunkMesh;
-	TArray<EBlockType> ChunkData;
+	TArray<EBlockType> BlockTypes;
+	TArray<EBlockState> BlockStates;
 	FIntVector ChunkIndex;
 	
 private:

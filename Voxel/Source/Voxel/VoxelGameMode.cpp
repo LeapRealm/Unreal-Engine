@@ -1,7 +1,7 @@
 #include "VoxelGameMode.h"
 
 #include "Chunk.h"
-#include "GraphRenderer.h"
+#include "GraphRenderer2D.h"
 #include "VoxelCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -15,21 +15,24 @@ void AVoxelGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	TArray<AActor*> Actors;
-	UGameplayStatics::GetAllActorsOfClass(this, AGraphRenderer::StaticClass(), Actors);
+	UGameplayStatics::GetAllActorsOfClass(this, AGraphRenderer2D::StaticClass(), Actors);
 	for (AActor* Actor : Actors)
 	{
-		if (AGraphRenderer* GraphRenderer = Cast<AGraphRenderer>(Actor))
+		if (AGraphRenderer2D* GraphRenderer = Cast<AGraphRenderer2D>(Actor))
 		{
 			switch (GraphRenderer->Type)
 			{
 			case EGraphRendererType::Surface:
 				SurfaceGraphSettings = GraphRenderer->GraphSettings;
 				break;
-			case EGraphRendererType::Mixed:
-				MixedGraphSettings = GraphRenderer->GraphSettings;
-				break;
 			case EGraphRendererType::Stone:
 				StoneGraphSettings = GraphRenderer->GraphSettings;
+				break;
+			case EGraphRendererType::DiamondTop:
+				DiamondTopGraphSettings = GraphRenderer->GraphSettings;
+				break;
+			case EGraphRendererType::DiamondBottom:
+				DiamondBottomGraphSettings = GraphRenderer->GraphSettings;
 				break;
 			}
 		}
