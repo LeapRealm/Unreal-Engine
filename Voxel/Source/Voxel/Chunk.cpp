@@ -36,19 +36,19 @@ void AChunk::BuildChunkData()
 		FIntVector Index3D = UVoxelFunctionLibrary::Index1DTo3D(Index1D, BlockCount);
 		Index3D += (ChunkIndex * BlockCount);
 
-		const FGraphSettings& SurfaceSettings = AVoxelGameMode::SurfaceGraphSettings;
+		const FVoxelNoiseSettings& SurfaceSettings = AVoxelGameMode::SurfaceNoiseSettings;
 		int32 SurfaceHeight = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise2D(FVector2D(Index3D.X + BlockCount.X, Index3D.Y),
 			SurfaceSettings.Octaves, SurfaceSettings.Scale, SurfaceSettings.HeightScale, SurfaceSettings.HeightOffset));
 		
-		const FGraphSettings& StoneSettings = AVoxelGameMode::StoneGraphSettings;
+		const FVoxelNoiseSettings& StoneSettings = AVoxelGameMode::StoneNoiseSettings;
 		int32 StoneHeight = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise2D(FVector2D(Index3D.X + BlockCount.X, Index3D.Y),
 			StoneSettings.Octaves, StoneSettings.Scale, StoneSettings.HeightScale, StoneSettings.HeightOffset));
 
-		const FGraphSettings& DiamondTopSettings = AVoxelGameMode::DiamondTopGraphSettings;
+		const FVoxelNoiseSettings& DiamondTopSettings = AVoxelGameMode::DiamondTopNoiseSettings;
 		int32 DiamondTopHeight = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise2D(FVector2D(Index3D.X + BlockCount.X, Index3D.Y),
 			DiamondTopSettings.Octaves, DiamondTopSettings.Scale, DiamondTopSettings.HeightScale, DiamondTopSettings.HeightOffset));
 
-		const FGraphSettings& DiamondBottomSettings = AVoxelGameMode::DiamondBottomGraphSettings;
+		const FVoxelNoiseSettings& DiamondBottomSettings = AVoxelGameMode::DiamondBottomNoiseSettings;
 		int32 DiamondBottomHeight = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise2D(FVector2D(Index3D.X + BlockCount.X, Index3D.Y),
 			DiamondBottomSettings.Octaves, DiamondBottomSettings.Scale, DiamondBottomSettings.HeightScale, DiamondBottomSettings.HeightOffset));
 

@@ -5,7 +5,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "VoxelGameMode.generated.h"
 
-class AGraphRenderer2D;
+class ANoiseRenderer2D;
 class AChunk;
 
 UCLASS()
@@ -20,10 +20,10 @@ public:
 	virtual void BeginPlay() override;
 	
 public:
-	inline static FGraphSettings SurfaceGraphSettings;
-	inline static FGraphSettings StoneGraphSettings;
-	inline static FGraphSettings DiamondTopGraphSettings;
-	inline static FGraphSettings DiamondBottomGraphSettings;
+	inline static FVoxelNoiseSettings SurfaceNoiseSettings;
+	inline static FVoxelNoiseSettings StoneNoiseSettings;
+	inline static FVoxelNoiseSettings DiamondTopNoiseSettings;
+	inline static FVoxelNoiseSettings DiamondBottomNoiseSettings;
 	
 public:
 	UPROPERTY(VisibleAnywhere)

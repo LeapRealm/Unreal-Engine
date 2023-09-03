@@ -24,9 +24,9 @@ private:
 
 public:
 	FMesh ChunkMesh;
+	FIntVector ChunkIndex;
 	TArray<EBlockType> BlockTypes;
 	TArray<EBlockState> BlockStates;
-	FIntVector ChunkIndex;
 	
 private:
 	UPROPERTY(VisibleAnywhere)

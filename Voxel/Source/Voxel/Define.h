@@ -70,7 +70,7 @@ enum class EBlockTextureType : uint8
 };
 
 UENUM()
-enum class EGraphRendererType : uint8
+enum class ENoiseRendererType : uint8
 {
 	None,
 	Surface,
@@ -116,7 +116,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FGraphSettings
+struct FVoxelNoiseSettings
 {
 	GENERATED_BODY()
 	

@@ -1,7 +1,7 @@
 #include "VoxelGameMode.h"
 
 #include "Chunk.h"
-#include "GraphRenderer2D.h"
+#include "NoiseRenderer2D.h"
 #include "VoxelCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -15,24 +15,24 @@ void AVoxelGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	TArray<AActor*> Actors;
-	UGameplayStatics::GetAllActorsOfClass(this, AGraphRenderer2D::StaticClass(), Actors);
+	UGameplayStatics::GetAllActorsOfClass(this, ANoiseRenderer2D::StaticClass(), Actors);
 	for (AActor* Actor : Actors)
 	{
-		if (AGraphRenderer2D* GraphRenderer = Cast<AGraphRenderer2D>(Actor))
+		if (ANoiseRenderer2D* GraphRenderer = Cast<ANoiseRenderer2D>(Actor))
 		{
 			switch (GraphRenderer->Type)
 			{
-			case EGraphRendererType::Surface:
-				SurfaceGraphSettings = GraphRenderer->GraphSettings;
+			case ENoiseRendererType::Surface:
+				SurfaceNoiseSettings = GraphRenderer->NoiseSettings;
 				break;
-			case EGraphRendererType::Stone:
-				StoneGraphSettings = GraphRenderer->GraphSettings;
+			case ENoiseRendererType::Stone:
+				StoneNoiseSettings = GraphRenderer->NoiseSettings;
 				break;
-			case EGraphRendererType::DiamondTop:
-				DiamondTopGraphSettings = GraphRenderer->GraphSettings;
+			case ENoiseRendererType::DiamondTop:
+				DiamondTopNoiseSettings = GraphRenderer->NoiseSettings;
 				break;
-			case EGraphRendererType::DiamondBottom:
-				DiamondBottomGraphSettings = GraphRenderer->GraphSettings;
+			case ENoiseRendererType::DiamondBottom:
+				DiamondBottomNoiseSettings = GraphRenderer->NoiseSettings;
 				break;
 			}
 		}
