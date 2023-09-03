@@ -4,7 +4,7 @@
 #include "Define.h"
 #include "ProceduralMeshComponent.h"
 
-void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide Side, EBlockType Type, const FVector& Offset, FMesh& OutMesh)
+void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide BlockSide, EBlockTextureType TextureType, const FVector& Offset, FMesh& OutMesh)
 {
 	const FVector FLU = FVoxel::FLU + Offset;
 	const FVector FRU = FVoxel::FRU + Offset;
@@ -18,12 +18,12 @@ void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide Side, EBlockType Type, cons
 	int32 VertexNum = OutMesh.Vertices.Num();
 	OutMesh.Triangles.Append({ VertexNum + 0, VertexNum + 2, VertexNum + 1, VertexNum + 1, VertexNum + 2, VertexNum + 3 });
 
-	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][0]);
-	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][1]);
-	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][2]);
-	OutMesh.UVs.Add(FVoxel::BlockUVs[Type][3]);
+	OutMesh.UVs.Add(FVoxel::BlockTextureUVs[static_cast<int32>(TextureType)][0]);
+	OutMesh.UVs.Add(FVoxel::BlockTextureUVs[static_cast<int32>(TextureType)][1]);
+	OutMesh.UVs.Add(FVoxel::BlockTextureUVs[static_cast<int32>(TextureType)][2]);
+	OutMesh.UVs.Add(FVoxel::BlockTextureUVs[static_cast<int32>(TextureType)][3]);
 	
-	switch (Side)
+	switch (BlockSide)
 	{
 	case EBlockSide::Forward:
 		OutMesh.Vertices.Add(FRU);
@@ -94,34 +94,35 @@ void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide Side, EBlockType Type, cons
 	}
 }
 
-void UVoxelFunctionLibrary::BuildBlockMesh(AChunk* Chunk, EBlockType Type, const FIntVector& BlockIndex, const FVector& Offset)
+void UVoxelFunctionLibrary::BuildBlockMesh(AChunk* Chunk, EBlockType BlockType, const FIntVector& BlockIndex, const FVector& Offset)
 {
-	if (Type == Air)
+	if (BlockType == EBlockType::Air)
 		return;
 	
 	for (int32 i = 0; i < (int32)EBlockSide::Count; i++)
 	{
-		EBlockSide Side = static_cast<EBlockSide>(i);
-		if (DoesNeedOptimization(Chunk, BlockIndex, Side) == false)
-			UVoxelFunctionLibrary::BuildQuadMesh(Side, Type, Offset, Chunk->ChunkMesh);
+		EBlockSide BlockSide = static_cast<EBlockSide>(i);
+		if (DoesNeedOptimization(Chunk, BlockIndex, BlockSide) == false)
+			UVoxelFunctionLibrary::BuildQuadMesh(BlockSide, GetTextureType(BlockSide, BlockType), Offset, Chunk->ChunkMesh);
 	}
 }
 
-bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FIntVector& BlockIndex, EBlockSide Side)
+bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FIntVector& BlockIndex, EBlockSide BlockSide)
 {
-	const int32 dx[] = { +0, +0, -1, +1, +0, +0 };
-	const int32 dy[] = { -1, +1, +0, +0, +0, +0 };
-	const int32 dz[] = { +0, +0, +0, +0, -1, +1 };
-	
-	FIntVector CheckIndex = FIntVector(BlockIndex.X + dx[(int32)Side], BlockIndex.Y + dy[(int32)Side], BlockIndex.Z + dz[(int32)Side]);
-	
-	if (CheckIndex.X < 0 || CheckIndex.X >= Chunk->BlockCount.X ||
-		CheckIndex.Y < 0 || CheckIndex.Y >= Chunk->BlockCount.Y ||
-		CheckIndex.Z < 0 || CheckIndex.Z >= Chunk->BlockCount.Z)
+	FIntVector CheckIndex = FIntVector(
+		BlockIndex.X + FVoxel::dx[static_cast<int32>(BlockSide)],
+		BlockIndex.Y + FVoxel::dy[static_cast<int32>(BlockSide)],
+		BlockIndex.Z + FVoxel::dz[static_cast<int32>(BlockSide)]
+	);
+
+	const FIntVector& BlockCount = FVoxel::BlockCount;
+	if (CheckIndex.X < 0 || CheckIndex.X >= BlockCount.X ||
+		CheckIndex.Y < 0 || CheckIndex.Y >= BlockCount.Y ||
+		CheckIndex.Z < 0 || CheckIndex.Z >= BlockCount.Z)
 		return false;
 
-	int32 Index = Index3DTo1D(CheckIndex, Chunk->BlockCount);
-	if (Chunk->ChunkData[Index] == Air || Chunk->ChunkData[Index] == Water)
+	int32 Index = Index3DTo1D(CheckIndex, FVoxel::BlockCount);
+	if (Chunk->ChunkData[Index] == EBlockType::Air || Chunk->ChunkData[Index] == EBlockType::Water)
 		return false;
 	return true;
 }
@@ -155,4 +156,46 @@ FIntVector UVoxelFunctionLibrary::Index1DTo3D(int32 Index, const FIntVector& Blo
 	int32 Y = Index / BlockCount.X;
 	int32 X = Index % BlockCount.X;
 	return FIntVector(X, Y, Z);
+}
+
+EBlockTextureType UVoxelFunctionLibrary::GetTextureType(EBlockSide BlockSide, EBlockType BlockType)
+{
+	EBlockTextureType TextureType = EBlockTextureType::Dirt;
+
+	if (BlockType == EBlockType::Grass)
+	{
+		switch (BlockSide)
+		{
+		case EBlockSide::Left:
+		case EBlockSide::Right:
+		case EBlockSide::Backward:
+		case EBlockSide::Forward:
+			TextureType = EBlockTextureType::GrassSide;
+			break;
+		case EBlockSide::Down:
+			TextureType = EBlockTextureType::Dirt;
+			break;
+		case EBlockSide::Up:
+			TextureType = EBlockTextureType::GrassTop;
+			break;
+		}
+	}
+	else if (BlockType == EBlockType::Dirt)
+	{
+		TextureType = EBlockTextureType::Dirt;
+	}
+	else if (BlockType == EBlockType::Stone)
+	{
+		TextureType = EBlockTextureType::Stone;
+	}
+	else if (BlockType == EBlockType::Sand)
+	{
+		TextureType = EBlockTextureType::Sand;
+	}
+	else if (BlockType == EBlockType::Water)
+	{
+		TextureType = EBlockTextureType::Water;
+	}
+
+	return TextureType;
 }

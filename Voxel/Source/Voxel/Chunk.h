@@ -23,19 +23,9 @@ private:
 	void BuildChunkMesh();
 
 public:
-	float HeightScale = 5.887208f;
-	float Scale = 0.001f;
-	int32 Octaves = 8;
-	float HeightOffset = 20.f;
-
-public:
 	FMesh ChunkMesh;
-	TArray<TEnumAsByte<EBlockType>> ChunkData;
-
-public:
+	TArray<EBlockType> ChunkData;
 	FIntVector ChunkIndex;
-	FIntVector BlockCount;
-	float BlockSize;
 	
 private:
 	UPROPERTY(VisibleAnywhere)

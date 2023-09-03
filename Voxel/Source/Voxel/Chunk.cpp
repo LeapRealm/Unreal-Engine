@@ -4,7 +4,6 @@
 #include "ProceduralMeshComponent.h"
 #include "VoxelFunctionLibrary.h"
 #include "VoxelGameMode.h"
-#include "Kismet/GameplayStatics.h"
 
 AChunk::AChunk()
 {
@@ -22,34 +21,65 @@ void AChunk::Init(const FIntVector& InChunkIndex)
 {
 	ChunkIndex = InChunkIndex;
 	
-	AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this));
-    check(VoxelGameMode);
-    BlockCount = VoxelGameMode->BlockCount;
-	BlockSize = VoxelGameMode->BlockSize;
-	
 	BuildChunkData();
 	BuildChunkMesh();
 }
 
 void AChunk::BuildChunkData()
 {
+	const FIntVector& BlockCount = FVoxel::BlockCount;
 	ChunkData.SetNumUninitialized(BlockCount.X * BlockCount.Y * BlockCount.Z);
+	
 	for (int32 Index1D = 0; Index1D < ChunkData.Num(); Index1D++)
 	{
 		FIntVector Index3D = UVoxelFunctionLibrary::Index1DTo3D(Index1D, BlockCount);
 		Index3D += (ChunkIndex * BlockCount);
 
-		float Z = UVoxelFunctionLibrary::FBMNoise(FVector2D(Index3D.X + BlockCount.X, Index3D.Y), Octaves, Scale, HeightScale, HeightOffset);
-		if (Z >= Index3D.Z)
-			ChunkData[Index1D] = Dirt;
+		const FGraphSettings& SurfaceSettings = AVoxelGameMode::SurfaceGraphSettings;
+		int SurfaceHeight = static_cast<int>(UVoxelFunctionLibrary::FBMNoise(FVector2D(Index3D.X + BlockCount.X, Index3D.Y),
+			SurfaceSettings.Octaves, SurfaceSettings.Scale, SurfaceSettings.HeightScale, SurfaceSettings.HeightOffset));
+
+		const FGraphSettings& MixedSettings = AVoxelGameMode::MixedGraphSettings;
+		int MixedHeight = static_cast<int>(UVoxelFunctionLibrary::FBMNoise(FVector2D(Index3D.X + BlockCount.X, Index3D.Y),
+			MixedSettings.Octaves, MixedSettings.Scale, MixedSettings.HeightScale, MixedSettings.HeightOffset));
+		
+		const FGraphSettings& StoneSettings = AVoxelGameMode::StoneGraphSettings;
+		int StoneHeight = static_cast<int>(UVoxelFunctionLibrary::FBMNoise(FVector2D(Index3D.X + BlockCount.X, Index3D.Y),
+			StoneSettings.Octaves, StoneSettings.Scale, StoneSettings.HeightScale, StoneSettings.HeightOffset));
+
+		if (Index3D.Z < StoneHeight)
+		{
+			ChunkData[Index1D] = EBlockType::Stone;
+		}
+		else if (Index3D.Z < MixedHeight)
+		{
+			if (FMath::RandRange(0.f, 1.f) <= MixedSettings.Probability)
+				ChunkData[Index1D] = EBlockType::Dirt;
+			else
+				ChunkData[Index1D] = EBlockType::Stone;
+		}
+		else if (Index3D.Z < SurfaceHeight)
+		{
+			ChunkData[Index1D] = EBlockType::Dirt;
+		}
+		else if (Index3D.Z == SurfaceHeight)
+		{
+			ChunkData[Index1D] = EBlockType::Grass;
+		}
 		else
-			ChunkData[Index1D] = Air;
+		{
+			ChunkData[Index1D] = EBlockType::Air;
+		}
 	}
 }
 
 void AChunk::BuildChunkMesh()
 {
 	ChunkMesh.Empty();
+	
+	const FIntVector& BlockCount = FVoxel::BlockCount;
+	const int32 BlockSize = FVoxel::BlockSize;
+	
 	for (int32 z = 0; z < BlockCount.Z; z++)
 	{
 		for (int32 y = 0; y < BlockCount.Y; y++)

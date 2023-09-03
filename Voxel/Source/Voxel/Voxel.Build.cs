@@ -14,10 +14,7 @@ public class Voxel : ModuleRules
 			"CoreUObject", 
 			"Engine", 
 			"InputCore",
-		});
-		
-		PrivateDependencyModuleNames.AddRange(new string[]
-		{
+			"EnhancedInput",
 			"ProceduralMeshComponent",
 		});
 		

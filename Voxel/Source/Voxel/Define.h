@@ -28,7 +28,7 @@ enum class EBlockSide : uint8
 };
 
 UENUM(BlueprintType)
-enum EBlockType
+enum class EBlockType : uint8
 {
 	Grass,
 	Dirt,
@@ -36,6 +36,26 @@ enum EBlockType
 	Sand,
 	Water,
 	Air,
+};
+
+UENUM(BlueprintType)
+enum class EBlockTextureType : uint8
+{
+	GrassTop,
+	GrassSide,
+	Dirt,
+	Stone,
+	Sand,
+	Water,
+};
+
+UENUM()
+enum class EGraphRendererType : uint8
+{
+	None,
+	Surface,
+	Mixed,
+	Stone,
 };
 
 USTRUCT(BlueprintType)
@@ -75,6 +95,28 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct FGraphSettings
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, meta=(ClampMin=0.f, ClampMax=1.f))
+	float Scale = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float HeightScale = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	int32 Octaves = 0;
+	
+	UPROPERTY(EditAnywhere)
+	float HeightOffset = 0.f;
+
+	UPROPERTY(EditAnywhere, meta=(ClampMin=0.f, ClampMax=1.f))
+	float Probability = 0.f;
+};
+
+USTRUCT(BlueprintType)
 struct FVoxel
 {
 	GENERATED_BODY()
@@ -90,5 +132,15 @@ public:
 	static const FVector BRD;
 
 public:
-	static const TArray<TArray<FVector2D>> BlockUVs;
+	static const TArray<TArray<FVector2D>> BlockTextureUVs;
+
+public:
+	static const FIntVector ChunkCount;
+	static const FIntVector BlockCount;
+	static const float BlockSize;
+
+public:
+	static const int32 dx[];
+	static const int32 dy[];
+	static const int32 dz[];
 };
