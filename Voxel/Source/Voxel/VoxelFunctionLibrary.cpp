@@ -175,6 +175,18 @@ float UVoxelFunctionLibrary::FBMNoise2D(const FVector2D& Location, int32 Octaves
 	return Total + HeightOffset;
 }
 
+float UVoxelFunctionLibrary::FBMNoise3D(const FVector& Location, int32 Octaves, float Scale, float HeightScale, float HeightOffset)
+{
+	float Total = 0.f;
+	float Frequency = 1.f;
+	for (int32 i = 0; i < Octaves; i++)
+	{
+		Total += FMath::PerlinNoise3D(FVector(Location.X * Scale * Frequency, Location.Y * Scale * Frequency, Location.Z * Scale * Frequency)) * HeightScale;
+		Frequency *= 2;
+	}
+	return Total + HeightOffset;
+}
+
 int32 UVoxelFunctionLibrary::Index3DTo1D(const FIntVector& Index, const FIntVector& BlockCount)
 {
 	return (Index.Z * BlockCount.X * BlockCount.Y) + (Index.Y * BlockCount.X) + Index.X;

@@ -24,6 +24,7 @@ public:
 	inline static FVoxelNoiseSettings StoneNoiseSettings;
 	inline static FVoxelNoiseSettings DiamondTopNoiseSettings;
 	inline static FVoxelNoiseSettings DiamondBottomNoiseSettings;
+	inline static FVoxelNoiseSettings CaveNoiseSettings;
 	
 public:
 	UPROPERTY(VisibleAnywhere)

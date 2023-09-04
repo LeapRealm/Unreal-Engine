@@ -70,15 +70,24 @@ const TArray<TArray<FVector2D>> FVoxel::BlockTextureUVs =
 	},
 };
 
-const FIntVector FVoxel::ChunkCount = FIntVector(10, 10, 10);
-const FIntVector FVoxel::BlockCount = FIntVector(10, 10, 10);
+const FIntVector FVoxel::ChunkCount = FIntVector(5, 5, 10);
+const FIntVector FVoxel::BlockCount = FIntVector(20, 20, 20);
 const float	FVoxel::BlockSize = 100.f;
 
 const int32 FVoxel::DX[] = { +0, +0, -1, +1, +0, +0 };
 const int32 FVoxel::DY[] = { -1, +1, +0, +0, +0, +0 };
 const int32 FVoxel::DZ[] = { +0, +0, +0, +0, -1, +1 };
 
-const float FVoxel::CoalPercent = 15.f;
-const float FVoxel::IronPercent = 10.f;
-const float FVoxel::GoldPercent = 5.f;
-const float FVoxel::DiamondPercent = 2.5f;
+const float FVoxel::CoalPercent = 8.f;
+const float FVoxel::IronPercent = 4.f;
+const float FVoxel::GoldPercent = 2.f;
+const float FVoxel::DiamondPercent = 1.f;
+const float FVoxel::CavePercent = 10.f;
+
+/*
+(Scale=0.001000,HeightScale=5.887208,Octaves=8,HeightOffset=20.000000,DrawCutOff=0.000000)
+(Scale=0.001000,HeightScale=3.668292,Octaves=9,HeightOffset=12.682276,DrawCutOff=0.000000)
+(Scale=0.001000,HeightScale=1.853949,Octaves=8,HeightOffset=4.000000,DrawCutOff=0.000000)
+(Scale=0.001000,HeightScale=1.853949,Octaves=8,HeightOffset=1.000000,DrawCutOff=0.000000)
+(Scale=0.080000,HeightScale=2.000000,Octaves=2,HeightOffset=1.000000,DrawCutOff=0.200000)
+*/

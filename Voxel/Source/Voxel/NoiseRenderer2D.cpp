@@ -7,8 +7,9 @@ ANoiseRenderer2D::ANoiseRenderer2D()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
-	SetRootComponent(SceneComponent);
+#if WITH_EDITOR
+	NoiseSettings = { 0.001f, 5.887208f, 8, 20.f };
+#endif
 }
 
 void ANoiseRenderer2D::Tick(float DeltaSeconds)
@@ -27,6 +28,8 @@ void ANoiseRenderer2D::Tick(float DeltaSeconds)
 
 void ANoiseRenderer2D::DrawGraph()
 {
+	Super::DrawGraph();
+	
 #if WITH_EDITOR
 	int32 Y = -1;
 	TArray<FVector> Positions;
@@ -34,7 +37,7 @@ void ANoiseRenderer2D::DrawGraph()
 				
 	for (int32 X = 0; X < PositionCount; X++)
 	{
-		float Z = UVoxelFunctionLibrary::FBMNoise2D(FVector2D(X + 10, Y),
+		float Z = UVoxelFunctionLibrary::FBMNoise2D(FVector2D(X, Y),
 			NoiseSettings.Octaves, NoiseSettings.Scale, NoiseSettings.HeightScale, NoiseSettings.HeightOffset);
 		Positions.Add(FVector(X, Y, Z) * 100);
 	}

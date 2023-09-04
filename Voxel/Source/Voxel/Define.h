@@ -77,23 +77,13 @@ enum class ENoiseRendererType : uint8
 	Stone,
 	DiamondTop,
 	DiamondBottom,
+	Cave,
 };
 
 USTRUCT(BlueprintType)
 struct FMesh
 {
 	GENERATED_BODY()
-
-public:
-	void Empty()
-	{
-		Vertices.Empty();
-		Triangles.Empty();
-		Normals.Empty();
-		UVs.Empty();
-		Tangents.Empty();
-		VertexColors.Empty();
-	}
 
 public:
 	UPROPERTY(VisibleAnywhere)
@@ -113,6 +103,17 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FColor> VertexColors;
+	
+public:
+	void Empty()
+	{
+		Vertices.Empty();
+		Triangles.Empty();
+		Normals.Empty();
+		UVs.Empty();
+		Tangents.Empty();
+		VertexColors.Empty();
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -132,6 +133,21 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	float HeightOffset = 0.f;
+
+	UPROPERTY(EditAnywhere, meta=(ClampMin=0.f, ClampMax=50.f))
+	float DrawCutOff = 0.f;
+
+public:
+	bool operator==(const FVoxelNoiseSettings& Other) const
+	{
+		return (Scale == Other.Scale && HeightScale == Other.HeightScale && Octaves == Other.Octaves &&
+				HeightOffset == Other.HeightOffset && DrawCutOff == Other.DrawCutOff);
+	}
+	
+	bool operator!=(const FVoxelNoiseSettings& Other) const
+	{
+		return !(*this == Other);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -167,4 +183,5 @@ public:
 	static const float IronPercent;
 	static const float GoldPercent;
 	static const float DiamondPercent;
+	static const float CavePercent;
 };

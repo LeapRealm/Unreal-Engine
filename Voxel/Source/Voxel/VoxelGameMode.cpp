@@ -1,7 +1,8 @@
 #include "VoxelGameMode.h"
 
 #include "Chunk.h"
-#include "NoiseRenderer2D.h"
+#include "NoiseRendererBase.h"
+#include "Define.h"
 #include "VoxelCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -15,24 +16,27 @@ void AVoxelGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	TArray<AActor*> Actors;
-	UGameplayStatics::GetAllActorsOfClass(this, ANoiseRenderer2D::StaticClass(), Actors);
+	UGameplayStatics::GetAllActorsOfClass(this, ANoiseRendererBase::StaticClass(), Actors);
 	for (AActor* Actor : Actors)
 	{
-		if (ANoiseRenderer2D* GraphRenderer = Cast<ANoiseRenderer2D>(Actor))
+		if (ANoiseRendererBase* NoiseRenderer = Cast<ANoiseRendererBase>(Actor))
 		{
-			switch (GraphRenderer->Type)
+			switch (NoiseRenderer->Type)
 			{
 			case ENoiseRendererType::Surface:
-				SurfaceNoiseSettings = GraphRenderer->NoiseSettings;
+				SurfaceNoiseSettings = NoiseRenderer->NoiseSettings;
 				break;
 			case ENoiseRendererType::Stone:
-				StoneNoiseSettings = GraphRenderer->NoiseSettings;
+				StoneNoiseSettings = NoiseRenderer->NoiseSettings;
 				break;
 			case ENoiseRendererType::DiamondTop:
-				DiamondTopNoiseSettings = GraphRenderer->NoiseSettings;
+				DiamondTopNoiseSettings = NoiseRenderer->NoiseSettings;
 				break;
 			case ENoiseRendererType::DiamondBottom:
-				DiamondBottomNoiseSettings = GraphRenderer->NoiseSettings;
+				DiamondBottomNoiseSettings = NoiseRenderer->NoiseSettings;
+				break;
+			case ENoiseRendererType::Cave:
+				CaveNoiseSettings = NoiseRenderer->NoiseSettings;
 				break;
 			}
 		}
