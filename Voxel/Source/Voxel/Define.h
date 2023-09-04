@@ -158,9 +158,9 @@ public:
 	static const float BlockSize;
 
 public:
-	static const int32 dx[];
-	static const int32 dy[];
-	static const int32 dz[];
+	static const int32 DX[];
+	static const int32 DY[];
+	static const int32 DZ[];
 
 public:
 	static const float CoalPercent;

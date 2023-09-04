@@ -50,9 +50,13 @@ void AVoxelGameMode::BeginPlay()
 			for (int32 x = 0; x < ChunkCount.X; x++)
 			{
 				AChunk* Chunk = GetWorld()->SpawnActor<AChunk>(FVector(x * BlockCount.X, y * BlockCount.Y, z * BlockCount.Z) * BlockSize, FRotator::ZeroRotator);
-				Chunk->Init(FIntVector(x, y, z));
+				Chunk->SetChunkIndex(FIntVector(x, y, z));
+				Chunk->BuildChunkData();
 				Chunks.Add(Chunk);
 			}
 		}
 	}
+
+	for (int32 i = 0; i < Chunks.Num(); i++)
+		Chunks[i]->BuildChunkMesh();
 }

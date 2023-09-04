@@ -3,6 +3,8 @@
 #include "Chunk.h"
 #include "Define.h"
 #include "ProceduralMeshComponent.h"
+#include "VoxelGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide BlockSide, EBlockTextureType TextureType, const FVector& Offset, FMesh& OutMesh)
 {
@@ -109,20 +111,49 @@ void UVoxelFunctionLibrary::BuildBlockMesh(AChunk* Chunk, EBlockType BlockType, 
 
 bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FIntVector& BlockIndex, EBlockSide BlockSide)
 {
-	FIntVector CheckIndex = FIntVector(
-		BlockIndex.X + FVoxel::dx[static_cast<int32>(BlockSide)],
-		BlockIndex.Y + FVoxel::dy[static_cast<int32>(BlockSide)],
-		BlockIndex.Z + FVoxel::dz[static_cast<int32>(BlockSide)]
+	FIntVector CheckBlockIndex = FIntVector(
+		BlockIndex.X + FVoxel::DX[static_cast<int32>(BlockSide)],
+		BlockIndex.Y + FVoxel::DY[static_cast<int32>(BlockSide)],
+		BlockIndex.Z + FVoxel::DZ[static_cast<int32>(BlockSide)]
 	);
 
 	const FIntVector& BlockCount = FVoxel::BlockCount;
-	if (CheckIndex.X < 0 || CheckIndex.X >= BlockCount.X ||
-		CheckIndex.Y < 0 || CheckIndex.Y >= BlockCount.Y ||
-		CheckIndex.Z < 0 || CheckIndex.Z >= BlockCount.Z)
-		return false;
+	const FIntVector& ChunkCount = FVoxel::ChunkCount;
 
-	int32 Index = Index3DTo1D(CheckIndex, FVoxel::BlockCount);
-	if (Chunk->BlockTypes[Index] == EBlockType::Air || Chunk->BlockTypes[Index] == EBlockType::Water)
+	EBlockType BlockType;
+	
+	if (CheckBlockIndex.X < 0 || CheckBlockIndex.X >= BlockCount.X ||
+		CheckBlockIndex.Y < 0 || CheckBlockIndex.Y >= BlockCount.Y ||
+		CheckBlockIndex.Z < 0 || CheckBlockIndex.Z >= BlockCount.Z)
+	{
+		CheckBlockIndex.X = (CheckBlockIndex.X + BlockCount.X) % BlockCount.X;
+		CheckBlockIndex.Y = (CheckBlockIndex.Y + BlockCount.Y) % BlockCount.Y;
+		CheckBlockIndex.Z = (CheckBlockIndex.Z + BlockCount.Z) % BlockCount.Z;
+		
+		FIntVector CheckChunkIndex = FIntVector(
+			Chunk->ChunkIndex.X + FVoxel::DX[static_cast<int32>(BlockSide)],
+			Chunk->ChunkIndex.Y + FVoxel::DY[static_cast<int32>(BlockSide)],
+			Chunk->ChunkIndex.Z + FVoxel::DZ[static_cast<int32>(BlockSide)]
+		);
+
+		if (CheckChunkIndex.X < 0 || CheckChunkIndex.X >= ChunkCount.X ||
+			CheckChunkIndex.Y < 0 || CheckChunkIndex.Y >= ChunkCount.Y ||
+			CheckChunkIndex.Z < 0 || CheckChunkIndex.Z >= ChunkCount.Z)
+			return false;
+		
+		AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(Chunk));
+		check(VoxelGameMode);
+		
+		AChunk* CheckChunk = VoxelGameMode->Chunks[Index3DTo1D(CheckChunkIndex, ChunkCount)];
+		BlockType = CheckChunk->BlockTypes[Index3DTo1D(CheckBlockIndex, BlockCount)];
+	}
+	else
+	{
+		int32 Index = Index3DTo1D(CheckBlockIndex, FVoxel::BlockCount);
+		BlockType = Chunk->BlockTypes[Index];
+	}
+
+	if (BlockType == EBlockType::Air || BlockType == EBlockType::Water)
 		return false;
 	return true;
 }

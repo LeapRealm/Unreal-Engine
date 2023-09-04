@@ -17,14 +17,6 @@ AChunk::AChunk()
 		Material = M_Block.Object;
 }
 
-void AChunk::Init(const FIntVector& InChunkIndex)
-{
-	ChunkIndex = InChunkIndex;
-	
-	BuildChunkData();
-	BuildChunkMesh();
-}
-
 void AChunk::BuildChunkData()
 {
 	const FIntVector& BlockCount = FVoxel::BlockCount;

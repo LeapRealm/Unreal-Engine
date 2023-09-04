@@ -16,12 +16,12 @@ public:
 	AChunk();
 
 public:
-	void Init(const FIntVector& InChunkIndex);
-
-private:
 	void BuildChunkData(); 
 	void BuildChunkMesh();
 
+public:
+	void SetChunkIndex(const FIntVector& InChunkIndex) { ChunkIndex = InChunkIndex; }
+	
 public:
 	FMesh ChunkMesh;
 	FIntVector ChunkIndex;

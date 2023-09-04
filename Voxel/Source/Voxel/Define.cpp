@@ -74,9 +74,9 @@ const FIntVector FVoxel::ChunkCount = FIntVector(10, 10, 10);
 const FIntVector FVoxel::BlockCount = FIntVector(10, 10, 10);
 const float	FVoxel::BlockSize = 100.f;
 
-const int32 FVoxel::dx[] = { +0, +0, -1, +1, +0, +0 };
-const int32 FVoxel::dy[] = { -1, +1, +0, +0, +0, +0 };
-const int32 FVoxel::dz[] = { +0, +0, +0, +0, -1, +1 };
+const int32 FVoxel::DX[] = { +0, +0, -1, +1, +0, +0 };
+const int32 FVoxel::DY[] = { -1, +1, +0, +0, +0, +0 };
+const int32 FVoxel::DZ[] = { +0, +0, +0, +0, -1, +1 };
 
 const float FVoxel::CoalPercent = 15.f;
 const float FVoxel::IronPercent = 10.f;
