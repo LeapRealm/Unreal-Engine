@@ -169,8 +169,8 @@ public:
 	static const TArray<TArray<FVector2D>> BlockTextureUVs;
 
 public:
-	static const FIntVector ChunkCount;
 	static const FIntVector BlockCount;
+	static const FIntVector ChunkCount;
 	static const float BlockSize;
 
 public:

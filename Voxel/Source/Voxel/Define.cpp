@@ -70,8 +70,8 @@ const TArray<TArray<FVector2D>> FVoxel::BlockTextureUVs =
 	},
 };
 
+const FIntVector FVoxel::BlockCount = FIntVector(16, 16, 16);
 const FIntVector FVoxel::ChunkCount = FIntVector(20, 20, 10);
-const FIntVector FVoxel::BlockCount = FIntVector(20, 20, 20);
 const float	FVoxel::BlockSize = 100.f;
 
 const int32 FVoxel::DX[] = { +0, +0, -1, +1, +0, +0 };
