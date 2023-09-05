@@ -82,7 +82,7 @@ const float FVoxel::CoalPercent = 8.f;
 const float FVoxel::IronPercent = 4.f;
 const float FVoxel::GoldPercent = 2.f;
 const float FVoxel::DiamondPercent = 1.f;
-const float FVoxel::CavePercent = 10.f;
+const float FVoxel::CavePercent = 30.f;
 
 /*
 (Scale=0.001000,HeightScale=5.887208,Octaves=8,HeightOffset=20.000000,DrawCutOff=0.000000)
