@@ -35,7 +35,7 @@ AVoxelCharacter::AVoxelCharacter()
 
 	GetCharacterMovement()->GravityScale = 1.2f;
 	GetCharacterMovement()->MaxWalkSpeed = 450.f;
-	GetCharacterMovement()->JumpZVelocity = 450.f;
+	GetCharacterMovement()->JumpZVelocity = 500.f;
 }
 
 void AVoxelCharacter::BeginPlay()
