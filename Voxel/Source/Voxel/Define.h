@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "ProceduralMeshComponent.h"
+#include "FastNoiseWrapper.h"
 #include "Define.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCustom, Log, All);
@@ -117,12 +118,12 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FVoxelNoiseSettings
+struct FPerlinNoiseSettings
 {
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, meta=(ClampMin=0.f, ClampMax=1.f))
+	UPROPERTY(EditAnywhere)
 	float Scale = 0.f;
 
 	UPROPERTY(EditAnywhere)
@@ -134,20 +135,36 @@ public:
 	UPROPERTY(EditAnywhere)
 	float HeightOffset = 0.f;
 
-	UPROPERTY(EditAnywhere, meta=(ClampMin=0.f, ClampMax=50.f))
+	UPROPERTY(EditAnywhere)
 	float DrawCutOff = 0.f;
+};
 
-public:
-	bool operator==(const FVoxelNoiseSettings& Other) const
-	{
-		return (Scale == Other.Scale && HeightScale == Other.HeightScale && Octaves == Other.Octaves &&
-				HeightOffset == Other.HeightOffset && DrawCutOff == Other.DrawCutOff);
-	}
+USTRUCT(BlueprintType)
+struct FFastNoiseSettings
+{
+	GENERATED_BODY()
 	
-	bool operator!=(const FVoxelNoiseSettings& Other) const
-	{
-		return !(*this == Other);
-	}
+public:
+	UPROPERTY(EditAnywhere)
+	EFastNoise_NoiseType NoiseType = EFastNoise_NoiseType::Simplex;
+	
+	UPROPERTY(EditAnywhere)
+	float Frequency = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	int32 Octaves = 0;
+
+	UPROPERTY(EditAnywhere)
+	float Lacunarity = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float Gain = 0.f;
+	
+	UPROPERTY(EditAnywhere)
+	float HeightScale = 0;
+
+	UPROPERTY(EditAnywhere)
+	float HeightOffset = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -184,4 +201,8 @@ public:
 	static const float GoldPercent;
 	static const float DiamondPercent;
 	static const float CavePercent;
+
+	static const float StoneHeightOffset;
+	static const float DiamondHeightMin;
+	static const float DiamondHeightMax;
 };

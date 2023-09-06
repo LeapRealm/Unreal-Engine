@@ -16,6 +16,8 @@ public class Voxel : ModuleRules
 			"InputCore",
 			"EnhancedInput",
 			"ProceduralMeshComponent",
+			"FastNoise",
+			"FastNoiseGenerator",
 		});
 		
 		PrivateIncludePaths.AddRange(new string[]

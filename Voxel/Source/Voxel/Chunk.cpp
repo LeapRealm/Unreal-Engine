@@ -4,6 +4,7 @@
 #include "ProceduralMeshComponent.h"
 #include "VoxelFunctionLibrary.h"
 #include "VoxelGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 AChunk::AChunk()
 {
@@ -19,6 +20,9 @@ AChunk::AChunk()
 
 void AChunk::BuildChunkData()
 {
+	AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this));
+	check(VoxelGameMode);
+	
 	const FIntVector& BlockCount = FVoxel::BlockCount;
 	BlockTypes.SetNumUninitialized(BlockCount.X * BlockCount.Y * BlockCount.Z);
 	BlockStates.SetNumUninitialized(BlockCount.X * BlockCount.Y * BlockCount.Z);
@@ -27,90 +31,80 @@ void AChunk::BuildChunkData()
 	
 	for (int32 Index1D = 0; Index1D < BlockTypes.Num(); Index1D++)
 	{
+		BlockStates[Index1D] = EBlockState::NoCrack;
+		
 		FIntVector Index3D = UVoxelFunctionLibrary::Index1DTo3D(Index1D, BlockCount);
 		Index3D += (ChunkIndex * BlockCount);
-
-		const FVoxelNoiseSettings& SurfaceSettings = AVoxelGameMode::SurfaceNoiseSettings;
-		int32 SurfaceHeight = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise2D(FVector2D(Index3D.X, Index3D.Y),
-			SurfaceSettings.Octaves, SurfaceSettings.Scale, SurfaceSettings.HeightScale, SurfaceSettings.HeightOffset));
 		
-		const FVoxelNoiseSettings& StoneSettings = AVoxelGameMode::StoneNoiseSettings;
-		int32 StoneHeight = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise2D(FVector2D(Index3D.X, Index3D.Y),
-			StoneSettings.Octaves, StoneSettings.Scale, StoneSettings.HeightScale, StoneSettings.HeightOffset));
-
-		const FVoxelNoiseSettings& CaveSettings = AVoxelGameMode::CaveNoiseSettings;
-		int32 CaveDig = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise3D(FVector(Index3D),
-			CaveSettings.Octaves, CaveSettings.Scale, CaveSettings.HeightScale, CaveSettings.HeightOffset));
-
-		const FVoxelNoiseSettings& DiamondTopSettings = AVoxelGameMode::DiamondTopNoiseSettings;
-		int32 DiamondTopHeight = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise2D(FVector2D(Index3D.X, Index3D.Y),
-			DiamondTopSettings.Octaves, DiamondTopSettings.Scale, DiamondTopSettings.HeightScale, DiamondTopSettings.HeightOffset));
-
-		const FVoxelNoiseSettings& DiamondBottomSettings = AVoxelGameMode::DiamondBottomNoiseSettings;
-		int32 DiamondBottomHeight = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise2D(FVector2D(Index3D.X, Index3D.Y),
-			DiamondBottomSettings.Octaves, DiamondBottomSettings.Scale, DiamondBottomSettings.HeightScale, DiamondBottomSettings.HeightOffset));
+		int32 SurfaceHeight = static_cast<int32>(VoxelGameMode->FastNoise2D(VoxelGameMode->SurfaceNoiseWrapper, 
+			FVector2D(Index3D.X, Index3D.Y), VoxelGameMode->SurfaceNoiseSettings));
 		
-		if (CaveRandValue <= FVoxel::CavePercent && Index3D.Z < StoneHeight &&
-			Index3D.Z > DiamondBottomHeight && CaveDig < CaveSettings.DrawCutOff)
+		int32 StoneHeight = SurfaceHeight - FVoxel::StoneHeightOffset;
+		
+		if (CaveRandValue <= FVoxel::CavePercent && Index3D.Z < StoneHeight && Index3D.Z > FVoxel::DiamondHeightMin)
 		{
-			BlockTypes[Index1D] = EBlockType::Air;
+			const FPerlinNoiseSettings& CaveSettings = VoxelGameMode->CaveNoiseSettings;
+			int32 CaveDig = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise3D(FVector(Index3D),
+				CaveSettings.Octaves, CaveSettings.Scale, CaveSettings.HeightScale, CaveSettings.HeightOffset));
+			
+			if (CaveDig < CaveSettings.DrawCutOff)
+			{
+				BlockTypes[Index1D] = EBlockType::Air;
+				continue;
+			}
+		}
+		
+		if (Index3D.Z < FVoxel::DiamondHeightMin)
+		{
+			BlockTypes[Index1D] = EBlockType::Stone;
+		}
+		else if (Index3D.Z < FVoxel::DiamondHeightMax)
+		{
+			float Percent = 0.f;
+			float RandValue = FMath::RandRange(0.f, 100.f);
+			
+			if (RandValue <= (Percent += FVoxel::IronPercent))
+				BlockTypes[Index1D] = EBlockType::Iron;
+			else if (RandValue <= (Percent += FVoxel::DiamondPercent))
+				BlockTypes[Index1D] = EBlockType::Diamond;
+			else
+				BlockTypes[Index1D] = EBlockType::Stone;
+		}
+		else if (Index3D.Z < StoneHeight)
+		{
+			float Percent = 0.f;
+			float RandValue = FMath::RandRange(0.f, 100.f);
+			
+			if (RandValue <= (Percent += FVoxel::CoalPercent))
+				BlockTypes[Index1D] = EBlockType::Coal;
+			else if (RandValue <= (Percent += FVoxel::IronPercent))
+				BlockTypes[Index1D] = EBlockType::Iron;
+			else if (RandValue <= (Percent += FVoxel::GoldPercent))
+				BlockTypes[Index1D] = EBlockType::Gold;
+			else
+				BlockTypes[Index1D] = EBlockType::Stone;
+		}
+		else if (Index3D.Z < (StoneHeight + SurfaceHeight) / 2)
+		{
+			float RandValue = FMath::RandRange(0.f, 100.f);
+			
+			if (RandValue <= 50.f)
+				BlockTypes[Index1D] = EBlockType::Dirt;
+			else
+				BlockTypes[Index1D] = EBlockType::Stone;
+		}
+		else if (Index3D.Z < SurfaceHeight)
+		{
+			BlockTypes[Index1D] = EBlockType::Dirt;
+		}
+		else if (Index3D.Z == SurfaceHeight)
+		{
+			BlockTypes[Index1D] = EBlockType::Grass;
 		}
 		else
 		{
-			if (Index3D.Z < DiamondBottomHeight)
-			{
-				BlockTypes[Index1D] = EBlockType::Stone;
-			}
-			else if (Index3D.Z < DiamondTopHeight)
-			{
-				float Percent = 0.f;
-				float RandValue = FMath::RandRange(0.f, 100.f);
-			
-				if (RandValue <= (Percent += FVoxel::IronPercent))
-					BlockTypes[Index1D] = EBlockType::Iron;
-				else if (RandValue <= (Percent += FVoxel::DiamondPercent))
-					BlockTypes[Index1D] = EBlockType::Diamond;
-				else
-					BlockTypes[Index1D] = EBlockType::Stone;
-			}
-			else if (Index3D.Z < StoneHeight)
-			{
-				float Percent = 0.f;
-				float RandValue = FMath::RandRange(0.f, 100.f);
-			
-				if (RandValue <= (Percent += FVoxel::CoalPercent))
-					BlockTypes[Index1D] = EBlockType::Coal;
-				else if (RandValue <= (Percent += FVoxel::IronPercent))
-					BlockTypes[Index1D] = EBlockType::Iron;
-				else if (RandValue <= (Percent += FVoxel::GoldPercent))
-					BlockTypes[Index1D] = EBlockType::Gold;
-				else
-					BlockTypes[Index1D] = EBlockType::Stone;
-			}
-			else if (Index3D.Z < (StoneHeight + SurfaceHeight) / 2)
-			{
-				float RandValue = FMath::RandRange(0.f, 100.f);
-			
-				if (RandValue <= 50.f)
-					BlockTypes[Index1D] = EBlockType::Dirt;
-				else
-					BlockTypes[Index1D] = EBlockType::Stone;
-			}
-			else if (Index3D.Z < SurfaceHeight)
-			{
-				BlockTypes[Index1D] = EBlockType::Dirt;
-			}
-			else if (Index3D.Z == SurfaceHeight)
-			{
-				BlockTypes[Index1D] = EBlockType::Grass;
-			}
-			else
-			{
-				BlockTypes[Index1D] = EBlockType::Air;
-			}
+			BlockTypes[Index1D] = EBlockType::Air;
 		}
-
-		BlockStates[Index1D] = EBlockState::NoCrack;
 	}
 }
 

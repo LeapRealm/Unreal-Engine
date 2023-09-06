@@ -70,8 +70,8 @@ const TArray<TArray<FVector2D>> FVoxel::BlockTextureUVs =
 	},
 };
 
-const FIntVector FVoxel::BlockCount = FIntVector(16, 16, 16);
-const FIntVector FVoxel::ChunkCount = FIntVector(20, 20, 10);
+const FIntVector FVoxel::BlockCount = FIntVector(32, 32, 32);
+const FIntVector FVoxel::ChunkCount = FIntVector(5, 5, 10);
 const float	FVoxel::BlockSize = 100.f;
 
 const int32 FVoxel::DX[] = { +0, +0, -1, +1, +0, +0 };
@@ -84,10 +84,6 @@ const float FVoxel::GoldPercent = 2.f;
 const float FVoxel::DiamondPercent = 1.f;
 const float FVoxel::CavePercent = 15.f;
 
-/*
-(Scale=0.001000,HeightScale=5.887208,Octaves=8,HeightOffset=20.000000,DrawCutOff=0.000000)
-(Scale=0.001000,HeightScale=3.668292,Octaves=9,HeightOffset=12.682276,DrawCutOff=0.000000)
-(Scale=0.001000,HeightScale=1.853949,Octaves=8,HeightOffset=4.000000,DrawCutOff=0.000000)
-(Scale=0.001000,HeightScale=1.853949,Octaves=8,HeightOffset=1.000000,DrawCutOff=0.000000)
-(Scale=0.080000,HeightScale=2.000000,Octaves=2,HeightOffset=1.000000,DrawCutOff=0.200000)
-*/
+const float FVoxel::StoneHeightOffset = 15.f;
+const float FVoxel::DiamondHeightMin = 4;
+const float FVoxel::DiamondHeightMax = 8;

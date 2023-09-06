@@ -1,47 +1,34 @@
 #include "VoxelGameMode.h"
 
 #include "Chunk.h"
-#include "NoiseRendererBase.h"
 #include "Define.h"
+#include "FastNoiseWrapper.h"
 #include "VoxelCharacter.h"
-#include "Kismet/GameplayStatics.h"
 
 AVoxelGameMode::AVoxelGameMode()
 {
 	DefaultPawnClass = AVoxelCharacter::StaticClass();
+	
+	SurfaceNoiseWrapper = CreateDefaultSubobject<UFastNoiseWrapper>(TEXT("FastNoiseWrapper"));
 }
 
 void AVoxelGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TArray<AActor*> Actors;
-	UGameplayStatics::GetAllActorsOfClass(this, ANoiseRendererBase::StaticClass(), Actors);
-	for (AActor* Actor : Actors)
-	{
-		if (ANoiseRendererBase* NoiseRenderer = Cast<ANoiseRendererBase>(Actor))
-		{
-			switch (NoiseRenderer->Type)
-			{
-			case ENoiseRendererType::Surface:
-				SurfaceNoiseSettings = NoiseRenderer->NoiseSettings;
-				break;
-			case ENoiseRendererType::Stone:
-				StoneNoiseSettings = NoiseRenderer->NoiseSettings;
-				break;
-			case ENoiseRendererType::DiamondTop:
-				DiamondTopNoiseSettings = NoiseRenderer->NoiseSettings;
-				break;
-			case ENoiseRendererType::DiamondBottom:
-				DiamondBottomNoiseSettings = NoiseRenderer->NoiseSettings;
-				break;
-			case ENoiseRendererType::Cave:
-				CaveNoiseSettings = NoiseRenderer->NoiseSettings;
-				break;
-			}
-		}
-	}
+	InitNoise();
+	BuildChunks();
+}
 
+void AVoxelGameMode::InitNoise()
+{
+	SurfaceNoiseWrapper->SetupFastNoise(SurfaceNoiseSettings.NoiseType, Seed,
+		SurfaceNoiseSettings.Frequency, EFastNoise_Interp::Quintic, EFastNoise_FractalType::FBM,
+		SurfaceNoiseSettings.Octaves, SurfaceNoiseSettings.Lacunarity, SurfaceNoiseSettings.Gain);
+}
+
+void AVoxelGameMode::BuildChunks()
+{
 	const FIntVector& ChunkCount = FVoxel::ChunkCount;
 	const FIntVector& BlockCount = FVoxel::BlockCount;
 	const int32 BlockSize = FVoxel::BlockSize;
@@ -63,4 +50,9 @@ void AVoxelGameMode::BeginPlay()
 
 	for (int32 i = 0; i < Chunks.Num(); i++)
 		Chunks[i]->BuildChunkMesh();
+}
+
+float AVoxelGameMode::FastNoise2D(UFastNoiseWrapper* FastNoiseWrapper, const FVector2D& Location, const FFastNoiseSettings& FastNoiseSettings)
+{
+	return FastNoiseWrapper->GetNoise2D(Location.X, Location.Y) * FastNoiseSettings.HeightScale + FastNoiseSettings.HeightOffset;
 }

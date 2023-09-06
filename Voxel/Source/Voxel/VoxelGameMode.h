@@ -5,8 +5,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "VoxelGameMode.generated.h"
 
-class ANoiseRenderer2D;
 class AChunk;
+class UFastNoiseWrapper;
 
 UCLASS()
 class VOXEL_API AVoxelGameMode : public AGameModeBase
@@ -19,14 +19,25 @@ public:
 public:
 	virtual void BeginPlay() override;
 	
-public:
-	inline static FVoxelNoiseSettings SurfaceNoiseSettings;
-	inline static FVoxelNoiseSettings StoneNoiseSettings;
-	inline static FVoxelNoiseSettings DiamondTopNoiseSettings;
-	inline static FVoxelNoiseSettings DiamondBottomNoiseSettings;
-	inline static FVoxelNoiseSettings CaveNoiseSettings;
+private:
+	void InitNoise();
+	void BuildChunks();
 	
+public:
+	float FastNoise2D(UFastNoiseWrapper* FastNoiseWrapper, const FVector2D& Location,const FFastNoiseSettings& FastNoiseSettings);
+
+public:
+	FFastNoiseSettings SurfaceNoiseSettings = {EFastNoise_NoiseType::SimplexFractal, 0.007, 5, 1.6, 0.5, 30, 220};
+	FPerlinNoiseSettings CaveNoiseSettings = {0.1, 2, 2, 1, 0.25};
+	
+public:
+	UPROPERTY(EditAnywhere)
+	int32 Seed = 1337;
+
 public:
 	UPROPERTY(VisibleAnywhere)
 	TArray<TObjectPtr<AChunk>> Chunks;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UFastNoiseWrapper> SurfaceNoiseWrapper;
 };
