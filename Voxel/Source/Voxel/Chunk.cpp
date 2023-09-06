@@ -36,7 +36,7 @@ void AChunk::BuildChunkData()
 		FIntVector Index3D = UVoxelFunctionLibrary::Index1DTo3D(Index1D, BlockCount);
 		Index3D += (ChunkIndex * BlockCount);
 		
-		int32 SurfaceHeight = static_cast<int32>(VoxelGameMode->FastNoise2D(VoxelGameMode->SurfaceNoiseWrapper, 
+		int32 SurfaceHeight = static_cast<int32>(UVoxelFunctionLibrary::FastNoise2D(VoxelGameMode->SurfaceNoiseWrapper, 
 			FVector2D(Index3D.X, Index3D.Y), VoxelGameMode->SurfaceNoiseSettings));
 		
 		int32 StoneHeight = SurfaceHeight - FVoxel::StoneHeightOffset;

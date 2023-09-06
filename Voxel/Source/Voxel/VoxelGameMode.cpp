@@ -51,8 +51,3 @@ void AVoxelGameMode::BuildChunks()
 	for (int32 i = 0; i < Chunks.Num(); i++)
 		Chunks[i]->BuildChunkMesh();
 }
-
-float AVoxelGameMode::FastNoise2D(UFastNoiseWrapper* FastNoiseWrapper, const FVector2D& Location, const FFastNoiseSettings& FastNoiseSettings)
-{
-	return FastNoiseWrapper->GetNoise2D(Location.X, Location.Y) * FastNoiseSettings.HeightScale + FastNoiseSettings.HeightOffset;
-}

@@ -22,9 +22,6 @@ public:
 private:
 	void InitNoise();
 	void BuildChunks();
-	
-public:
-	float FastNoise2D(UFastNoiseWrapper* FastNoiseWrapper, const FVector2D& Location,const FFastNoiseSettings& FastNoiseSettings);
 
 public:
 	FFastNoiseSettings SurfaceNoiseSettings = {EFastNoise_NoiseType::SimplexFractal, 0.007, 5, 1.6, 0.5, 30, 220};

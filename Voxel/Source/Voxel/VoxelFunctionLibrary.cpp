@@ -187,6 +187,11 @@ float UVoxelFunctionLibrary::FBMNoise3D(const FVector& Location, int32 Octaves, 
 	return Total + HeightOffset;
 }
 
+float UVoxelFunctionLibrary::FastNoise2D(UFastNoiseWrapper* FastNoiseWrapper, const FVector2D& Location, const FFastNoiseSettings& FastNoiseSettings)
+{
+	return FastNoiseWrapper->GetNoise2D(Location.X, Location.Y) * FastNoiseSettings.HeightScale + FastNoiseSettings.HeightOffset;
+}
+
 int32 UVoxelFunctionLibrary::Index3DTo1D(const FIntVector& Index, const FIntVector& BlockCount)
 {
 	return (Index.Z * BlockCount.X * BlockCount.Y) + (Index.Y * BlockCount.X) + Index.X;
