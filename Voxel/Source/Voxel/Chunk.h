@@ -14,10 +14,13 @@ class VOXEL_API AChunk : public AActor
 	
 public:	
 	AChunk();
-
+	
 public:
 	void BuildChunkData(); 
 	void BuildChunkMesh();
+	
+	void CreateChunkMesh();
+	void UpdateChunkMesh();
 
 public:
 	void SetChunkIndex(const FIntVector& InChunkIndex) { ChunkIndex = InChunkIndex; }
@@ -28,7 +31,7 @@ public:
 	TArray<EBlockType> BlockTypes;
 	TArray<EBlockState> BlockStates;
 	
-private:
+public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UMaterial> Material;
 	

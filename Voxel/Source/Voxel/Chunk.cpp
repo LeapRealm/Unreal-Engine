@@ -35,6 +35,12 @@ void AChunk::BuildChunkData()
 		
 		FIntVector Index3D = UVoxelFunctionLibrary::Index1DTo3D(Index1D, BlockCount);
 		Index3D += (ChunkIndex * BlockCount);
+
+		if (Index3D.Z == 0)
+		{
+			BlockTypes[Index1D] = EBlockType::BedRock;
+			continue;
+		}
 		
 		int32 SurfaceHeight = static_cast<int32>(UVoxelFunctionLibrary::FastNoise2D(VoxelGameMode->SurfaceNoiseWrapper, 
 			FVector2D(Index3D.X, Index3D.Y), VoxelGameMode->SurfaceNoiseSettings));
@@ -126,8 +132,16 @@ void AChunk::BuildChunkMesh()
 			}
 		}
 	}
+}
 
+void AChunk::CreateChunkMesh()
+{
 	ProceduralMeshComponent->ClearAllMeshSections();
 	UVoxelFunctionLibrary::CreateMeshSection(0, ProceduralMeshComponent, ChunkMesh);
 	ProceduralMeshComponent->SetMaterial(0, Material);
+}
+
+void AChunk::UpdateChunkMesh()
+{
+	UVoxelFunctionLibrary::UpdateMeshSection(0, ProceduralMeshComponent, ChunkMesh);
 }

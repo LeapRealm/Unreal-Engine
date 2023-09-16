@@ -42,12 +42,32 @@ void AVoxelGameMode::BuildChunks()
 			{
 				AChunk* Chunk = GetWorld()->SpawnActor<AChunk>(FVector(x * BlockCount.X, y * BlockCount.Y, z * BlockCount.Z) * BlockSize, FRotator::ZeroRotator);
 				Chunk->SetChunkIndex(FIntVector(x, y, z));
-				Chunk->BuildChunkData();
 				Chunks.Add(Chunk);
 			}
 		}
 	}
 
-	for (int32 i = 0; i < Chunks.Num(); i++)
-		Chunks[i]->BuildChunkMesh();
+	AsyncTask(ENamedThreads::AnyThread, [this]()
+	{
+		for (int32 i = 0; i < Chunks.Num(); i++)
+		{
+			AChunk* Chunk = Chunks[i];
+			if (IsValid(Chunk))
+				Chunks[i]->BuildChunkData();
+		}
+
+		for (int32 i = 0; i < Chunks.Num(); i++)
+		{
+			AChunk* Chunk = Chunks[i];
+			if (IsValid(Chunk))
+			{
+				Chunks[i]->BuildChunkMesh();
+				AsyncTask(ENamedThreads::GameThread, [Chunk]()
+				{
+					if (IsValid(Chunk))
+						Chunk->CreateChunkMesh();
+				});
+			}
+		}
+	});
 }

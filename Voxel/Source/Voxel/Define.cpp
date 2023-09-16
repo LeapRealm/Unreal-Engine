@@ -70,8 +70,8 @@ const TArray<TArray<FVector2D>> FVoxel::BlockTextureUVs =
 	},
 };
 
-const FIntVector FVoxel::BlockCount = FIntVector(32, 32, 32);
-const FIntVector FVoxel::ChunkCount = FIntVector(20, 20, 10);
+const FIntVector FVoxel::BlockCount = FIntVector(32, 32, 128);
+const FIntVector FVoxel::ChunkCount = FIntVector(10, 10, 1);
 const float	FVoxel::BlockSize = 100.f;
 
 const int32 FVoxel::DX[] = { +0, +0, -1, +1, +0, +0 };
@@ -82,7 +82,7 @@ const float FVoxel::CoalPercent = 8.f;
 const float FVoxel::IronPercent = 6.f;
 const float FVoxel::GoldPercent = 3.f;
 const float FVoxel::DiamondPercent = 2.f;
-const float FVoxel::CavePercent = 15.f;
+const float FVoxel::CavePercent = 0.f;
 
 const float FVoxel::StoneHeightOffset = 15.f;
 const float FVoxel::DiamondHeightMin = 4;
