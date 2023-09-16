@@ -24,7 +24,7 @@ private:
 	void BuildChunks();
 
 public:
-	FFastNoiseSettings SurfaceNoiseSettings = {EFastNoise_NoiseType::SimplexFractal, 0.007, 5, 1.6, 0.5, 30, 220};
+	FFastNoiseSettings SurfaceNoiseSettings = {EFastNoise_NoiseType::SimplexFractal, 0.007, 5, 1.6, 0.5, 30, 100};
 	FPerlinNoiseSettings CaveNoiseSettings = {0.1, 2, 2, 1, 0.25};
 	
 public:

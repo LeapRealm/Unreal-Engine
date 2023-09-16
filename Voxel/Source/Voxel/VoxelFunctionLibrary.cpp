@@ -160,7 +160,7 @@ bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FInt
 
 void UVoxelFunctionLibrary::CreateMeshSection(int32 Index, UProceduralMeshComponent* Component, const FMesh& Mesh)
 {
-	Component->CreateMeshSection(Index, Mesh.Vertices, Mesh.Triangles, Mesh.Normals, Mesh.UVs, Mesh.VertexColors, Mesh.Tangents, false);
+	Component->CreateMeshSection(Index, Mesh.Vertices, Mesh.Triangles, Mesh.Normals, Mesh.UVs, Mesh.VertexColors, Mesh.Tangents, true);
 }
 
 void UVoxelFunctionLibrary::UpdateMeshSection(int32 Index, UProceduralMeshComponent* Component, const FMesh& Mesh)

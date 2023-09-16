@@ -11,6 +11,7 @@ AChunk::AChunk()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	ProceduralMeshComponent = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProcMesh"));
+	ProceduralMeshComponent->bUseAsyncCooking = true;
 	SetRootComponent(ProceduralMeshComponent);
 	
 	static ConstructorHelpers::FObjectFinder<UMaterial> M_Block(TEXT("/Script/Engine.Material'/Game/Materials/M_Block.M_Block'"));
