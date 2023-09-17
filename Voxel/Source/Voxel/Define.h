@@ -168,6 +168,18 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct FChunkData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<EBlockType> BlockTypes;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<EBlockState> BlockStates;
+};
+
+USTRUCT(BlueprintType)
 struct FVoxel
 {
 	GENERATED_BODY()
@@ -205,4 +217,8 @@ public:
 	static const float StoneHeightOffset;
 	static const float DiamondHeightMin;
 	static const float DiamondHeightMax;
+
+public:
+	static const FFastNoiseSettings SurfaceNoiseSettings;
+	static const FPerlinNoiseSettings CaveNoiseSettings;
 };

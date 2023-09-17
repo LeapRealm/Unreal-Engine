@@ -16,20 +16,13 @@ public:
 	AChunk();
 	
 public:
-	void BuildChunkData(); 
+	void Init(const FIntVector& NewChunkIndex);
 	void BuildChunkMesh();
-	
 	void CreateChunkMesh();
-	void UpdateChunkMesh();
 
 public:
-	void SetChunkIndex(const FIntVector& InChunkIndex) { ChunkIndex = InChunkIndex; }
-	
-public:
-	FMesh ChunkMesh;
 	FIntVector ChunkIndex;
-	TArray<EBlockType> BlockTypes;
-	TArray<EBlockState> BlockStates;
+	FMesh ChunkMesh;
 	
 public:
 	UPROPERTY(VisibleAnywhere)

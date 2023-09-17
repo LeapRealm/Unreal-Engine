@@ -4,6 +4,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 AVoxelCharacter::AVoxelCharacter()
@@ -30,10 +31,15 @@ AVoxelCharacter::AVoxelCharacter()
 	// Component
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(GetRootComponent());
-	CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+	
+	//CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+	CameraComponent->SetRelativeLocationAndRotation(FVector(0.f, 0.f, 10000.f), FRotator(-90, 0, 0));
 	CameraComponent->bUsePawnControlRotation = true;
 
-	GetCharacterMovement()->GravityScale = 1.2f;
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	// GetCharacterMovement()->GravityScale = 1.2f;
+	GetCharacterMovement()->GravityScale = 0.f;
 	GetCharacterMovement()->MaxWalkSpeed = 450.f;
 	GetCharacterMovement()->JumpZVelocity = 500.f;
 }
@@ -79,8 +85,11 @@ void AVoxelCharacter::Move(const FInputActionValue& Value)
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	AddMovementInput(ForwardDirection, MoveVector.X);
-	AddMovementInput(RightDirection, MoveVector.Y);
+	// AddMovementInput(ForwardDirection, MoveVector.X);
+	// AddMovementInput(RightDirection, MoveVector.Y);
+
+	FVector MoveDirection = (ForwardDirection * MoveVector.X + RightDirection * MoveVector.Y).GetSafeNormal();
+	AddActorWorldOffset(MoveDirection * 50.f);
 }
 
 void AVoxelCharacter::Look(const FInputActionValue& Value)

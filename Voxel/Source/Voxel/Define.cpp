@@ -71,7 +71,7 @@ const TArray<TArray<FVector2D>> FVoxel::BlockTextureUVs =
 };
 
 const FIntVector FVoxel::BlockCount = FIntVector(32, 32, 32);
-const FIntVector FVoxel::ChunkCount = FIntVector(10, 10, 5);
+const FIntVector FVoxel::ChunkCount = FIntVector(50, 50, 5);
 const float	FVoxel::BlockSize = 100.f;
 
 const int32 FVoxel::DX[] = { +0, +0, -1, +1, +0, +0 };
@@ -87,3 +87,6 @@ const float FVoxel::CavePercent = 15.f;
 const float FVoxel::StoneHeightOffset = 15.f;
 const float FVoxel::DiamondHeightMin = 4;
 const float FVoxel::DiamondHeightMax = 8;
+
+const FFastNoiseSettings FVoxel::SurfaceNoiseSettings = { EFastNoise_NoiseType::SimplexFractal, 0.007, 5, 1.6, 0.5, 30, 100 };
+const FPerlinNoiseSettings FVoxel::CaveNoiseSettings = { 0.1, 2, 2, 1, 0.25 };

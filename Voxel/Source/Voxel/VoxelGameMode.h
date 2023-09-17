@@ -6,6 +6,7 @@
 #include "VoxelGameMode.generated.h"
 
 class AChunk;
+class AVoxelCharacter;
 class UFastNoiseWrapper;
 
 UCLASS()
@@ -21,20 +22,43 @@ public:
 	
 private:
 	void InitNoise();
-	void BuildChunks();
+	void InitChunks();
 
-public:
-	FFastNoiseSettings SurfaceNoiseSettings = {EFastNoise_NoiseType::SimplexFractal, 0.007, 5, 1.6, 0.5, 30, 100};
-	FPerlinNoiseSettings CaveNoiseSettings = {0.1, 2, 2, 1, 0.25};
-	
+	void CullingChunks();
+	void DestroyFarChunks(const FIntVector& MinCullIndex, const FIntVector& MaxCullIndex);
+	void SpawnNearChunks(const FIntVector& MinCullIndex, const FIntVector& MaxCullIndex);
+
 public:
 	UPROPERTY(EditAnywhere)
 	int32 Seed = 1337;
 
+	UPROPERTY(EditAnywhere)
+	float CullingChunksTimerRate = 1.f;
+
+	UPROPERTY(EditAnywhere)
+	int32 CullIndexDistance = 3;
+
+	UPROPERTY(VisibleAnywhere)
+	FIntVector PlayerChunkIndex;
+	
 public:
 	UPROPERTY(VisibleAnywhere)
+	TArray<FChunkData> ChunkDatas;
+	
+	UPROPERTY(VisibleAnywhere)
 	TArray<TObjectPtr<AChunk>> Chunks;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<TObjectPtr<AChunk>> SpawnedChunks;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UFastNoiseWrapper> SurfaceNoiseWrapper;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<AVoxelCharacter> VoxelCharacter;
+
+private:
+	bool bInitCompleted = false;
+	FTimerHandle CullingChunksTimerHandle;
+	std::atomic<int32> BuiltChunkDataCount;
 };

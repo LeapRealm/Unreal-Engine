@@ -22,7 +22,7 @@ public class Voxel : ModuleRules
 		
 		PrivateIncludePaths.AddRange(new string[]
 		{
-			"Voxel",
+			"Voxel/",
 		});
 	}
 }

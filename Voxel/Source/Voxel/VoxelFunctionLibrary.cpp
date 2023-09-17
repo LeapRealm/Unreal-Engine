@@ -6,6 +6,99 @@
 #include "VoxelGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
+void UVoxelFunctionLibrary::BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrapper, const FIntVector& ChunkIndex, FChunkData& ChunkData)
+{
+	const FIntVector& BlockCount = FVoxel::BlockCount;
+
+	TArray<EBlockType>& BlockTypes = ChunkData.BlockTypes;
+	TArray<EBlockState>& BlockStates = ChunkData.BlockStates;
+	
+	float CaveRandValue = FMath::RandRange(0.f, 100.f);
+	
+	for (int32 LocalBlockIndex1D = 0; LocalBlockIndex1D < BlockTypes.Num(); LocalBlockIndex1D++)
+	{
+		BlockStates[LocalBlockIndex1D] = EBlockState::NoCrack;
+		
+		const FIntVector WorldBlockIndex3D = UVoxelFunctionLibrary::Index1DTo3D(LocalBlockIndex1D, BlockCount) + (ChunkIndex * BlockCount);
+
+		if (WorldBlockIndex3D.Z == 0)
+		{
+			BlockTypes[LocalBlockIndex1D] = EBlockType::BedRock;
+			continue;
+		}
+		
+		int32 SurfaceHeight = static_cast<int32>(UVoxelFunctionLibrary::FastNoise2D(SurfaceNoiseWrapper, 
+			FVector2D(WorldBlockIndex3D.X, WorldBlockIndex3D.Y), FVoxel::SurfaceNoiseSettings));
+		
+		int32 StoneHeight = SurfaceHeight - FVoxel::StoneHeightOffset;
+		
+		if (CaveRandValue <= FVoxel::CavePercent && WorldBlockIndex3D.Z < StoneHeight && WorldBlockIndex3D.Z > FVoxel::DiamondHeightMin)
+		{
+			const FPerlinNoiseSettings& CaveSettings = FVoxel::CaveNoiseSettings;
+			int32 CaveDig = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise3D(FVector(WorldBlockIndex3D),
+				CaveSettings.Octaves, CaveSettings.Scale, CaveSettings.HeightScale, CaveSettings.HeightOffset));
+			
+			if (CaveDig < CaveSettings.DrawCutOff)
+			{
+				BlockTypes[LocalBlockIndex1D] = EBlockType::Air;
+				continue;
+			}
+		}
+		
+		if (WorldBlockIndex3D.Z < FVoxel::DiamondHeightMin)
+		{
+			BlockTypes[LocalBlockIndex1D] = EBlockType::Stone;
+		}
+		else if (WorldBlockIndex3D.Z < FVoxel::DiamondHeightMax)
+		{
+			float Percent = 0.f;
+			float RandValue = FMath::RandRange(0.f, 100.f);
+			
+			if (RandValue <= (Percent += FVoxel::IronPercent))
+				BlockTypes[LocalBlockIndex1D] = EBlockType::Iron;
+			else if (RandValue <= (Percent += FVoxel::DiamondPercent))
+				BlockTypes[LocalBlockIndex1D] = EBlockType::Diamond;
+			else
+				BlockTypes[LocalBlockIndex1D] = EBlockType::Stone;
+		}
+		else if (WorldBlockIndex3D.Z < StoneHeight)
+		{
+			float Percent = 0.f;
+			float RandValue = FMath::RandRange(0.f, 100.f);
+			
+			if (RandValue <= (Percent += FVoxel::CoalPercent))
+				BlockTypes[LocalBlockIndex1D] = EBlockType::Coal;
+			else if (RandValue <= (Percent += FVoxel::IronPercent))
+				BlockTypes[LocalBlockIndex1D] = EBlockType::Iron;
+			else if (RandValue <= (Percent += FVoxel::GoldPercent))
+				BlockTypes[LocalBlockIndex1D] = EBlockType::Gold;
+			else
+				BlockTypes[LocalBlockIndex1D] = EBlockType::Stone;
+		}
+		else if (WorldBlockIndex3D.Z < (StoneHeight + SurfaceHeight) / 2)
+		{
+			float RandValue = FMath::RandRange(0.f, 100.f);
+			
+			if (RandValue <= 50.f)
+				BlockTypes[LocalBlockIndex1D] = EBlockType::Dirt;
+			else
+				BlockTypes[LocalBlockIndex1D] = EBlockType::Stone;
+		}
+		else if (WorldBlockIndex3D.Z < SurfaceHeight)
+		{
+			BlockTypes[LocalBlockIndex1D] = EBlockType::Dirt;
+		}
+		else if (WorldBlockIndex3D.Z == SurfaceHeight)
+		{
+			BlockTypes[LocalBlockIndex1D] = EBlockType::Grass;
+		}
+		else
+		{
+			BlockTypes[LocalBlockIndex1D] = EBlockType::Air;
+		}
+	}
+}
+
 void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide BlockSide, EBlockTextureType TextureType, const FVector& Offset, FMesh& OutMesh)
 {
 	const FVector FLU = FVoxel::FLU + Offset;
@@ -100,8 +193,9 @@ void UVoxelFunctionLibrary::BuildBlockMesh(AChunk* Chunk, EBlockType BlockType, 
 {
 	if (BlockType == EBlockType::Air)
 		return;
-	
-	for (int32 i = 0; i < (int32)EBlockSide::Count; i++)
+
+	const int32 BlockSideCount = static_cast<int32>(EBlockSide::Count);
+	for (int32 i = 0; i < BlockSideCount; i++)
 	{
 		EBlockSide BlockSide = static_cast<EBlockSide>(i);
 		if (DoesNeedOptimization(Chunk, BlockIndex, BlockSide) == false)
@@ -111,7 +205,11 @@ void UVoxelFunctionLibrary::BuildBlockMesh(AChunk* Chunk, EBlockType BlockType, 
 
 bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FIntVector& BlockIndex, EBlockSide BlockSide)
 {
-	FIntVector CheckBlockIndex = FIntVector(
+	AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(Chunk));
+	if (VoxelGameMode == nullptr)
+		return false;
+	
+	FIntVector CheckBlockIndex3D = FIntVector(
 		BlockIndex.X + FVoxel::DX[static_cast<int32>(BlockSide)],
 		BlockIndex.Y + FVoxel::DY[static_cast<int32>(BlockSide)],
 		BlockIndex.Z + FVoxel::DZ[static_cast<int32>(BlockSide)]
@@ -122,40 +220,78 @@ bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FInt
 
 	EBlockType BlockType;
 	
-	if (CheckBlockIndex.X < 0 || CheckBlockIndex.X >= BlockCount.X ||
-		CheckBlockIndex.Y < 0 || CheckBlockIndex.Y >= BlockCount.Y ||
-		CheckBlockIndex.Z < 0 || CheckBlockIndex.Z >= BlockCount.Z)
+	if (CheckBlockIndex3D.X < 0 || CheckBlockIndex3D.X >= BlockCount.X ||
+		CheckBlockIndex3D.Y < 0 || CheckBlockIndex3D.Y >= BlockCount.Y ||
+		CheckBlockIndex3D.Z < 0 || CheckBlockIndex3D.Z >= BlockCount.Z)
 	{
-		CheckBlockIndex.X = (CheckBlockIndex.X + BlockCount.X) % BlockCount.X;
-		CheckBlockIndex.Y = (CheckBlockIndex.Y + BlockCount.Y) % BlockCount.Y;
-		CheckBlockIndex.Z = (CheckBlockIndex.Z + BlockCount.Z) % BlockCount.Z;
+		CheckBlockIndex3D.X = (CheckBlockIndex3D.X + BlockCount.X) % BlockCount.X;
+		CheckBlockIndex3D.Y = (CheckBlockIndex3D.Y + BlockCount.Y) % BlockCount.Y;
+		CheckBlockIndex3D.Z = (CheckBlockIndex3D.Z + BlockCount.Z) % BlockCount.Z;
 		
-		FIntVector CheckChunkIndex = FIntVector(
+		FIntVector CheckChunkIndex3D = FIntVector(
 			Chunk->ChunkIndex.X + FVoxel::DX[static_cast<int32>(BlockSide)],
 			Chunk->ChunkIndex.Y + FVoxel::DY[static_cast<int32>(BlockSide)],
 			Chunk->ChunkIndex.Z + FVoxel::DZ[static_cast<int32>(BlockSide)]
 		);
 
-		if (CheckChunkIndex.X < 0 || CheckChunkIndex.X >= ChunkCount.X ||
-			CheckChunkIndex.Y < 0 || CheckChunkIndex.Y >= ChunkCount.Y ||
-			CheckChunkIndex.Z < 0 || CheckChunkIndex.Z >= ChunkCount.Z)
+		if (CheckChunkIndex3D.X < 0 || CheckChunkIndex3D.X >= ChunkCount.X ||
+			CheckChunkIndex3D.Y < 0 || CheckChunkIndex3D.Y >= ChunkCount.Y ||
+			CheckChunkIndex3D.Z < 0 || CheckChunkIndex3D.Z >= ChunkCount.Z)
 			return false;
 		
-		AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(Chunk));
-		check(VoxelGameMode);
-		
-		AChunk* CheckChunk = VoxelGameMode->Chunks[Index3DTo1D(CheckChunkIndex, ChunkCount)];
-		BlockType = CheckChunk->BlockTypes[Index3DTo1D(CheckBlockIndex, BlockCount)];
+		const FChunkData& CheckChunkData = VoxelGameMode->ChunkDatas[Index3DTo1D(CheckChunkIndex3D, ChunkCount)];
+		BlockType = CheckChunkData.BlockTypes[Index3DTo1D(CheckBlockIndex3D, BlockCount)];
 	}
 	else
 	{
-		int32 Index = Index3DTo1D(CheckBlockIndex, FVoxel::BlockCount);
-		BlockType = Chunk->BlockTypes[Index];
+		const FChunkData& CheckChunkData = VoxelGameMode->ChunkDatas[Index3DTo1D(Chunk->ChunkIndex, ChunkCount)];
+		BlockType = CheckChunkData.BlockTypes[Index3DTo1D(CheckBlockIndex3D, BlockCount)];
 	}
 
 	if (BlockType == EBlockType::Air || BlockType == EBlockType::Water)
 		return false;
 	return true;
+}
+
+EBlockTextureType UVoxelFunctionLibrary::GetTextureType(EBlockSide BlockSide, EBlockType BlockType)
+{
+	EBlockTextureType TextureType = EBlockTextureType::Dirt;
+
+	if (BlockType == EBlockType::Grass)
+	{
+		switch (BlockSide)
+		{
+		case EBlockSide::Left:
+		case EBlockSide::Right:
+		case EBlockSide::Backward:
+		case EBlockSide::Forward:
+			TextureType = EBlockTextureType::GrassSide;
+			break;
+		case EBlockSide::Down:
+			TextureType = EBlockTextureType::Dirt;
+			break;
+		case EBlockSide::Up:
+			TextureType = EBlockTextureType::GrassTop;
+			break;
+		}
+	}
+	else
+	{
+		switch (BlockType)
+		{
+		case EBlockType::Dirt:		TextureType = EBlockTextureType::Dirt;		break;
+		case EBlockType::Stone:		TextureType = EBlockTextureType::Stone;		break;
+		case EBlockType::Sand:		TextureType = EBlockTextureType::Sand;		break;
+		case EBlockType::Coal:		TextureType = EBlockTextureType::Coal;		break;
+		case EBlockType::Iron:		TextureType = EBlockTextureType::Iron;		break;
+		case EBlockType::Gold:		TextureType = EBlockTextureType::Gold;		break;
+		case EBlockType::Diamond:	TextureType = EBlockTextureType::Diamond;	break;
+		case EBlockType::BedRock:	TextureType = EBlockTextureType::BedRock;	break;
+		case EBlockType::Water:		TextureType = EBlockTextureType::Water;		break;
+		}
+	}
+
+	return TextureType;
 }
 
 void UVoxelFunctionLibrary::CreateMeshSection(int32 Index, UProceduralMeshComponent* Component, const FMesh& Mesh)
@@ -211,43 +347,19 @@ FIntVector UVoxelFunctionLibrary::Index1DTo3D(int32 Index, const FIntVector& Blo
 	return FIntVector(X, Y, Z);
 }
 
-EBlockTextureType UVoxelFunctionLibrary::GetTextureType(EBlockSide BlockSide, EBlockType BlockType)
+FIntVector UVoxelFunctionLibrary::WorldPosToChunkIndex(FVector WorldPos)
 {
-	EBlockTextureType TextureType = EBlockTextureType::Dirt;
-
-	if (BlockType == EBlockType::Grass)
-	{
-		switch (BlockSide)
-		{
-		case EBlockSide::Left:
-		case EBlockSide::Right:
-		case EBlockSide::Backward:
-		case EBlockSide::Forward:
-			TextureType = EBlockTextureType::GrassSide;
-			break;
-		case EBlockSide::Down:
-			TextureType = EBlockTextureType::Dirt;
-			break;
-		case EBlockSide::Up:
-			TextureType = EBlockTextureType::GrassTop;
-			break;
-		}
-	}
-	else
-	{
-		switch (BlockType)
-		{
-		case EBlockType::Dirt:		TextureType = EBlockTextureType::Dirt;		break;
-		case EBlockType::Stone:		TextureType = EBlockTextureType::Stone;		break;
-		case EBlockType::Sand:		TextureType = EBlockTextureType::Sand;		break;
-		case EBlockType::Coal:		TextureType = EBlockTextureType::Coal;		break;
-		case EBlockType::Iron:		TextureType = EBlockTextureType::Iron;		break;
-		case EBlockType::Gold:		TextureType = EBlockTextureType::Gold;		break;
-		case EBlockType::Diamond:	TextureType = EBlockTextureType::Diamond;	break;
-		case EBlockType::BedRock:	TextureType = EBlockTextureType::BedRock;	break;
-		case EBlockType::Water:		TextureType = EBlockTextureType::Water;		break;
-		}
-	}
-
-	return TextureType;
+	if (WorldPos.X < 0 || WorldPos.Y < 0 || WorldPos.Z < 0)
+		return FIntVector::ZeroValue;
+	
+	const FIntVector& BlockCount = FVoxel::BlockCount;
+	const FIntVector& ChunkCount = FVoxel::ChunkCount;
+	float BlockSize = FVoxel::BlockSize;
+	FVector ChunkSize = FVector(BlockCount.X * BlockSize, BlockCount.Y * BlockSize, BlockCount.Z * BlockSize);
+	
+	FIntVector ChunkIndex = FIntVector(WorldPos / ChunkSize);
+	if (ChunkIndex.X >= ChunkCount.X || ChunkIndex.Y >= ChunkCount.Y || ChunkIndex.Z >= ChunkCount.Z)
+		return FIntVector::ZeroValue;
+	
+	return ChunkIndex;
 }
