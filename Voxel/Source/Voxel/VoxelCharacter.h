@@ -26,6 +26,13 @@ private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	
+	void Attack();
+	void Interaction();
+
+public:
+	UPROPERTY(EditAnywhere)
+	float LineTraceHitRange = 500.f;
+	
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComponent;
@@ -42,4 +49,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UInputAction> JumpAction;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> AttackAction;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> InteractionAction;
 };

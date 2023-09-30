@@ -29,9 +29,17 @@ private:
 	void SpawnNearChunks(const FIntVector& MinCullIndex, const FIntVector& MaxCullIndex);
 
 public:
+	void UpdateBlockType(const FIntVector& ChunkIndex3D, const FIntVector& BlockIndex3D, EBlockType NewBlockType);
+	void UpdateBlockState(const FIntVector& ChunkIndex3D, const FIntVector& BlockIndex3D, EBlockState NewBlockState);
+
+public:
 	UPROPERTY(EditAnywhere)
 	int32 Seed = 1337;
 
+public:
+	UPROPERTY(EditAnywhere)
+	bool bCullEnable = false;
+	
 	UPROPERTY(EditAnywhere)
 	float CullingChunksTimerRate = 1.f;
 
@@ -58,7 +66,7 @@ public:
 	TObjectPtr<AVoxelCharacter> VoxelCharacter;
 
 private:
-	bool bInitCompleted = false;
+	bool bBuildChunkDataCompleted = false;
 	FTimerHandle CullingChunksTimerHandle;
 	std::atomic<int32> BuiltChunkDataCount;
 };

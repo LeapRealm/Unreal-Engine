@@ -16,7 +16,7 @@ class VOXEL_API UVoxelFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	static void BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrapper, const FIntVector& ChunkIndex, FChunkData& ChunkData);
+	static void BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrapper, const FIntVector& ChunkIndex3D, FChunkData& ChunkData);
 	
 	static void BuildQuadMesh(EBlockSide BlockSide, EBlockTextureType TextureType, const FVector& Offset, FMesh& OutMesh);
 	static void BuildBlockMesh(AChunk* Chunk, EBlockType BlockType, const FIntVector& BlockIndex, const FVector& Offset);
@@ -31,8 +31,9 @@ public:
 	static float FBMNoise3D(const FVector& Location, int32 Octaves, float Scale, float HeightScale, float HeightOffset);
 	static float FastNoise2D(UFastNoiseWrapper* FastNoiseWrapper, const FVector2D& Location, const FFastNoiseSettings& FastNoiseSettings);
 
-	static int32 Index3DTo1D(const FIntVector& Index, const FIntVector& BlockCount);
+	static int32 Index3DTo1D(const FIntVector& Index, const FIntVector& Count);
 	static FIntVector Index1DTo3D(int32 Index, const FIntVector& BlockCount);
 	
-	static FIntVector WorldPosToChunkIndex(FVector WorldPos);
+	static FIntVector WorldPosToChunkIndex(const FVector& WorldPos);
+	static FIntVector WorldPosToBlockIndex(const FVector& WorldPos);
 };

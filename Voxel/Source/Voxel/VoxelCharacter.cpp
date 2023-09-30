@@ -1,17 +1,22 @@
 #include "VoxelCharacter.h"
 
+#include "Chunk.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "VoxelFunctionLibrary.h"
+#include "VoxelGameMode.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AVoxelCharacter::AVoxelCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Asset
+	// Assets
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC_Default(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
 	if (IMC_Default.Succeeded())
 		DefaultMappingContext = IMC_Default.Object;
@@ -28,20 +33,28 @@ AVoxelCharacter::AVoxelCharacter()
 	if (IA_Jump.Succeeded())
 		JumpAction = IA_Jump.Object;
 
-	// Component
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Attack(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_Attack.IA_Attack'"));
+	if (IA_Attack.Succeeded())
+		AttackAction = IA_Attack.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Interaction(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_Interaction.IA_Interaction'"));
+	if (IA_Interaction.Succeeded())
+		InteractionAction = IA_Interaction.Object;
+
+	// Components
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(GetRootComponent());
 	
-	//CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
-	CameraComponent->SetRelativeLocationAndRotation(FVector(0.f, 0.f, 10000.f), FRotator(-90, 0, 0));
+	CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 	CameraComponent->bUsePawnControlRotation = true;
-
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	// GetCharacterMovement()->GravityScale = 1.2f;
-	GetCharacterMovement()->GravityScale = 0.f;
+	GetCharacterMovement()->GravityScale = 1.f;
 	GetCharacterMovement()->MaxWalkSpeed = 450.f;
 	GetCharacterMovement()->JumpZVelocity = 500.f;
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = true;
+	bUseControllerRotationRoll = false;
 }
 
 void AVoxelCharacter::BeginPlay()
@@ -72,6 +85,9 @@ void AVoxelCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AVoxelCharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AVoxelCharacter::StopJumping);
+		
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::Attack);
+		EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::Interaction);
 	}
 }
 
@@ -85,11 +101,8 @@ void AVoxelCharacter::Move(const FInputActionValue& Value)
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	// AddMovementInput(ForwardDirection, MoveVector.X);
-	// AddMovementInput(RightDirection, MoveVector.Y);
-
-	FVector MoveDirection = (ForwardDirection * MoveVector.X + RightDirection * MoveVector.Y).GetSafeNormal();
-	AddActorWorldOffset(MoveDirection * 50.f);
+	AddMovementInput(ForwardDirection, MoveVector.X);
+	AddMovementInput(RightDirection, MoveVector.Y);
 }
 
 void AVoxelCharacter::Look(const FInputActionValue& Value)
@@ -98,4 +111,45 @@ void AVoxelCharacter::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookVector.X);
 	AddControllerPitchInput(LookVector.Y);
+}
+
+void AVoxelCharacter::Attack()
+{
+	FVector Start = CameraComponent->GetComponentLocation();
+	FVector End = Start + UKismetMathLibrary::GetForwardVector(CameraComponent->GetComponentRotation()) * LineTraceHitRange;
+	TArray<AActor*> ActorsToIgnore = { this };
+	FHitResult HitResult;
+	if (UKismetSystemLibrary::LineTraceSingle(this, Start, End, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true))
+	{
+		if (AChunk* HitChunk = Cast<AChunk>(HitResult.GetActor()))
+		{
+			const FVector& BlockLocation = HitResult.ImpactPoint + (-HitResult.ImpactNormal * (FVoxel::BlockSize / 2.f));
+			const FIntVector& HitChunkIndex = HitChunk->ChunkIndex;
+			const FIntVector& HitBlockIndex = UVoxelFunctionLibrary::WorldPosToBlockIndex(BlockLocation);
+
+			if (AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this)))
+				VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Air);
+		}
+	}
+}
+
+void AVoxelCharacter::Interaction()
+{
+	FVector Start = CameraComponent->GetComponentLocation();
+	FVector End = Start + UKismetMathLibrary::GetForwardVector(CameraComponent->GetComponentRotation()) * LineTraceHitRange;
+	TArray<AActor*> ActorsToIgnore = { this };
+	FHitResult HitResult;
+	if (UKismetSystemLibrary::LineTraceSingle(this, Start, End, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true))
+	{
+		if (HitResult.GetActor() && HitResult.GetActor()->GetClass() == AChunk::StaticClass())
+		{
+			const FVector& BlockLocation = HitResult.ImpactPoint + (HitResult.ImpactNormal * (FVoxel::BlockSize / 2.f));
+			const FIntVector& HitChunkIndex = UVoxelFunctionLibrary::WorldPosToChunkIndex(BlockLocation);
+			const FIntVector& HitBlockIndex = UVoxelFunctionLibrary::WorldPosToBlockIndex(BlockLocation);
+
+			// TODO: 플레이어와 겹치는지 확인해야함
+			if (AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this)))
+				VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Dirt);
+		}
+	}
 }

@@ -40,7 +40,6 @@ enum class EBlockType : uint8
 	Gold,
 	Diamond,
 	BedRock,
-	Water,
 	Air,
 };
 
@@ -67,7 +66,6 @@ enum class EBlockTextureType : uint8
 	Gold,
 	Diamond,
 	BedRock,
-	Water,
 };
 
 UENUM()
@@ -200,7 +198,7 @@ public:
 public:
 	static const FIntVector BlockCount;
 	static const FIntVector ChunkCount;
-	static const float BlockSize;
+	static const int32 BlockSize;
 
 public:
 	static const int32 DX[];

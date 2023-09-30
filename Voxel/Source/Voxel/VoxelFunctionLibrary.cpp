@@ -6,7 +6,7 @@
 #include "VoxelGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
-void UVoxelFunctionLibrary::BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrapper, const FIntVector& ChunkIndex, FChunkData& ChunkData)
+void UVoxelFunctionLibrary::BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrapper, const FIntVector& ChunkIndex3D, FChunkData& ChunkData)
 {
 	const FIntVector& BlockCount = FVoxel::BlockCount;
 
@@ -19,7 +19,7 @@ void UVoxelFunctionLibrary::BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrappe
 	{
 		BlockStates[LocalBlockIndex1D] = EBlockState::NoCrack;
 		
-		const FIntVector WorldBlockIndex3D = UVoxelFunctionLibrary::Index1DTo3D(LocalBlockIndex1D, BlockCount) + (ChunkIndex * BlockCount);
+		const FIntVector WorldBlockIndex3D = UVoxelFunctionLibrary::Index1DTo3D(LocalBlockIndex1D, BlockCount) + (ChunkIndex3D * BlockCount);
 
 		if (WorldBlockIndex3D.Z == 0)
 		{
@@ -233,7 +233,7 @@ bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FInt
 			Chunk->ChunkIndex.Y + FVoxel::DY[static_cast<int32>(BlockSide)],
 			Chunk->ChunkIndex.Z + FVoxel::DZ[static_cast<int32>(BlockSide)]
 		);
-
+		
 		if (CheckChunkIndex3D.X < 0 || CheckChunkIndex3D.X >= ChunkCount.X ||
 			CheckChunkIndex3D.Y < 0 || CheckChunkIndex3D.Y >= ChunkCount.Y ||
 			CheckChunkIndex3D.Z < 0 || CheckChunkIndex3D.Z >= ChunkCount.Z)
@@ -248,7 +248,7 @@ bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FInt
 		BlockType = CheckChunkData.BlockTypes[Index3DTo1D(CheckBlockIndex3D, BlockCount)];
 	}
 
-	if (BlockType == EBlockType::Air || BlockType == EBlockType::Water)
+	if (BlockType == EBlockType::Air)
 		return false;
 	return true;
 }
@@ -287,7 +287,6 @@ EBlockTextureType UVoxelFunctionLibrary::GetTextureType(EBlockSide BlockSide, EB
 		case EBlockType::Gold:		TextureType = EBlockTextureType::Gold;		break;
 		case EBlockType::Diamond:	TextureType = EBlockTextureType::Diamond;	break;
 		case EBlockType::BedRock:	TextureType = EBlockTextureType::BedRock;	break;
-		case EBlockType::Water:		TextureType = EBlockTextureType::Water;		break;
 		}
 	}
 
@@ -333,9 +332,9 @@ float UVoxelFunctionLibrary::FastNoise2D(UFastNoiseWrapper* FastNoiseWrapper, co
 	return FastNoiseWrapper->GetNoise2D(Location.X, Location.Y) * FastNoiseSettings.HeightScale + FastNoiseSettings.HeightOffset;
 }
 
-int32 UVoxelFunctionLibrary::Index3DTo1D(const FIntVector& Index, const FIntVector& BlockCount)
+int32 UVoxelFunctionLibrary::Index3DTo1D(const FIntVector& Index, const FIntVector& Count)
 {
-	return (Index.Z * BlockCount.X * BlockCount.Y) + (Index.Y * BlockCount.X) + Index.X;
+	return (Index.Z * Count.X * Count.Y) + (Index.Y * Count.X) + Index.X;
 }
 
 FIntVector UVoxelFunctionLibrary::Index1DTo3D(int32 Index, const FIntVector& BlockCount)
@@ -347,19 +346,43 @@ FIntVector UVoxelFunctionLibrary::Index1DTo3D(int32 Index, const FIntVector& Blo
 	return FIntVector(X, Y, Z);
 }
 
-FIntVector UVoxelFunctionLibrary::WorldPosToChunkIndex(FVector WorldPos)
+FIntVector UVoxelFunctionLibrary::WorldPosToChunkIndex(const FVector& WorldPos)
 {
 	if (WorldPos.X < 0 || WorldPos.Y < 0 || WorldPos.Z < 0)
 		return FIntVector::ZeroValue;
 	
 	const FIntVector& BlockCount = FVoxel::BlockCount;
 	const FIntVector& ChunkCount = FVoxel::ChunkCount;
-	float BlockSize = FVoxel::BlockSize;
-	FVector ChunkSize = FVector(BlockCount.X * BlockSize, BlockCount.Y * BlockSize, BlockCount.Z * BlockSize);
+	int32 BlockSize = FVoxel::BlockSize;
+	FIntVector ChunkSize = FIntVector(BlockCount.X * BlockSize, BlockCount.Y * BlockSize, BlockCount.Z * BlockSize);
+	FIntVector WorldPosInt = FIntVector(WorldPos);
 	
-	FIntVector ChunkIndex = FIntVector(WorldPos / ChunkSize);
+	FIntVector ChunkIndex = FIntVector(WorldPosInt.X / ChunkSize.X,
+									   WorldPosInt.Y / ChunkSize.Y,
+									   WorldPosInt.Z / ChunkSize.Z);
+	
 	if (ChunkIndex.X >= ChunkCount.X || ChunkIndex.Y >= ChunkCount.Y || ChunkIndex.Z >= ChunkCount.Z)
 		return FIntVector::ZeroValue;
 	
 	return ChunkIndex;
+}
+
+FIntVector UVoxelFunctionLibrary::WorldPosToBlockIndex(const FVector& WorldPos)
+{
+	if (WorldPos.X < 0 || WorldPos.Y < 0 || WorldPos.Z < 0)
+		return FIntVector::ZeroValue;
+
+	const FIntVector& BlockCount = FVoxel::BlockCount;
+	int32 BlockSize = FVoxel::BlockSize;
+	FIntVector ChunkSize = FIntVector(BlockCount.X * BlockSize, BlockCount.Y * BlockSize, BlockCount.Z * BlockSize);
+	FIntVector WorldPosInt = FIntVector(WorldPos);
+	
+	FIntVector BlockIndex = FIntVector(WorldPosInt.X % ChunkSize.X / BlockSize,
+									   WorldPosInt.Y % ChunkSize.Y / BlockSize,
+									   WorldPosInt.Z % ChunkSize.Z / BlockSize);
+	
+	if (BlockIndex.X >= BlockCount.X || BlockIndex.Y >= BlockCount.Y || BlockIndex.Z >= BlockCount.Z)
+		return FIntVector::ZeroValue;
+
+	return BlockIndex;
 }
