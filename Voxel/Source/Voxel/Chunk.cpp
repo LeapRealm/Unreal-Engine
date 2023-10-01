@@ -11,7 +11,7 @@ AChunk::AChunk()
 	PrimaryActorTick.bCanEverTick = false;
 	
 	ProceduralMeshComponent = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralMeshComponent"));
-	ProceduralMeshComponent->bUseAsyncCooking = true;
+	ProceduralMeshComponent->bUseAsyncCooking = false;
 	SetRootComponent(ProceduralMeshComponent);
 	
 	static ConstructorHelpers::FObjectFinder<UMaterial> M_Block(TEXT("/Script/Engine.Material'/Game/Materials/M_Block.M_Block'"));
@@ -29,6 +29,8 @@ void AChunk::BuildChunkMesh()
 	AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this));
 	if (VoxelGameMode == nullptr)
 		return;
+
+	FScopeLock ScopeLock(&CriticalSection);
 	
 	ChunkMesh.Empty();
 	
@@ -54,6 +56,8 @@ void AChunk::BuildChunkMesh()
 
 void AChunk::CreateChunkMesh()
 {
+	FScopeLock ScopeLock(&CriticalSection);
+	
 	ProceduralMeshComponent->ClearAllMeshSections();
 	UVoxelFunctionLibrary::CreateMeshSection(0, ProceduralMeshComponent, ChunkMesh);
 	ProceduralMeshComponent->SetMaterial(0, Material);

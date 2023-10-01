@@ -293,14 +293,9 @@ EBlockTextureType UVoxelFunctionLibrary::GetTextureType(EBlockSide BlockSide, EB
 	return TextureType;
 }
 
-void UVoxelFunctionLibrary::CreateMeshSection(int32 Index, UProceduralMeshComponent* Component, const FMesh& Mesh)
+void UVoxelFunctionLibrary::CreateMeshSection(int32 Index, UProceduralMeshComponent* Component, const FMesh Mesh)
 {
 	Component->CreateMeshSection(Index, Mesh.Vertices, Mesh.Triangles, Mesh.Normals, Mesh.UVs, Mesh.VertexColors, Mesh.Tangents, true);
-}
-
-void UVoxelFunctionLibrary::UpdateMeshSection(int32 Index, UProceduralMeshComponent* Component, const FMesh& Mesh)
-{
-	Component->UpdateMeshSection(Index, Mesh.Vertices, Mesh.Normals, Mesh.UVs, Mesh.VertexColors, Mesh.Tangents);
 }
 
 float UVoxelFunctionLibrary::FBMNoise2D(const FVector2D& Location, int32 Octaves, float Scale, float HeightScale, float HeightOffset)

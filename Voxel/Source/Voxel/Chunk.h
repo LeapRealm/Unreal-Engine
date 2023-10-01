@@ -23,6 +23,9 @@ public:
 public:
 	FIntVector ChunkIndex;
 	FMesh ChunkMesh;
+
+public:
+	FCriticalSection CriticalSection;
 	
 public:
 	UPROPERTY(VisibleAnywhere)

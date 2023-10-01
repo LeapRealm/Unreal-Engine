@@ -50,7 +50,7 @@ AVoxelCharacter::AVoxelCharacter()
 	
 	GetCharacterMovement()->GravityScale = 1.f;
 	GetCharacterMovement()->MaxWalkSpeed = 450.f;
-	GetCharacterMovement()->JumpZVelocity = 500.f;
+	GetCharacterMovement()->JumpZVelocity = 700.f;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
@@ -143,11 +143,25 @@ void AVoxelCharacter::Interaction()
 	{
 		if (HitResult.GetActor() && HitResult.GetActor()->GetClass() == AChunk::StaticClass())
 		{
-			const FVector& BlockLocation = HitResult.ImpactPoint + (HitResult.ImpactNormal * (FVoxel::BlockSize / 2.f));
+			const FIntVector& BlockCount = FVoxel::BlockCount;
+			int32 BlockSize = FVoxel::BlockSize;
+			
+			const FVector& BlockLocation = HitResult.ImpactPoint + (HitResult.ImpactNormal * (BlockSize / 2.f));
 			const FIntVector& HitChunkIndex = UVoxelFunctionLibrary::WorldPosToChunkIndex(BlockLocation);
 			const FIntVector& HitBlockIndex = UVoxelFunctionLibrary::WorldPosToBlockIndex(BlockLocation);
-
-			// TODO: 플레이어와 겹치는지 확인해야함
+			
+			FIntVector ChunkSize = FIntVector(BlockCount.X * BlockSize, BlockCount.Y * BlockSize, BlockCount.Z * BlockSize);
+			FVector BlockCenterLocation = FVector(ChunkSize * HitChunkIndex) + FVector(HitBlockIndex * BlockSize) + FVector(BlockSize / 2.f);
+			TArray<FHitResult> HitResults;
+			TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+			
+			if (UKismetSystemLibrary::BoxTraceMultiForObjects(this, BlockCenterLocation, BlockCenterLocation, FVector(BlockSize / 2.f), FRotator::ZeroRotator,
+				ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, HitResults, false))
+			{
+				return;
+			}
+			
 			if (AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this)))
 				VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Dirt);
 		}

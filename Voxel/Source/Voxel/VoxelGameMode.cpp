@@ -170,24 +170,40 @@ void AVoxelGameMode::UpdateBlockType(const FIntVector& ChunkIndex3D, const FIntV
 	int32 BlockIndex1D = UVoxelFunctionLibrary::Index3DTo1D(BlockIndex3D, FVoxel::BlockCount);
 
 	TArray<EBlockType>& BlockTypes = ChunkDatas[ChunkIndex1D].BlockTypes;
+	LOG_SCREEN(TEXT("%d"), BlockTypes[BlockIndex1D]);
+	
 	if (BlockTypes[BlockIndex1D] == NewBlockType)
 		return;
 
 	// TODO: (모든 BlockType에 대해서) 가장자리 부분일 경우, 주변 청크로 같이 업데이트해야 함
-	BlockTypes[BlockIndex1D] = NewBlockType;
-	
-	AChunk* Chunk = Chunks[ChunkIndex1D];
-	AsyncTask(ENamedThreads::AnyThread, [Chunk]()
 	{
-		if (IsValid(Chunk))
-			Chunk->BuildChunkMesh();
+		FScopeLock ScopeLock(&Chunks[ChunkIndex1D]->CriticalSection);
+		BlockTypes[BlockIndex1D] = NewBlockType;
+	}
+
+	TArray<AChunk*> DirtyChunks;
+	DirtyChunks.Add(Chunks[ChunkIndex1D]);
+	
+	if (BlockIndex3D.X == 0)
+	{
 		
-		AsyncTask(ENamedThreads::GameThread, [Chunk]()
+	}
+	
+	
+	for (AChunk* DirtyChunk : DirtyChunks)
+	{
+		AsyncTask(ENamedThreads::AnyThread, [DirtyChunk]()
 		{
-			if (IsValid(Chunk))
-				Chunk->CreateChunkMesh();
+			if (IsValid(DirtyChunk))
+				DirtyChunk->BuildChunkMesh();
+			
+			AsyncTask(ENamedThreads::GameThread, [DirtyChunk]()
+			{
+				if (IsValid(DirtyChunk))
+					DirtyChunk->CreateChunkMesh();
+			});
 		});
-	});
+	}
 }
 
 void AVoxelGameMode::UpdateBlockState(const FIntVector& ChunkIndex3D, const FIntVector& BlockIndex3D, EBlockState NewBlockState)
