@@ -9,6 +9,7 @@
 void UVoxelFunctionLibrary::BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrapper, const FIntVector& ChunkIndex3D, FChunkData& ChunkData)
 {
 	const FIntVector& BlockCount = FVoxel::BlockCount;
+	const FIntVector& ChunkCount = FVoxel::ChunkCount;
 
 	TArray<EBlockType>& BlockTypes = ChunkData.BlockTypes;
 	TArray<EBlockState>& BlockStates = ChunkData.BlockStates;
@@ -18,9 +19,11 @@ void UVoxelFunctionLibrary::BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrappe
 	for (int32 LocalBlockIndex1D = 0; LocalBlockIndex1D < BlockTypes.Num(); LocalBlockIndex1D++)
 	{
 		BlockStates[LocalBlockIndex1D] = EBlockState::NoCrack;
-		
-		const FIntVector WorldBlockIndex3D = UVoxelFunctionLibrary::Index1DTo3D(LocalBlockIndex1D, BlockCount) + (ChunkIndex3D * BlockCount);
 
+		const FIntVector LocalBlockIndex3D = UVoxelFunctionLibrary::Index1DTo3D(LocalBlockIndex1D, BlockCount);
+		const FIntVector WorldBlockIndex3D = LocalBlockIndex3D + (ChunkIndex3D * BlockCount);
+
+		// 맨 아래는 배드락
 		if (WorldBlockIndex3D.Z == 0)
 		{
 			BlockTypes[LocalBlockIndex1D] = EBlockType::BedRock;
@@ -31,20 +34,37 @@ void UVoxelFunctionLibrary::BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrappe
 			FVector2D(WorldBlockIndex3D.X, WorldBlockIndex3D.Y), FVoxel::SurfaceNoiseSettings));
 		
 		int32 StoneHeight = SurfaceHeight - FVoxel::StoneHeightOffset;
-		
-		if (CaveRandValue <= FVoxel::CavePercent && WorldBlockIndex3D.Z < StoneHeight && WorldBlockIndex3D.Z > FVoxel::DiamondHeightMin)
+
+		// 돌 지역이면서
+		if (WorldBlockIndex3D.Z < StoneHeight)
 		{
-			const FPerlinNoiseSettings& CaveSettings = FVoxel::CaveNoiseSettings;
-			int32 CaveDig = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise3D(FVector(WorldBlockIndex3D),
-				CaveSettings.Octaves, CaveSettings.Scale, CaveSettings.HeightScale, CaveSettings.HeightOffset));
-			
-			if (CaveDig < CaveSettings.DrawCutOff)
+			// 가장자리 청크의 가장자리 블록은 배드락
+			if (ChunkIndex3D.X == 0 && LocalBlockIndex3D.X == 0 || ChunkIndex3D.X == ChunkCount.X - 1 && LocalBlockIndex3D.X == BlockCount.X - 1 ||
+				ChunkIndex3D.Y == 0 && LocalBlockIndex3D.Y == 0 || ChunkIndex3D.Y == ChunkCount.Y - 1 && LocalBlockIndex3D.Y == BlockCount.Y - 1)
 			{
-				BlockTypes[LocalBlockIndex1D] = EBlockType::Air;
+				BlockTypes[LocalBlockIndex1D] = EBlockType::BedRock;
 				continue;
 			}
+			
+			// 동굴을 만들어야 한다면
+			if (CaveRandValue <= FVoxel::CavePercent && WorldBlockIndex3D.Z > FVoxel::DiamondHeightMin)
+			{
+				const FPerlinNoiseSettings& CaveSettings = FVoxel::CaveNoiseSettings;
+				int32 CaveDig = static_cast<int32>(UVoxelFunctionLibrary::FBMNoise3D(FVector(WorldBlockIndex3D),
+					CaveSettings.Octaves, CaveSettings.Scale, CaveSettings.HeightScale, CaveSettings.HeightOffset));
+
+				// 일부분을 동굴에서 파낸다
+				if (CaveDig < CaveSettings.DrawCutOff)
+				{
+					BlockTypes[LocalBlockIndex1D] = EBlockType::Air;
+					continue;
+				}
+			}
 		}
-		
+
+		// 돌 지역의 파내지 않은 부분 중에서 광물은 높이에 따라 확률적으로 배치한다
+		// 돌 지역 위에 돌과 흙을 섞은 층과 그 위에 흙 층을 만든다
+		// 지상과 맞닿은 표면부분에 잔디를 만들고, 나머지는 공기로 채운다
 		if (WorldBlockIndex3D.Z < FVoxel::DiamondHeightMin)
 		{
 			BlockTypes[LocalBlockIndex1D] = EBlockType::Stone;
@@ -293,7 +313,7 @@ EBlockTextureType UVoxelFunctionLibrary::GetTextureType(EBlockSide BlockSide, EB
 	return TextureType;
 }
 
-void UVoxelFunctionLibrary::CreateMeshSection(int32 Index, UProceduralMeshComponent* Component, const FMesh Mesh)
+void UVoxelFunctionLibrary::CreateMeshSection(int32 Index, UProceduralMeshComponent* Component, const FMesh& Mesh)
 {
 	Component->CreateMeshSection(Index, Mesh.Vertices, Mesh.Triangles, Mesh.Normals, Mesh.UVs, Mesh.VertexColors, Mesh.Tangents, true);
 }
