@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "ProceduralMeshComponent.h"
 #include "FastNoiseWrapper.h"
 #include "Define.generated.h"
 
@@ -80,6 +79,51 @@ enum class ENoiseRendererType : uint8
 };
 
 USTRUCT(BlueprintType)
+struct FVoxel
+{
+	GENERATED_BODY()
+
+public:
+	static const FVector FLU;
+	static const FVector FRU;
+	static const FVector FLD;
+	static const FVector FRD;
+	static const FVector BLU;
+	static const FVector BRU;
+	static const FVector BLD;
+	static const FVector BRD;
+
+public:
+	static const TArray<TArray<FVector2D>> BlockTextureUVs;
+
+public:
+	static const FIntVector BlockCount;
+	static const FIntVector ChunkCount;
+	static const int32 BlockSize;
+
+public:
+	static const int32 DX[];
+	static const int32 DY[];
+	static const int32 DZ[];
+
+public:
+	static const float CoalPercent;
+	static const float IronPercent;
+	static const float GoldPercent;
+	static const float DiamondPercent;
+	static const float CavePercent;
+
+	static const float StoneHeightOffset;
+	static const float DiamondHeightMin;
+	static const float DiamondHeightMax;
+
+public:
+	static const FFastNoiseSettings SurfaceNoiseSettings;
+	static const FPerlinNoiseSettings CaveNoiseSettings;
+};
+
+
+USTRUCT(BlueprintType)
 struct FMesh
 {
 	GENERATED_BODY()
@@ -96,12 +140,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FVector2D> UVs;
-
-	UPROPERTY(VisibleAnywhere)
-	TArray<FProcMeshTangent> Tangents;
-
-	UPROPERTY(VisibleAnywhere)
-	TArray<FColor> VertexColors;
 	
 public:
 	void Empty()
@@ -110,8 +148,6 @@ public:
 		Triangles.Empty();
 		Normals.Empty();
 		UVs.Empty();
-		Tangents.Empty();
-		VertexColors.Empty();
 	}
 };
 
@@ -175,48 +211,4 @@ struct FChunkData
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<EBlockState> BlockStates;
-};
-
-USTRUCT(BlueprintType)
-struct FVoxel
-{
-	GENERATED_BODY()
-
-public:
-	static const FVector FLU;
-	static const FVector FRU;
-	static const FVector FLD;
-	static const FVector FRD;
-	static const FVector BLU;
-	static const FVector BRU;
-	static const FVector BLD;
-	static const FVector BRD;
-
-public:
-	static const TArray<TArray<FVector2D>> BlockTextureUVs;
-
-public:
-	static const FIntVector BlockCount;
-	static const FIntVector ChunkCount;
-	static const int32 BlockSize;
-
-public:
-	static const int32 DX[];
-	static const int32 DY[];
-	static const int32 DZ[];
-
-public:
-	static const float CoalPercent;
-	static const float IronPercent;
-	static const float GoldPercent;
-	static const float DiamondPercent;
-	static const float CavePercent;
-
-	static const float StoneHeightOffset;
-	static const float DiamondHeightMin;
-	static const float DiamondHeightMax;
-
-public:
-	static const FFastNoiseSettings SurfaceNoiseSettings;
-	static const FPerlinNoiseSettings CaveNoiseSettings;
 };

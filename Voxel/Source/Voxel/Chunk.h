@@ -18,15 +18,11 @@ public:
 public:
 	void Init(const FIntVector& NewChunkIndex);
 	void BuildChunkMesh();
-	void CreateChunkMesh();
 
 public:
 	FIntVector ChunkIndex;
 	FMesh ChunkMesh;
 
-public:
-	FCriticalSection CriticalSection;
-	
 public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UMaterial> Material;

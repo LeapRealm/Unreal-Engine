@@ -157,13 +157,11 @@ void AVoxelCharacter::Interaction()
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
 			
 			if (UKismetSystemLibrary::BoxTraceMultiForObjects(this, BlockCenterLocation, BlockCenterLocation, FVector(BlockSize / 2.f), FRotator::ZeroRotator,
-				ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, HitResults, false))
+				ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, HitResults, false) == false)
 			{
-				return;
+				if (AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this)))
+					VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Dirt);
 			}
-			
-			if (AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this)))
-				VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Dirt);
 		}
 	}
 }

@@ -1,6 +1,5 @@
 #include "VoxelFunctionLibrary.h"
 
-#include "Chunk.h"
 #include "Define.h"
 #include "ProceduralMeshComponent.h"
 #include "VoxelGameMode.h"
@@ -8,6 +7,7 @@
 
 void UVoxelFunctionLibrary::BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrapper, const FIntVector& ChunkIndex3D, FChunkData& ChunkData)
 {
+	// TODO: 동굴 생성 확률 변경 필요
 	const FIntVector& BlockCount = FVoxel::BlockCount;
 	const FIntVector& ChunkCount = FVoxel::ChunkCount;
 
@@ -209,7 +209,7 @@ void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide BlockSide, EBlockTextureTyp
 	}
 }
 
-void UVoxelFunctionLibrary::BuildBlockMesh(AChunk* Chunk, EBlockType BlockType, const FIntVector& BlockIndex, const FVector& Offset)
+void UVoxelFunctionLibrary::BuildBlockMesh(const FIntVector& ChunkIndex, FMesh& ChunkMesh, EBlockType BlockType, const FIntVector& BlockIndex, const FVector& Offset)
 {
 	if (BlockType == EBlockType::Air)
 		return;
@@ -218,16 +218,15 @@ void UVoxelFunctionLibrary::BuildBlockMesh(AChunk* Chunk, EBlockType BlockType, 
 	for (int32 i = 0; i < BlockSideCount; i++)
 	{
 		EBlockSide BlockSide = static_cast<EBlockSide>(i);
-		if (DoesNeedOptimization(Chunk, BlockIndex, BlockSide) == false)
-			UVoxelFunctionLibrary::BuildQuadMesh(BlockSide, GetTextureType(BlockSide, BlockType), Offset, Chunk->ChunkMesh);
+		if (DoesNeedOptimization(ChunkIndex, BlockIndex, BlockSide) == false)
+			UVoxelFunctionLibrary::BuildQuadMesh(BlockSide, GetTextureType(BlockSide, BlockType), Offset, ChunkMesh);
 	}
 }
 
-bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FIntVector& BlockIndex, EBlockSide BlockSide)
+bool UVoxelFunctionLibrary::DoesNeedOptimization(const FIntVector& ChunkIndex, const FIntVector& BlockIndex, EBlockSide BlockSide)
 {
-	AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(Chunk));
-	if (VoxelGameMode == nullptr)
-		return false;
+	AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(GEngine->GameViewport));
+	check(VoxelGameMode);
 	
 	FIntVector CheckBlockIndex3D = FIntVector(
 		BlockIndex.X + FVoxel::DX[static_cast<int32>(BlockSide)],
@@ -249,9 +248,9 @@ bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FInt
 		CheckBlockIndex3D.Z = (CheckBlockIndex3D.Z + BlockCount.Z) % BlockCount.Z;
 		
 		FIntVector CheckChunkIndex3D = FIntVector(
-			Chunk->ChunkIndex.X + FVoxel::DX[static_cast<int32>(BlockSide)],
-			Chunk->ChunkIndex.Y + FVoxel::DY[static_cast<int32>(BlockSide)],
-			Chunk->ChunkIndex.Z + FVoxel::DZ[static_cast<int32>(BlockSide)]
+			ChunkIndex.X + FVoxel::DX[static_cast<int32>(BlockSide)],
+			ChunkIndex.Y + FVoxel::DY[static_cast<int32>(BlockSide)],
+			ChunkIndex.Z + FVoxel::DZ[static_cast<int32>(BlockSide)]
 		);
 		
 		if (CheckChunkIndex3D.X < 0 || CheckChunkIndex3D.X >= ChunkCount.X ||
@@ -264,7 +263,7 @@ bool UVoxelFunctionLibrary::DoesNeedOptimization(const AChunk* Chunk, const FInt
 	}
 	else
 	{
-		const FChunkData& CheckChunkData = VoxelGameMode->ChunkDatas[Index3DTo1D(Chunk->ChunkIndex, ChunkCount)];
+		const FChunkData& CheckChunkData = VoxelGameMode->ChunkDatas[Index3DTo1D(ChunkIndex, ChunkCount)];
 		BlockType = CheckChunkData.BlockTypes[Index3DTo1D(CheckBlockIndex3D, BlockCount)];
 	}
 
@@ -315,7 +314,7 @@ EBlockTextureType UVoxelFunctionLibrary::GetTextureType(EBlockSide BlockSide, EB
 
 void UVoxelFunctionLibrary::CreateMeshSection(int32 Index, UProceduralMeshComponent* Component, const FMesh& Mesh)
 {
-	Component->CreateMeshSection(Index, Mesh.Vertices, Mesh.Triangles, Mesh.Normals, Mesh.UVs, Mesh.VertexColors, Mesh.Tangents, true);
+	Component->CreateMeshSection(Index, Mesh.Vertices, Mesh.Triangles, Mesh.Normals, Mesh.UVs, TArray<FColor>(), TArray<FProcMeshTangent>(), true);
 }
 
 float UVoxelFunctionLibrary::FBMNoise2D(const FVector2D& Location, int32 Octaves, float Scale, float HeightScale, float HeightOffset)

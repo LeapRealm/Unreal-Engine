@@ -19,8 +19,8 @@ public:
 	static void BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrapper, const FIntVector& ChunkIndex3D, FChunkData& ChunkData);
 	
 	static void BuildQuadMesh(EBlockSide BlockSide, EBlockTextureType TextureType, const FVector& Offset, FMesh& OutMesh);
-	static void BuildBlockMesh(AChunk* Chunk, EBlockType BlockType, const FIntVector& BlockIndex, const FVector& Offset);
-	static bool DoesNeedOptimization(const AChunk* Chunk, const FIntVector& BlockIndex, EBlockSide BlockSide);
+	static void BuildBlockMesh(const FIntVector& ChunkIndex, FMesh& ChunkMesh, EBlockType BlockType, const FIntVector& BlockIndex, const FVector& Offset);
+	static bool DoesNeedOptimization(const FIntVector& ChunkIndex, const FIntVector& BlockIndex, EBlockSide BlockSide);
 
 	static EBlockTextureType GetTextureType(EBlockSide BlockSide, EBlockType BlockType);
 	

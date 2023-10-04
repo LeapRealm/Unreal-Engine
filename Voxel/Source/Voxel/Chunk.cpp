@@ -11,7 +11,7 @@ AChunk::AChunk()
 	PrimaryActorTick.bCanEverTick = false;
 	
 	ProceduralMeshComponent = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralMeshComponent"));
-	ProceduralMeshComponent->bUseAsyncCooking = false;
+	ProceduralMeshComponent->bUseAsyncCooking = true;
 	SetRootComponent(ProceduralMeshComponent);
 	
 	static ConstructorHelpers::FObjectFinder<UMaterial> M_Block(TEXT("/Script/Engine.Material'/Game/Materials/M_Block.M_Block'"));
@@ -27,11 +27,9 @@ void AChunk::Init(const FIntVector& NewChunkIndex)
 void AChunk::BuildChunkMesh()
 {
 	AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this));
-	if (VoxelGameMode == nullptr)
+	if (VoxelGameMode == nullptr || IsValid(this) == false)
 		return;
 
-	FScopeLock ScopeLock(&CriticalSection);
-	
 	ChunkMesh.Empty();
 	
 	const int32 BlockSize = FVoxel::BlockSize;
@@ -48,17 +46,15 @@ void AChunk::BuildChunkMesh()
 			for (int32 x = 0; x < BlockCount.X; x++)
 			{
 				int32 BlockIndex1D = UVoxelFunctionLibrary::Index3DTo1D(FIntVector(x, y, z), BlockCount);
-				UVoxelFunctionLibrary::BuildBlockMesh(this, ChunkData.BlockTypes[BlockIndex1D], FIntVector(x, y, z), FVector(x, y, z) * BlockSize);
+				UVoxelFunctionLibrary::BuildBlockMesh(ChunkIndex, ChunkMesh, ChunkData.BlockTypes[BlockIndex1D], FIntVector(x, y, z), FVector(x, y, z) * BlockSize);
 			}
 		}
 	}
-}
 
-void AChunk::CreateChunkMesh()
-{
-	FScopeLock ScopeLock(&CriticalSection);
-	
-	ProceduralMeshComponent->ClearAllMeshSections();
-	UVoxelFunctionLibrary::CreateMeshSection(0, ProceduralMeshComponent, ChunkMesh);
-	ProceduralMeshComponent->SetMaterial(0, Material);
+	AsyncTask(ENamedThreads::GameThread, [this]()
+	{
+		ProceduralMeshComponent->ClearAllMeshSections();
+		UVoxelFunctionLibrary::CreateMeshSection(0, ProceduralMeshComponent, ChunkMesh);
+		ProceduralMeshComponent->SetMaterial(0, Material);
+	});
 }

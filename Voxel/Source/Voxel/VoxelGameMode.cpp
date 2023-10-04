@@ -5,12 +5,10 @@
 #include "FastNoiseWrapper.h"
 #include "VoxelCharacter.h"
 #include "VoxelFunctionLibrary.h"
-#include "Kismet/GameplayStatics.h"
 
 AVoxelGameMode::AVoxelGameMode()
 {
 	DefaultPawnClass = AVoxelCharacter::StaticClass();
-	
 	SurfaceNoiseWrapper = CreateDefaultSubobject<UFastNoiseWrapper>(TEXT("SurfaceNoiseWrapper"));
 }
 
@@ -38,7 +36,6 @@ void AVoxelGameMode::InitChunks()
 	const FIntVector& BlockCount = FVoxel::BlockCount;
 	const int32 TotalBlockCount = BlockCount.X * BlockCount.Y * BlockCount.Z;
 	
-	Chunks.SetNumZeroed(TotalChunkCount);
 	ChunkDatas.SetNum(TotalChunkCount);
 	
 	for (int32 ChunkIndex1D = 0; ChunkIndex1D < ChunkDatas.Num(); ChunkIndex1D++)
@@ -46,98 +43,33 @@ void AVoxelGameMode::InitChunks()
 		ChunkDatas[ChunkIndex1D].BlockTypes.SetNumUninitialized(TotalBlockCount);
 		ChunkDatas[ChunkIndex1D].BlockStates.SetNumUninitialized(TotalBlockCount);
 		
-		AsyncTask(ENamedThreads::AnyThread, [this, ChunkIndex1D]()
+		AsyncTask(ENamedThreads::AnyThread, [this, ChunkIndex1D, TotalChunkCount]()
 		{
 			UVoxelFunctionLibrary::BuildChunkData(SurfaceNoiseWrapper, UVoxelFunctionLibrary::Index1DTo3D(ChunkIndex1D, FVoxel::ChunkCount), ChunkDatas[ChunkIndex1D]);
-			BuiltChunkDataCount.fetch_add(1);
+			if (BuiltChunkDataCount.fetch_add(1) == (TotalChunkCount - 1))
+				AsyncTask(ENamedThreads::GameThread, [this](){ SpawnChunks(); });
 		});
 	}
-	
-	GetWorldTimerManager().SetTimer(CullingChunksTimerHandle, this, &AVoxelGameMode::CullingChunks, CullingChunksTimerRate, true);
 }
 
-void AVoxelGameMode::CullingChunks()
-{
-	if (bBuildChunkDataCompleted == false)
-	{
-		const FIntVector& ChunkCount = FVoxel::ChunkCount;
-		int32 TotalChunkCount = ChunkCount.X * ChunkCount.Y * ChunkCount.Z;
-		bBuildChunkDataCompleted = (BuiltChunkDataCount.load() == TotalChunkCount);
-		if (bBuildChunkDataCompleted == false)
-			return;
-	}
-	
-	if (IsValid(VoxelCharacter) == false)
-	{
-		VoxelCharacter = Cast<AVoxelCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
-		if (VoxelCharacter == nullptr)
-			return;
-	}
-
-	FIntVector NewPlayerChunkIndex = UVoxelFunctionLibrary::WorldPosToChunkIndex(VoxelCharacter->GetActorLocation());
-	if (PlayerChunkIndex == NewPlayerChunkIndex)
-		return;
-
-	PlayerChunkIndex = NewPlayerChunkIndex;
-	
-	FIntVector MinCullIndex, MaxCullIndex;
-	if (bCullEnable)
-	{
-		MinCullIndex = FIntVector(FMath::Max(0, PlayerChunkIndex.X - CullIndexDistance),
-								  FMath::Max(0, PlayerChunkIndex.Y - CullIndexDistance),
-								  FMath::Max(0, PlayerChunkIndex.Z - CullIndexDistance));
-		MaxCullIndex = FIntVector(FMath::Min(FVoxel::ChunkCount.X - 1, PlayerChunkIndex.X + CullIndexDistance),
-								  FMath::Min(FVoxel::ChunkCount.Y - 1, PlayerChunkIndex.Y + CullIndexDistance),
-								  FMath::Min(FVoxel::ChunkCount.Z - 1, PlayerChunkIndex.Z + CullIndexDistance));
-	}
-	else
-	{
-		MinCullIndex = FIntVector(0, 0, 0);
-		MaxCullIndex = FIntVector(FVoxel::ChunkCount.X - 1, FVoxel::ChunkCount.Y - 1, FVoxel::ChunkCount.Z - 1);
-	}
-	
-	DestroyFarChunks(MinCullIndex, MaxCullIndex);
-	SpawnNearChunks(MinCullIndex, MaxCullIndex);
-
-	if (bCullEnable == false)
-	{
-		GetWorldTimerManager().ClearTimer(CullingChunksTimerHandle);
-		CullingChunksTimerHandle.Invalidate();
-		return;
-	}
-}
-
-void AVoxelGameMode::DestroyFarChunks(const FIntVector& MinCullIndex, const FIntVector& MaxCullIndex)
+void AVoxelGameMode::SpawnChunks()
 {
 	const FIntVector& ChunkCount = FVoxel::ChunkCount;
-	
-	for (int32 i = 0; i < SpawnedChunks.Num(); i++)
-	{
-		AChunk* Chunk = SpawnedChunks[i];
-		const FIntVector& ChunkIndex = Chunk->ChunkIndex;
+	const int32 TotalChunkCount = ChunkCount.X * ChunkCount.Y * ChunkCount.Z;
 
-		if (ChunkIndex.X < MinCullIndex.X || ChunkIndex.Y < MinCullIndex.Y || ChunkIndex.Z < MinCullIndex.Z ||
-			ChunkIndex.X > MaxCullIndex.X || ChunkIndex.Y > MaxCullIndex.Y || ChunkIndex.Z > MaxCullIndex.Z)
-		{
-			int32 Index1D = UVoxelFunctionLibrary::Index3DTo1D(ChunkIndex, ChunkCount);
-			Chunks[Index1D] = nullptr;
-			SpawnedChunks.RemoveAtSwap(i--);
-			GetWorld()->DestroyActor(Chunk);
-		}
-	}
-}
-
-void AVoxelGameMode::SpawnNearChunks(const FIntVector& MinCullIndex, const FIntVector& MaxCullIndex)
-{
-	const FIntVector& ChunkCount = FVoxel::ChunkCount;
 	const FIntVector& BlockCount = FVoxel::BlockCount;
 	const int32 BlockSize = FVoxel::BlockSize;
+
+	const FIntVector MinChunkIndex = FIntVector(0, 0, 0);
+	const FIntVector MaxChunkIndex = FIntVector(ChunkCount.X - 1, ChunkCount.Y - 1, ChunkCount.Z - 1);
 	
-	for (int32 z = MinCullIndex.Z; z <= MaxCullIndex.Z; z++)
+	Chunks.SetNumZeroed(TotalChunkCount);
+	
+	for (int32 z = MinChunkIndex.Z; z <= MaxChunkIndex.Z; z++)
 	{
-		for (int32 y = MinCullIndex.Y; y <= MaxCullIndex.Y; y++)
+		for (int32 y = MinChunkIndex.Y; y <= MaxChunkIndex.Y; y++)
 		{
-			for (int32 x = MinCullIndex.X; x <= MaxCullIndex.X; x++)
+			for (int32 x = MinChunkIndex.X; x <= MaxChunkIndex.X; x++)
 			{
 				int32 Index1D = UVoxelFunctionLibrary::Index3DTo1D(FIntVector(x, y, z), ChunkCount);
 				if (Chunks[Index1D])
@@ -146,18 +78,10 @@ void AVoxelGameMode::SpawnNearChunks(const FIntVector& MinCullIndex, const FIntV
 				AChunk* Chunk = GetWorld()->SpawnActor<AChunk>(FVector(x * BlockCount.X, y * BlockCount.Y, z * BlockCount.Z) * BlockSize, FRotator::ZeroRotator);
 				Chunk->Init(FIntVector(x, y, z));
 				Chunks[Index1D] = Chunk;
-				SpawnedChunks.Add(Chunk);
 
 				AsyncTask(ENamedThreads::AnyThread, [Chunk]()
 				{
-					if (IsValid(Chunk))
-						Chunk->BuildChunkMesh();
-					
-					AsyncTask(ENamedThreads::GameThread, [Chunk]()
-					{
-						if (IsValid(Chunk))
-							Chunk->CreateChunkMesh();
-					});
+					Chunk->BuildChunkMesh();
 				});
 			}
 		}
@@ -170,38 +94,18 @@ void AVoxelGameMode::UpdateBlockType(const FIntVector& ChunkIndex3D, const FIntV
 	int32 BlockIndex1D = UVoxelFunctionLibrary::Index3DTo1D(BlockIndex3D, FVoxel::BlockCount);
 
 	TArray<EBlockType>& BlockTypes = ChunkDatas[ChunkIndex1D].BlockTypes;
-	LOG_SCREEN(TEXT("%d"), BlockTypes[BlockIndex1D]);
-	
-	if (BlockTypes[BlockIndex1D] == NewBlockType)
-		return;
+	BlockTypes[BlockIndex1D] = NewBlockType;
 
 	// TODO: (모든 BlockType에 대해서) 가장자리 부분일 경우, 주변 청크로 같이 업데이트해야 함
-	{
-		FScopeLock ScopeLock(&Chunks[ChunkIndex1D]->CriticalSection);
-		BlockTypes[BlockIndex1D] = NewBlockType;
-	}
 
 	TArray<AChunk*> DirtyChunks;
 	DirtyChunks.Add(Chunks[ChunkIndex1D]);
-	
-	if (BlockIndex3D.X == 0)
-	{
-		
-	}
-	
 	
 	for (AChunk* DirtyChunk : DirtyChunks)
 	{
 		AsyncTask(ENamedThreads::AnyThread, [DirtyChunk]()
 		{
-			if (IsValid(DirtyChunk))
-				DirtyChunk->BuildChunkMesh();
-			
-			AsyncTask(ENamedThreads::GameThread, [DirtyChunk]()
-			{
-				if (IsValid(DirtyChunk))
-					DirtyChunk->CreateChunkMesh();
-			});
+			DirtyChunk->BuildChunkMesh();
 		});
 	}
 }
