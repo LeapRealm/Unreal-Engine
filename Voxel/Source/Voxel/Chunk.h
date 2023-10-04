@@ -23,6 +23,9 @@ public:
 	FIntVector ChunkIndex;
 	FMesh ChunkMesh;
 
+private:
+	FCriticalSection CriticalSection;
+
 public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UMaterial> Material;
