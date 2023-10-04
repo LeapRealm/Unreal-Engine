@@ -15,7 +15,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCustom, Log, All);
 #define	LOG_SCREEN_COLOR(Color ,Format, ...) GEngine->AddOnScreenDebugMessage(-1, 5.f, Color, FString::Printf(Format, ##__VA_ARGS__))
 
 UENUM(BlueprintType)
-enum class EBlockSide : uint8
+enum class ESide : uint8
 {
 	Left,
 	Right,

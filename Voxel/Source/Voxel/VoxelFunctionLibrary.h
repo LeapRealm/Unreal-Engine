@@ -18,11 +18,11 @@ class VOXEL_API UVoxelFunctionLibrary : public UBlueprintFunctionLibrary
 public:
 	static void BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrapper, const FIntVector& ChunkIndex3D, FChunkData& ChunkData);
 	
-	static void BuildQuadMesh(EBlockSide BlockSide, EBlockTextureType TextureType, const FVector& Offset, FMesh& OutMesh);
+	static void BuildQuadMesh(ESide BlockSide, EBlockTextureType TextureType, const FVector& Offset, FMesh& OutMesh);
 	static void BuildBlockMesh(const FIntVector& ChunkIndex, FMesh& ChunkMesh, EBlockType BlockType, const FIntVector& BlockIndex, const FVector& Offset);
-	static bool DoesNeedOptimization(const FIntVector& ChunkIndex, const FIntVector& BlockIndex, EBlockSide BlockSide);
+	static bool DoesNeedOptimization(const FIntVector& ChunkIndex, const FIntVector& BlockIndex, ESide BlockSide);
 
-	static EBlockTextureType GetTextureType(EBlockSide BlockSide, EBlockType BlockType);
+	static EBlockTextureType GetTextureType(ESide BlockSide, EBlockType BlockType);
 	
 	static void CreateMeshSection(int32 Index, UProceduralMeshComponent* Component, const FMesh& Mesh);
 	

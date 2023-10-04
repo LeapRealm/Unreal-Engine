@@ -7,13 +7,13 @@
 
 void UVoxelFunctionLibrary::BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrapper, const FIntVector& ChunkIndex3D, FChunkData& ChunkData)
 {
-	// TODO: 동굴 생성 확률 변경 필요
 	const FIntVector& BlockCount = FVoxel::BlockCount;
 	const FIntVector& ChunkCount = FVoxel::ChunkCount;
 
 	TArray<EBlockType>& BlockTypes = ChunkData.BlockTypes;
 	TArray<EBlockState>& BlockStates = ChunkData.BlockStates;
 	
+	// TODO: 동굴 생성 확률 변경 필요
 	float CaveRandValue = FMath::RandRange(0.f, 100.f);
 	
 	for (int32 LocalBlockIndex1D = 0; LocalBlockIndex1D < BlockTypes.Num(); LocalBlockIndex1D++)
@@ -119,7 +119,7 @@ void UVoxelFunctionLibrary::BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrappe
 	}
 }
 
-void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide BlockSide, EBlockTextureType TextureType, const FVector& Offset, FMesh& OutMesh)
+void UVoxelFunctionLibrary::BuildQuadMesh(ESide BlockSide, EBlockTextureType TextureType, const FVector& Offset, FMesh& OutMesh)
 {
 	const FVector FLU = FVoxel::FLU + Offset;
 	const FVector FRU = FVoxel::FRU + Offset;
@@ -140,7 +140,7 @@ void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide BlockSide, EBlockTextureTyp
 	
 	switch (BlockSide)
 	{
-	case EBlockSide::Forward:
+	case ESide::Forward:
 		OutMesh.Vertices.Add(FRU);
 		OutMesh.Vertices.Add(FLU);
 		OutMesh.Vertices.Add(FRD);
@@ -151,7 +151,7 @@ void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide BlockSide, EBlockTextureTyp
 		OutMesh.Normals.Add(FVector::ForwardVector);
 		OutMesh.Normals.Add(FVector::ForwardVector);
 		break;
-	case EBlockSide::Backward:
+	case ESide::Backward:
 		OutMesh.Vertices.Add(BLU);
 		OutMesh.Vertices.Add(BRU);
 		OutMesh.Vertices.Add(BLD);
@@ -162,7 +162,7 @@ void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide BlockSide, EBlockTextureTyp
 		OutMesh.Normals.Add(FVector::BackwardVector);
 		OutMesh.Normals.Add(FVector::BackwardVector);
 		break;
-	case EBlockSide::Down:
+	case ESide::Down:
 		OutMesh.Vertices.Add(BLD);
 		OutMesh.Vertices.Add(BRD);
 		OutMesh.Vertices.Add(FLD);
@@ -173,7 +173,7 @@ void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide BlockSide, EBlockTextureTyp
 		OutMesh.Normals.Add(FVector::DownVector);
 		OutMesh.Normals.Add(FVector::DownVector);
 		break;
-	case EBlockSide::Up:
+	case ESide::Up:
 		OutMesh.Vertices.Add(BRU);
 		OutMesh.Vertices.Add(BLU);
 		OutMesh.Vertices.Add(FRU);
@@ -184,7 +184,7 @@ void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide BlockSide, EBlockTextureTyp
 		OutMesh.Normals.Add(FVector::UpVector);
 		OutMesh.Normals.Add(FVector::UpVector);
 		break;
-	case EBlockSide::Left:
+	case ESide::Left:
 		OutMesh.Vertices.Add(FLU);
 		OutMesh.Vertices.Add(BLU);
 		OutMesh.Vertices.Add(FLD);
@@ -195,7 +195,7 @@ void UVoxelFunctionLibrary::BuildQuadMesh(EBlockSide BlockSide, EBlockTextureTyp
 		OutMesh.Normals.Add(FVector::LeftVector);
 		OutMesh.Normals.Add(FVector::LeftVector);
 		break;
-	case EBlockSide::Right:
+	case ESide::Right:
 		OutMesh.Vertices.Add(BRU);
 		OutMesh.Vertices.Add(FRU);
 		OutMesh.Vertices.Add(BRD);
@@ -214,16 +214,16 @@ void UVoxelFunctionLibrary::BuildBlockMesh(const FIntVector& ChunkIndex, FMesh& 
 	if (BlockType == EBlockType::Air)
 		return;
 
-	const int32 BlockSideCount = static_cast<int32>(EBlockSide::Count);
+	const int32 BlockSideCount = static_cast<int32>(ESide::Count);
 	for (int32 i = 0; i < BlockSideCount; i++)
 	{
-		EBlockSide BlockSide = static_cast<EBlockSide>(i);
+		ESide BlockSide = static_cast<ESide>(i);
 		if (DoesNeedOptimization(ChunkIndex, BlockIndex, BlockSide) == false)
 			UVoxelFunctionLibrary::BuildQuadMesh(BlockSide, GetTextureType(BlockSide, BlockType), Offset, ChunkMesh);
 	}
 }
 
-bool UVoxelFunctionLibrary::DoesNeedOptimization(const FIntVector& ChunkIndex, const FIntVector& BlockIndex, EBlockSide BlockSide)
+bool UVoxelFunctionLibrary::DoesNeedOptimization(const FIntVector& ChunkIndex, const FIntVector& BlockIndex, ESide BlockSide)
 {
 	AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(GEngine->GameViewport));
 	check(VoxelGameMode);
@@ -272,7 +272,7 @@ bool UVoxelFunctionLibrary::DoesNeedOptimization(const FIntVector& ChunkIndex, c
 	return true;
 }
 
-EBlockTextureType UVoxelFunctionLibrary::GetTextureType(EBlockSide BlockSide, EBlockType BlockType)
+EBlockTextureType UVoxelFunctionLibrary::GetTextureType(ESide BlockSide, EBlockType BlockType)
 {
 	EBlockTextureType TextureType = EBlockTextureType::Dirt;
 
@@ -280,16 +280,16 @@ EBlockTextureType UVoxelFunctionLibrary::GetTextureType(EBlockSide BlockSide, EB
 	{
 		switch (BlockSide)
 		{
-		case EBlockSide::Left:
-		case EBlockSide::Right:
-		case EBlockSide::Backward:
-		case EBlockSide::Forward:
+		case ESide::Left:
+		case ESide::Right:
+		case ESide::Backward:
+		case ESide::Forward:
 			TextureType = EBlockTextureType::GrassSide;
 			break;
-		case EBlockSide::Down:
+		case ESide::Down:
 			TextureType = EBlockTextureType::Dirt;
 			break;
-		case EBlockSide::Up:
+		case ESide::Up:
 			TextureType = EBlockTextureType::GrassTop;
 			break;
 		}

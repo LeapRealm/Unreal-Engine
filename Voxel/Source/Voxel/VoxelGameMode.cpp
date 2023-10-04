@@ -16,6 +16,8 @@ void AVoxelGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// TODO: 맵 밖으로 못나가게 투명벽 세우기
+
 	InitNoise();
 	InitChunks();
 }
@@ -90,16 +92,49 @@ void AVoxelGameMode::SpawnChunks()
 
 void AVoxelGameMode::UpdateBlockType(const FIntVector& ChunkIndex3D, const FIntVector& BlockIndex3D, EBlockType NewBlockType)
 {
-	int32 ChunkIndex1D = UVoxelFunctionLibrary::Index3DTo1D(ChunkIndex3D, FVoxel::ChunkCount);
-	int32 BlockIndex1D = UVoxelFunctionLibrary::Index3DTo1D(BlockIndex3D, FVoxel::BlockCount);
+	const FIntVector& ChunkCount = FVoxel::ChunkCount;
+	const FIntVector& BlockCount = FVoxel::BlockCount;
+	
+	int32 ChunkIndex1D = UVoxelFunctionLibrary::Index3DTo1D(ChunkIndex3D, ChunkCount);
+	int32 BlockIndex1D = UVoxelFunctionLibrary::Index3DTo1D(BlockIndex3D, BlockCount);
 
 	TArray<EBlockType>& BlockTypes = ChunkDatas[ChunkIndex1D].BlockTypes;
 	BlockTypes[BlockIndex1D] = NewBlockType;
-
-	// TODO: (모든 BlockType에 대해서) 가장자리 부분일 경우, 주변 청크로 같이 업데이트해야 함
-
+	
 	TArray<AChunk*> DirtyChunks;
 	DirtyChunks.Add(Chunks[ChunkIndex1D]);
+	
+	TArray<ESide> ChunkSides;
+	if (BlockIndex3D.X == 0)
+		ChunkSides.Add(ESide::Backward);
+	else if (BlockIndex3D.X == BlockCount.X - 1)
+		ChunkSides.Add(ESide::Forward);
+	
+	if (BlockIndex3D.Y == 0)
+		ChunkSides.Add(ESide::Left);
+	else if (BlockIndex3D.Y == BlockCount.Y - 1)
+		ChunkSides.Add(ESide::Right);
+			
+	if (BlockIndex3D.Z == 0)
+		ChunkSides.Add(ESide::Down);
+	else if (BlockIndex3D.Z == BlockCount.Z - 1)
+		ChunkSides.Add(ESide::Up);
+	
+	for (ESide ChunkSide : ChunkSides)
+	{
+		FIntVector SideChunkIndex3D = ChunkIndex3D + FIntVector(
+			FVoxel::DX[static_cast<int32>(ChunkSide)],
+			FVoxel::DY[static_cast<int32>(ChunkSide)],
+			FVoxel::DZ[static_cast<int32>(ChunkSide)]
+		);
+		
+		if (SideChunkIndex3D.X < 0 || SideChunkIndex3D.X >= ChunkCount.X ||
+			SideChunkIndex3D.Y < 0 || SideChunkIndex3D.Y >= ChunkCount.Y ||
+			SideChunkIndex3D.Z < 0 || SideChunkIndex3D.Z >= ChunkCount.Z)
+			continue;
+		
+		DirtyChunks.Add(Chunks[UVoxelFunctionLibrary::Index3DTo1D(SideChunkIndex3D, ChunkCount)]);
+	}
 	
 	for (AChunk* DirtyChunk : DirtyChunks)
 	{

@@ -10,10 +10,10 @@ const int32 FVoxel::DX[] = { +0, +0, -1, +1, +0, +0 };
 const int32 FVoxel::DY[] = { -1, +1, +0, +0, +0, +0 };
 const int32 FVoxel::DZ[] = { +0, +0, +0, +0, -1, +1 };
 
-const float FVoxel::CoalPercent = 8.f;
-const float FVoxel::IronPercent = 6.f;
-const float FVoxel::GoldPercent = 3.f;
-const float FVoxel::DiamondPercent = 2.f;
+const float FVoxel::CoalPercent = 6.f;
+const float FVoxel::IronPercent = 3.f;
+const float FVoxel::GoldPercent = 1.5f;
+const float FVoxel::DiamondPercent = 0.75f;
 const float FVoxel::CavePercent = 15.f;
 
 const float FVoxel::StoneHeightOffset = 15.f;
@@ -21,7 +21,7 @@ const float FVoxel::DiamondHeightMin = 4;
 const float FVoxel::DiamondHeightMax = 8;
 
 const FFastNoiseSettings FVoxel::SurfaceNoiseSettings = { EFastNoise_NoiseType::SimplexFractal, 0.007, 5, 1.6, 0.5, 30, 200 };
-const FPerlinNoiseSettings FVoxel::CaveNoiseSettings = { 0.1, 2, 2, 1, 0.25 };
+const FPerlinNoiseSettings FVoxel::CaveNoiseSettings = { 0.12, 2, 2, 1, 0.25 };
 
 const FVector FVoxel::FLU = FVector(+100.f, +000.f, +100.f);
 const FVector FVoxel::FRU = FVector(+100.f, +100.f, +100.f);
