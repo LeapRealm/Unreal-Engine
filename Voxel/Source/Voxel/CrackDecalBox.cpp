@@ -29,15 +29,17 @@ void ACrackDecalBox::BeginPlay()
 	StaticMeshComponent->SetMaterial(0, MaterialInstanceDynamic);
 }
 
-void ACrackDecalBox::SetVisibility(EBlockState BlockState)
+void ACrackDecalBox::SetVisibility(EBlockState NewBlockState)
 {
-	if (BlockState == EBlockState::NoCrack)
+	BlockState = NewBlockState;
+	
+	if (NewBlockState == EBlockState::NoCrack)
 	{
 		StaticMeshComponent->SetVisibility(false);
 		return;
 	}
 	
-	switch (BlockState)
+	switch (NewBlockState)
 	{
 	case EBlockState::Crack1: MaterialInstanceDynamic->SetScalarParameterValue(TEXT("X"), 0); break;
 	case EBlockState::Crack2: MaterialInstanceDynamic->SetScalarParameterValue(TEXT("X"), 2); break;

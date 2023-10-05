@@ -17,8 +17,12 @@ protected:
 	virtual void BeginPlay() override;
 	
 public:
-	void SetVisibility(EBlockState BlockState);
+	EBlockState GetBlockState() { return BlockState; }
+	void SetVisibility(EBlockState NewBlockState);
 
+private:
+	EBlockState BlockState = EBlockState::NoCrack;
+	
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;

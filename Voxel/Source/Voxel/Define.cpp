@@ -14,7 +14,8 @@ const float FVoxel::CoalPercent = 6.f;
 const float FVoxel::IronPercent = 3.f;
 const float FVoxel::GoldPercent = 1.5f;
 const float FVoxel::DiamondPercent = 0.75f;
-const float FVoxel::CavePercent = 15.f;
+// const float FVoxel::CavePercent = 15.f;
+const float FVoxel::CavePercent = 0.f;
 
 const float FVoxel::StoneHeightOffset = 15.f;
 const float FVoxel::DiamondHeightMin = 4;
@@ -23,14 +24,14 @@ const float FVoxel::DiamondHeightMax = 8;
 const FFastNoiseSettings FVoxel::SurfaceNoiseSettings = { EFastNoise_NoiseType::SimplexFractal, 0.007, 5, 1.6, 0.5, 30, 200 };
 const FPerlinNoiseSettings FVoxel::CaveNoiseSettings = { 0.12, 2, 2, 1, 0.25 };
 
-const FVector FVoxel::FLU = FVector(+100.f, +000.f, +100.f);
-const FVector FVoxel::FRU = FVector(+100.f, +100.f, +100.f);
-const FVector FVoxel::FLD = FVector(+100.f, +000.f, +000.f);
-const FVector FVoxel::FRD = FVector(+100.f, +100.f, +000.f);
-const FVector FVoxel::BLU = FVector(+000.f, +000.f, +100.f);
-const FVector FVoxel::BRU = FVector(+000.f, +100.f, +100.f);
-const FVector FVoxel::BLD = FVector(+000.f, +000.f, +000.f);
-const FVector FVoxel::BRD = FVector(+000.f, +100.f, +000.f);
+const FVector FVoxel::FLU = FVector(+FVoxel::BlockSize, +000.f,				+FVoxel::BlockSize);
+const FVector FVoxel::FRU = FVector(+FVoxel::BlockSize, +FVoxel::BlockSize, +FVoxel::BlockSize);
+const FVector FVoxel::FLD = FVector(+FVoxel::BlockSize, +000.f,				+000.f);
+const FVector FVoxel::FRD = FVector(+FVoxel::BlockSize, +FVoxel::BlockSize, +000.f);
+const FVector FVoxel::BLU = FVector(+000.f,				+000.f,				+FVoxel::BlockSize);
+const FVector FVoxel::BRU = FVector(+000.f,				+FVoxel::BlockSize, +FVoxel::BlockSize);
+const FVector FVoxel::BLD = FVector(+000.f,				+000.f,				+000.f);
+const FVector FVoxel::BRD = FVector(+000.f,				+FVoxel::BlockSize, +000.f);
 
 const TArray<TArray<FVector2D>> FVoxel::BlockTextureUVs =
 {

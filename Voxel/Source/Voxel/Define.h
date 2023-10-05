@@ -50,6 +50,8 @@ enum class EBlockState : uint8
 	Crack2,
 	Crack3,
 	Crack4,
+	
+	Count,
 };
 
 UENUM(BlueprintType)

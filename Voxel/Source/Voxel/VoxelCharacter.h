@@ -28,11 +28,14 @@ private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	
-	void CheckTeleportPlayerToCenter();
 	void StartAttack();
 	void StopAttack();
-	bool AttackLineTrace(FIntVector& ChunkIndex3D, FIntVector& BlockIndex3D);
-	void Interaction();
+	void TryPlaceBlock();
+
+private:
+	void CheckTeleportPlayerToCenter();
+	bool LineTraceChunk(FHitResult& OutHitResult);
+	bool LineTraceCrackBlock(FIntVector& OutHitChunkIndex, FIntVector& OutHitBlockIndex);
 
 public:
 	UPROPERTY(EditAnywhere)

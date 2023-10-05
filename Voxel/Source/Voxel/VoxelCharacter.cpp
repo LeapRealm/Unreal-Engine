@@ -48,7 +48,7 @@ AVoxelCharacter::AVoxelCharacter()
 	
 	GetCharacterMovement()->GravityScale = 1.f;
 	GetCharacterMovement()->MaxWalkSpeed = 450.f;
-	GetCharacterMovement()->JumpZVelocity = 700.f;
+	GetCharacterMovement()->JumpZVelocity = 600.f;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
@@ -91,7 +91,7 @@ void AVoxelCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &AVoxelCharacter::StartAttack);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Completed, this, &AVoxelCharacter::StopAttack);
-		EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::Interaction);
+		EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::TryPlaceBlock);
 	}
 }
 
@@ -117,6 +117,71 @@ void AVoxelCharacter::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookVector.Y);
 }
 
+void AVoxelCharacter::StartAttack()
+{
+	// TODO : 블럭 크랙 내기
+	FIntVector HitChunkIndex, HitBlockIndex;
+	if (LineTraceCrackBlock(HitChunkIndex, HitBlockIndex))
+	{
+		FVector WorldCenterPos = UVoxelFunctionLibrary::GetBlockCenterWorldPos(HitChunkIndex, HitBlockIndex);
+		CrackDecalBox->SetVisibility(EBlockState::Crack1);
+		CrackDecalBox->SetActorLocation(WorldCenterPos);
+	}
+	if (AttackTimerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+		AttackTimerHandle.Invalidate();
+	}
+		
+	// TODO: 타이머에서도 라인트레이스해서 블록을 해제 & 변경해야함
+	GetWorldTimerManager().SetTimer(AttackTimerHandle, [this, HitChunkIndex, HitBlockIndex]()
+	{
+		EBlockState NewBlockState = static_cast<EBlockState>((static_cast<int32>(CrackDecalBox->GetBlockState()) + 1) % static_cast<int32>(EBlockState::Count));
+		if (NewBlockState == EBlockState::NoCrack)
+		{
+			VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Air);
+			StopAttack();
+		}
+		else
+		{
+			CrackDecalBox->SetVisibility(NewBlockState);
+		}
+	}, 0.25f, true);
+}
+
+void AVoxelCharacter::StopAttack()
+{
+	if (AttackTimerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+		AttackTimerHandle.Invalidate();
+	}
+	
+	CrackDecalBox->SetVisibility(EBlockState::NoCrack);
+}
+
+void AVoxelCharacter::TryPlaceBlock()
+{
+	FHitResult ChunkHitResult;
+	if (LineTraceChunk(ChunkHitResult))
+	{
+		const FVector& BlockLocation = ChunkHitResult.ImpactPoint + (ChunkHitResult.ImpactNormal * (FVoxel::BlockSize / 2.f));
+		const FIntVector& HitChunkIndex = UVoxelFunctionLibrary::WorldPosToChunkIndex(BlockLocation);
+		const FIntVector& HitBlockIndex = UVoxelFunctionLibrary::WorldPosToBlockIndex(BlockLocation);
+		const FVector& BlockCenterLocation = UVoxelFunctionLibrary::GetBlockCenterWorldPos(HitChunkIndex, HitBlockIndex);
+		
+		FHitResult PawnHitResult;
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+		
+		if (UKismetSystemLibrary::BoxTraceSingleForObjects(this, BlockCenterLocation, BlockCenterLocation, FVector(FVoxel::BlockSize / 2.f),
+			FRotator::ZeroRotator, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, PawnHitResult, false) == false)
+		{
+			VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Dirt);
+		}
+	}
+}
+
 void AVoxelCharacter::CheckTeleportPlayerToCenter()
 {
 	if (GetActorLocation().Z < 0)
@@ -130,49 +195,7 @@ void AVoxelCharacter::CheckTeleportPlayerToCenter()
 	}
 }
 
-void AVoxelCharacter::StartAttack()
-{
-	// TODO : 블럭 크랙 내기
-	// 누구한테 캔 블럭을 줄것인가? => 가장 처음 때린 사람
-
-	FIntVector ChunkIndex3D, BlockIndex3D;
-	int ChunkIndex1D, BlockIndex1D;
-	
-	if (AttackLineTrace(ChunkIndex3D, BlockIndex3D))
-	{
-		ChunkIndex1D = UVoxelFunctionLibrary::Index3DTo1D(ChunkIndex3D, FVoxel::ChunkCount);
-		BlockIndex1D = UVoxelFunctionLibrary::Index3DTo1D(BlockIndex3D, FVoxel::BlockCount);
-		EBlockType BlockType = VoxelGameMode->ChunkDatas[ChunkIndex1D].BlockTypes[BlockIndex1D];
-		if (BlockType == EBlockType::BedRock)
-			return;
-		
-		// TODO: 누가 이미 깨고 있으면 못 깨도록 막아야 함
-		FVector WorldCenterPos = UVoxelFunctionLibrary::GetBlockCenterWorldPos(ChunkIndex3D, BlockIndex3D);
-		CrackDecalBox->SetVisibility(EBlockState::Crack1);
-		CrackDecalBox->SetActorLocation(WorldCenterPos);
-		
-		// GetWorldTimerManager().SetTimer(AttackTimerHandle, []()
-		// {
-		// 	
-		// }, )
-	}
-	
-	// if (AVoxelGameMode* )
-	// 	VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Air);
-}
-
-void AVoxelCharacter::StopAttack()
-{
-	if (AttackTimerHandle.IsValid())
-	{
-		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
-		AttackTimerHandle.Invalidate();
-	}
-	
-	// CrackDecalBox->SetVisibility(EBlockState::NoCrack);
-}
-
-bool AVoxelCharacter::AttackLineTrace(FIntVector& ChunkIndex3D, FIntVector& BlockIndex3D)
+bool AVoxelCharacter::LineTraceChunk(FHitResult& OutHitResult)
 {
 	FVector Start = CameraComponent->GetComponentLocation();
 	FVector End = Start + UKismetMathLibrary::GetForwardVector(CameraComponent->GetComponentRotation()) * LineTraceHitRange;
@@ -180,43 +203,40 @@ bool AVoxelCharacter::AttackLineTrace(FIntVector& ChunkIndex3D, FIntVector& Bloc
 	FHitResult HitResult;
 	if (UKismetSystemLibrary::LineTraceSingle(this, Start, End, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true))
 	{
-		if (AChunk* HitChunk = Cast<AChunk>(HitResult.GetActor()))
+		if (HitResult.GetActor() && HitResult.GetActor()->GetClass() == AChunk::StaticClass())
 		{
-			const FVector& BlockLocation = HitResult.ImpactPoint + (-HitResult.ImpactNormal * (FVoxel::BlockSize / 2.f));
-			ChunkIndex3D = HitChunk->ChunkIndex;
-			BlockIndex3D = UVoxelFunctionLibrary::WorldPosToBlockIndex(BlockLocation);
+			OutHitResult = HitResult;
 			return true;
 		}
 	}
 	return false;
 }
 
-void AVoxelCharacter::Interaction()
+bool AVoxelCharacter::LineTraceCrackBlock(FIntVector& OutHitChunkIndex, FIntVector& OutHitBlockIndex)
 {
-	FVector Start = CameraComponent->GetComponentLocation();
-	FVector End = Start + UKismetMathLibrary::GetForwardVector(CameraComponent->GetComponentRotation()) * LineTraceHitRange;
-	TArray<AActor*> ActorsToIgnore = { this };
-	FHitResult HitResult;
-	if (UKismetSystemLibrary::LineTraceSingle(this, Start, End, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true))
+	FHitResult ChunkHitResult;
+	if (LineTraceChunk(ChunkHitResult))
 	{
-		if (HitResult.GetActor() && HitResult.GetActor()->GetClass() == AChunk::StaticClass())
-		{
-			int32 BlockSize = FVoxel::BlockSize;
-			const FVector& BlockLocation = HitResult.ImpactPoint + (HitResult.ImpactNormal * (BlockSize / 2.f));
-			const FIntVector& HitChunkIndex = UVoxelFunctionLibrary::WorldPosToChunkIndex(BlockLocation);
-			const FIntVector& HitBlockIndex = UVoxelFunctionLibrary::WorldPosToBlockIndex(BlockLocation);
-			FVector BlockCenterLocation = UVoxelFunctionLibrary::GetBlockCenterWorldPos(HitChunkIndex, HitBlockIndex);
-			
-			TArray<FHitResult> HitResults;
-			TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-			
-			if (UKismetSystemLibrary::BoxTraceMultiForObjects(this, BlockCenterLocation, BlockCenterLocation, FVector(BlockSize / 2.f), FRotator::ZeroRotator,
-				ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, HitResults, false) == false)
-			{
-				if (VoxelGameMode)
-					VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Dirt);
-			}
-		}
+		const FVector& BlockLocation = ChunkHitResult.ImpactPoint + (-ChunkHitResult.ImpactNormal * (FVoxel::BlockSize / 2.f));
+		OutHitChunkIndex = UVoxelFunctionLibrary::WorldPosToChunkIndex(BlockLocation);
+		OutHitBlockIndex = UVoxelFunctionLibrary::WorldPosToBlockIndex(BlockLocation);
+		
+		int ChunkIndex1D = UVoxelFunctionLibrary::Index3DTo1D(OutHitChunkIndex, FVoxel::ChunkCount);
+		int BlockIndex1D = UVoxelFunctionLibrary::Index3DTo1D(OutHitBlockIndex, FVoxel::BlockCount);
+		EBlockType BlockType = VoxelGameMode->ChunkDatas[ChunkIndex1D].BlockTypes[BlockIndex1D];
+		if (BlockType == EBlockType::BedRock)
+			return false;
+		
+		const FVector& BlockCenterLocation = UVoxelFunctionLibrary::GetBlockCenterWorldPos(OutHitChunkIndex, OutHitBlockIndex);
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
+		TArray<AActor*> ActorsToIgnore = { CrackDecalBox };
+		TArray<AActor*> OutActors;
+		if (UKismetSystemLibrary::SphereOverlapActors(this, BlockCenterLocation, FVoxel::BlockSize / 2.f - 20.f,
+			ObjectTypes, ACrackDecalBox::StaticClass(), ActorsToIgnore, OutActors))
+			return false;
+
+		return true;
 	}
+	return false;
 }
