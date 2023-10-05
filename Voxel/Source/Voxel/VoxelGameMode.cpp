@@ -1,5 +1,6 @@
 #include "VoxelGameMode.h"
 
+#include "BlockingBox.h"
 #include "Chunk.h"
 #include "Define.h"
 #include "FastNoiseWrapper.h"
@@ -16,10 +17,40 @@ void AVoxelGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// TODO: 맵 밖으로 못나가게 투명벽 세우기
-
+	InitInvisibleWalls();
 	InitNoise();
 	InitChunks();
+}
+
+void AVoxelGameMode::InitInvisibleWalls()
+{
+	const FIntVector& ChunkCount = FVoxel::ChunkCount;
+	const FIntVector& BlockCount = FVoxel::BlockCount;
+	int32 BlockSize = FVoxel::BlockSize;
+	FIntVector ChunkSize = FIntVector(BlockCount.X * BlockSize, BlockCount.Y * BlockSize, BlockCount.Z * BlockSize);
+	
+	FVector MinLocation = FVector(0, 0, 0);
+	FVector MaxLocation = FVector(ChunkSize.X * ChunkCount.X, ChunkSize.Y * ChunkCount.Y, ChunkSize.Z * ChunkCount.Z);
+	FVector Center = (MinLocation + MaxLocation) / 2.f;
+	FVector BoxSize = (MaxLocation - MinLocation) / 2.f;
+	BoxSize.Z *= 1.5f;
+	
+	TArray<FVector> SpawnLocations;
+	TArray<FVector> BoxExtents;
+	SpawnLocations.Add(FVector(Center.X, -BlockSize, Center.Z));
+	BoxExtents.Add(FVector(BoxSize.X, 100, BoxSize.Z));
+	SpawnLocations.Add(FVector(Center.X, MaxLocation.Y + BlockSize, Center.Z));
+	BoxExtents.Add(FVector(BoxSize.X, 100, BoxSize.Z));
+	SpawnLocations.Add(FVector(-BlockSize, Center.Y, Center.Z));
+	BoxExtents.Add(FVector(100, BoxSize.Y, BoxSize.Z));
+	SpawnLocations.Add(FVector(MaxLocation.X + BlockSize, Center.Y, Center.Z));
+	BoxExtents.Add(FVector(100, BoxSize.Y, BoxSize.Z));
+	
+	for (int i = 0; i < SpawnLocations.Num(); i++)
+	{
+		ABlockingBox* BlockingBox = GetWorld()->SpawnActor<ABlockingBox>(SpawnLocations[i], FRotator::ZeroRotator);
+		BlockingBox->SetBoxExtent(BoxExtents[i]);
+	}
 }
 
 void AVoxelGameMode::InitNoise()
@@ -43,8 +74,6 @@ void AVoxelGameMode::InitChunks()
 	for (int32 ChunkIndex1D = 0; ChunkIndex1D < ChunkDatas.Num(); ChunkIndex1D++)
 	{
 		ChunkDatas[ChunkIndex1D].BlockTypes.SetNumUninitialized(TotalBlockCount);
-		ChunkDatas[ChunkIndex1D].BlockStates.SetNumUninitialized(TotalBlockCount);
-		
 		AsyncTask(ENamedThreads::AnyThread, [this, ChunkIndex1D, TotalChunkCount]()
 		{
 			UVoxelFunctionLibrary::BuildChunkData(SurfaceNoiseWrapper, UVoxelFunctionLibrary::Index1DTo3D(ChunkIndex1D, FVoxel::ChunkCount), ChunkDatas[ChunkIndex1D]);
@@ -99,6 +128,9 @@ void AVoxelGameMode::UpdateBlockType(const FIntVector& ChunkIndex3D, const FIntV
 	int32 BlockIndex1D = UVoxelFunctionLibrary::Index3DTo1D(BlockIndex3D, BlockCount);
 
 	TArray<EBlockType>& BlockTypes = ChunkDatas[ChunkIndex1D].BlockTypes;
+	if (BlockTypes[BlockIndex1D] == EBlockType::BedRock)
+		return;
+	
 	BlockTypes[BlockIndex1D] = NewBlockType;
 	
 	TArray<AChunk*> DirtyChunks;
@@ -143,9 +175,4 @@ void AVoxelGameMode::UpdateBlockType(const FIntVector& ChunkIndex3D, const FIntV
 			DirtyChunk->BuildChunkMesh();
 		});
 	}
-}
-
-void AVoxelGameMode::UpdateBlockState(const FIntVector& ChunkIndex3D, const FIntVector& BlockIndex3D, EBlockState NewBlockState)
-{
-	// TODO
 }

@@ -11,15 +11,12 @@ void UVoxelFunctionLibrary::BuildChunkData(UFastNoiseWrapper* SurfaceNoiseWrappe
 	const FIntVector& ChunkCount = FVoxel::ChunkCount;
 
 	TArray<EBlockType>& BlockTypes = ChunkData.BlockTypes;
-	TArray<EBlockState>& BlockStates = ChunkData.BlockStates;
 	
 	// TODO: 동굴 생성 확률 변경 필요
 	float CaveRandValue = FMath::RandRange(0.f, 100.f);
 	
 	for (int32 LocalBlockIndex1D = 0; LocalBlockIndex1D < BlockTypes.Num(); LocalBlockIndex1D++)
 	{
-		BlockStates[LocalBlockIndex1D] = EBlockState::NoCrack;
-
 		const FIntVector LocalBlockIndex3D = UVoxelFunctionLibrary::Index1DTo3D(LocalBlockIndex1D, BlockCount);
 		const FIntVector WorldBlockIndex3D = LocalBlockIndex3D + (ChunkIndex3D * BlockCount);
 
@@ -399,4 +396,13 @@ FIntVector UVoxelFunctionLibrary::WorldPosToBlockIndex(const FVector& WorldPos)
 		return FIntVector::ZeroValue;
 
 	return BlockIndex;
+}
+
+FVector UVoxelFunctionLibrary::GetBlockCenterWorldPos(const FIntVector& ChunkIndex3D, const FIntVector& BlockIndex3D)
+{
+	const FIntVector& BlockCount = FVoxel::BlockCount;
+	int32 BlockSize = FVoxel::BlockSize;
+	FIntVector ChunkSize = FIntVector(BlockCount.X * BlockSize, BlockCount.Y * BlockSize, BlockCount.Z * BlockSize);
+
+	return FVector(ChunkSize * ChunkIndex3D) + FVector(BlockIndex3D * BlockSize) + FVector(BlockSize / 2.f);
 }

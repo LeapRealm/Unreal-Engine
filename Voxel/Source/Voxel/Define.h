@@ -208,7 +208,4 @@ struct FChunkData
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<EBlockType> BlockTypes;
-
-	UPROPERTY(VisibleAnywhere)
-	TArray<EBlockState> BlockStates;
 };

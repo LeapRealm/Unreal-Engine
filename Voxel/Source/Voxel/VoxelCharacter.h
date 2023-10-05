@@ -4,6 +4,8 @@
 #include "GameFramework/Character.h"
 #include "VoxelCharacter.generated.h"
 
+class AVoxelGameMode;
+class ACrackDecalBox;
 struct FInputActionValue;
 class UInputMappingContext;
 class UInputAction;
@@ -26,16 +28,25 @@ private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	
-	void Attack();
+	void CheckTeleportPlayerToCenter();
+	void StartAttack();
+	void StopAttack();
+	bool AttackLineTrace(FIntVector& ChunkIndex3D, FIntVector& BlockIndex3D);
 	void Interaction();
 
 public:
 	UPROPERTY(EditAnywhere)
 	float LineTraceHitRange = 500.f;
+
+private:
+	FTimerHandle AttackTimerHandle;
 	
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<ACrackDecalBox> CrackDecalBox;
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -55,4 +66,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UInputAction> InteractionAction;
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<AVoxelGameMode> VoxelGameMode;
 };

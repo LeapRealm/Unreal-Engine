@@ -35,4 +35,6 @@ public:
 	
 	static FIntVector WorldPosToChunkIndex(const FVector& WorldPos);
 	static FIntVector WorldPosToBlockIndex(const FVector& WorldPos);
+
+	static FVector GetBlockCenterWorldPos(const FIntVector& ChunkIndex3D, const FIntVector& BlockIndex3D);
 };

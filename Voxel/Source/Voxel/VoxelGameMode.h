@@ -21,13 +21,13 @@ public:
 	virtual void BeginPlay() override;
 	
 private:
+	void InitInvisibleWalls();
 	void InitNoise();
 	void InitChunks();
 	void SpawnChunks();
 	
 public:
 	void UpdateBlockType(const FIntVector& ChunkIndex3D, const FIntVector& BlockIndex3D, EBlockType NewBlockType);
-	void UpdateBlockState(const FIntVector& ChunkIndex3D, const FIntVector& BlockIndex3D, EBlockState NewBlockState);
 	
 public:
 	UPROPERTY(EditAnywhere)

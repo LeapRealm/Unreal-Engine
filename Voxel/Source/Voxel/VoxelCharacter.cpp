@@ -1,6 +1,7 @@
 #include "VoxelCharacter.h"
 
 #include "Chunk.h"
+#include "CrackDecalBox.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -15,8 +16,7 @@
 AVoxelCharacter::AVoxelCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	// Assets
+	
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC_Default(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
 	if (IMC_Default.Succeeded())
 		DefaultMappingContext = IMC_Default.Object;
@@ -40,13 +40,11 @@ AVoxelCharacter::AVoxelCharacter()
 	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Interaction(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_Interaction.IA_Interaction'"));
 	if (IA_Interaction.Succeeded())
 		InteractionAction = IA_Interaction.Object;
-
-	// Components
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	CameraComponent->SetupAttachment(GetRootComponent());
 	
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 	CameraComponent->bUsePawnControlRotation = true;
+	CameraComponent->SetupAttachment(GetRootComponent());
 	
 	GetCharacterMovement()->GravityScale = 1.f;
 	GetCharacterMovement()->MaxWalkSpeed = 450.f;
@@ -68,11 +66,16 @@ void AVoxelCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this));
+	CrackDecalBox = GetWorld()->SpawnActor<ACrackDecalBox>();
 }
 
 void AVoxelCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	CheckTeleportPlayerToCenter();
 }
 
 void AVoxelCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -86,7 +89,8 @@ void AVoxelCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AVoxelCharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AVoxelCharacter::StopJumping);
 		
-		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::Attack);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &AVoxelCharacter::StartAttack);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Completed, this, &AVoxelCharacter::StopAttack);
 		EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::Interaction);
 	}
 }
@@ -113,24 +117,78 @@ void AVoxelCharacter::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookVector.Y);
 }
 
-void AVoxelCharacter::Attack()
+void AVoxelCharacter::CheckTeleportPlayerToCenter()
+{
+	if (GetActorLocation().Z < 0)
+	{
+		const FIntVector& ChunkCount = FVoxel::ChunkCount;
+		const FIntVector& BlockCount = FVoxel::BlockCount;
+		int32 BlockSize = FVoxel::BlockSize;
+		FIntVector ChunkSize = FIntVector(BlockCount.X * BlockSize, BlockCount.Y * BlockSize, BlockCount.Z * BlockSize);
+		FVector MaxLocation = FVector(ChunkSize.X * ChunkCount.X, ChunkSize.Y * ChunkCount.Y, ChunkSize.Z * ChunkCount.Z);
+		SetActorLocation(FVector(MaxLocation.X / 2.f, MaxLocation.Y / 2.f, MaxLocation.Z + 300.f));
+	}
+}
+
+void AVoxelCharacter::StartAttack()
+{
+	// TODO : 블럭 크랙 내기
+	// 누구한테 캔 블럭을 줄것인가? => 가장 처음 때린 사람
+
+	FIntVector ChunkIndex3D, BlockIndex3D;
+	int ChunkIndex1D, BlockIndex1D;
+	
+	if (AttackLineTrace(ChunkIndex3D, BlockIndex3D))
+	{
+		ChunkIndex1D = UVoxelFunctionLibrary::Index3DTo1D(ChunkIndex3D, FVoxel::ChunkCount);
+		BlockIndex1D = UVoxelFunctionLibrary::Index3DTo1D(BlockIndex3D, FVoxel::BlockCount);
+		EBlockType BlockType = VoxelGameMode->ChunkDatas[ChunkIndex1D].BlockTypes[BlockIndex1D];
+		if (BlockType == EBlockType::BedRock)
+			return;
+		
+		// TODO: 누가 이미 깨고 있으면 못 깨도록 막아야 함
+		FVector WorldCenterPos = UVoxelFunctionLibrary::GetBlockCenterWorldPos(ChunkIndex3D, BlockIndex3D);
+		CrackDecalBox->SetVisibility(EBlockState::Crack1);
+		CrackDecalBox->SetActorLocation(WorldCenterPos);
+		
+		// GetWorldTimerManager().SetTimer(AttackTimerHandle, []()
+		// {
+		// 	
+		// }, )
+	}
+	
+	// if (AVoxelGameMode* )
+	// 	VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Air);
+}
+
+void AVoxelCharacter::StopAttack()
+{
+	if (AttackTimerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+		AttackTimerHandle.Invalidate();
+	}
+	
+	// CrackDecalBox->SetVisibility(EBlockState::NoCrack);
+}
+
+bool AVoxelCharacter::AttackLineTrace(FIntVector& ChunkIndex3D, FIntVector& BlockIndex3D)
 {
 	FVector Start = CameraComponent->GetComponentLocation();
 	FVector End = Start + UKismetMathLibrary::GetForwardVector(CameraComponent->GetComponentRotation()) * LineTraceHitRange;
 	TArray<AActor*> ActorsToIgnore = { this };
 	FHitResult HitResult;
-	if (UKismetSystemLibrary::LineTraceSingle(this, Start, End, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true))
+	if (UKismetSystemLibrary::LineTraceSingle(this, Start, End, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true))
 	{
 		if (AChunk* HitChunk = Cast<AChunk>(HitResult.GetActor()))
 		{
 			const FVector& BlockLocation = HitResult.ImpactPoint + (-HitResult.ImpactNormal * (FVoxel::BlockSize / 2.f));
-			const FIntVector& HitChunkIndex = HitChunk->ChunkIndex;
-			const FIntVector& HitBlockIndex = UVoxelFunctionLibrary::WorldPosToBlockIndex(BlockLocation);
-
-			if (AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this)))
-				VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Air);
+			ChunkIndex3D = HitChunk->ChunkIndex;
+			BlockIndex3D = UVoxelFunctionLibrary::WorldPosToBlockIndex(BlockLocation);
+			return true;
 		}
 	}
+	return false;
 }
 
 void AVoxelCharacter::Interaction()
@@ -143,15 +201,12 @@ void AVoxelCharacter::Interaction()
 	{
 		if (HitResult.GetActor() && HitResult.GetActor()->GetClass() == AChunk::StaticClass())
 		{
-			const FIntVector& BlockCount = FVoxel::BlockCount;
 			int32 BlockSize = FVoxel::BlockSize;
-			
 			const FVector& BlockLocation = HitResult.ImpactPoint + (HitResult.ImpactNormal * (BlockSize / 2.f));
 			const FIntVector& HitChunkIndex = UVoxelFunctionLibrary::WorldPosToChunkIndex(BlockLocation);
 			const FIntVector& HitBlockIndex = UVoxelFunctionLibrary::WorldPosToBlockIndex(BlockLocation);
+			FVector BlockCenterLocation = UVoxelFunctionLibrary::GetBlockCenterWorldPos(HitChunkIndex, HitBlockIndex);
 			
-			FIntVector ChunkSize = FIntVector(BlockCount.X * BlockSize, BlockCount.Y * BlockSize, BlockCount.Z * BlockSize);
-			FVector BlockCenterLocation = FVector(ChunkSize * HitChunkIndex) + FVector(HitBlockIndex * BlockSize) + FVector(BlockSize / 2.f);
 			TArray<FHitResult> HitResults;
 			TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
@@ -159,7 +214,7 @@ void AVoxelCharacter::Interaction()
 			if (UKismetSystemLibrary::BoxTraceMultiForObjects(this, BlockCenterLocation, BlockCenterLocation, FVector(BlockSize / 2.f), FRotator::ZeroRotator,
 				ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, HitResults, false) == false)
 			{
-				if (AVoxelGameMode* VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this)))
+				if (VoxelGameMode)
 					VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Dirt);
 			}
 		}
