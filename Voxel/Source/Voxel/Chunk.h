@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Define.h"
 #include "GameFramework/Actor.h"
 #include "Chunk.generated.h"
 
@@ -21,7 +20,6 @@ public:
 
 public:
 	FIntVector ChunkIndex;
-	FMesh ChunkMesh;
 
 private:
 	FCriticalSection CriticalSection;

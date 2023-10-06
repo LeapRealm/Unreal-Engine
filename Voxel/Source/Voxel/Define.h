@@ -142,15 +142,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FVector2D> UVs;
-	
-public:
-	void Empty()
-	{
-		Vertices.Empty();
-		Triangles.Empty();
-		Normals.Empty();
-		UVs.Empty();
-	}
 };
 
 USTRUCT(BlueprintType)

@@ -30,9 +30,8 @@ void AChunk::BuildChunkMesh()
 	check(VoxelGameMode);
 
 	FScopeLock ScopeLock(&CriticalSection);
-	
-	ChunkMesh.Empty();
-	
+
+	FMesh ChunkMesh;
 	const int32 BlockSize = FVoxel::BlockSize;
 	const FIntVector& BlockCount = FVoxel::BlockCount;
 	const FIntVector& ChunkCount = FVoxel::ChunkCount;
@@ -51,8 +50,8 @@ void AChunk::BuildChunkMesh()
 			}
 		}
 	}
-
-	AsyncTask(ENamedThreads::GameThread, [CachedMesh = ChunkMesh, this]()
+	
+	AsyncTask(ENamedThreads::GameThread, [CachedMesh = MoveTemp(ChunkMesh), this]()
 	{
 		ProceduralMeshComponent->ClearAllMeshSections();
 		UVoxelFunctionLibrary::CreateMeshSection(0, ProceduralMeshComponent, CachedMesh);
