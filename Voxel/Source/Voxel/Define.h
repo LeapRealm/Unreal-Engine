@@ -51,7 +51,7 @@ enum class EBlockState : uint8
 	Crack3,
 	Crack4,
 	
-	Count,
+	Count
 };
 
 UENUM(BlueprintType)
@@ -69,7 +69,7 @@ enum class EBlockTextureType : uint8
 	BedRock,
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class ENoiseRendererType : uint8
 {
 	None,
@@ -78,6 +78,15 @@ enum class ENoiseRendererType : uint8
 	DiamondTop,
 	DiamondBottom,
 	Cave,
+};
+
+UENUM(BlueprintType)
+enum class EViewMode : uint8
+{
+	First,
+	Third,
+	
+	Count
 };
 
 USTRUCT(BlueprintType)

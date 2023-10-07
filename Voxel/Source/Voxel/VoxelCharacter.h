@@ -1,9 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Define.h"
 #include "GameFramework/Character.h"
 #include "VoxelCharacter.generated.h"
 
+class USpringArmComponent;
 class AVoxelGameMode;
 class ACrackDecalBox;
 struct FInputActionValue;
@@ -29,22 +31,35 @@ private:
 	void Look(const FInputActionValue& Value);
 	
 	void StartAttack();
+	void Attacking();
 	void StopAttack();
+	
+	void TryCrackBlock();
 	void TryPlaceBlock();
+
+	void ToggleViewMode();
 
 private:
 	void CheckTeleportPlayerToCenter();
-	bool LineTraceChunk(FHitResult& OutHitResult);
-	bool LineTraceCrackBlock(FIntVector& OutHitChunkIndex, FIntVector& OutHitBlockIndex);
+	bool LineTrace(FHitResult& OutHitResult);
+	bool FindBlockAndCanCrackBlock(FIntVector& OutHitChunkIndex, FIntVector& OutHitBlockIndex);
 
 public:
 	UPROPERTY(EditAnywhere)
 	float LineTraceHitRange = 500.f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FVector2D LastMoveInputValue = FVector2D::ZeroVector;
+
 private:
-	FTimerHandle AttackTimerHandle;
+	float TargetAttackTime = 0.25f;
+	float CurrentAttackTime = 0.f;
+	EViewMode ViewMode = EViewMode::First;
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USpringArmComponent> SpringArmComponent;
 	
-private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComponent;
 
@@ -69,6 +84,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UInputAction> InteractionAction;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> ToggleViewModeAction;
 
 private:
 	UPROPERTY(VisibleAnywhere)

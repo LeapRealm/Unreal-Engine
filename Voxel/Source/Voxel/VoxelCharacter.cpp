@@ -9,6 +9,7 @@
 #include "VoxelGameMode.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -40,11 +41,34 @@ AVoxelCharacter::AVoxelCharacter()
 	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Interaction(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_Interaction.IA_Interaction'"));
 	if (IA_Interaction.Succeeded())
 		InteractionAction = IA_Interaction.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_ToggleViewMode(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_ToggleViewMode.IA_ToggleViewMode'"));
+	if (IA_ToggleViewMode.Succeeded())
+		ToggleViewModeAction = IA_ToggleViewMode.Object;
+
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -88.f));
+	GetMesh()->SetOwnerNoSee(true);
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Steve(TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/SK_Steve.SK_Steve'"));
+	if (SK_Steve.Succeeded())
+		GetMesh()->SetSkeletalMesh(SK_Steve.Object);
+
+	static ConstructorHelpers::FClassFinder<UAnimInstance> ABP_Steve(TEXT("/Script/Engine.AnimBlueprint'/Game/Assets/ABP_Steve.ABP_Steve_C'"));
+	if (ABP_Steve.Succeeded())
+		GetMesh()->SetAnimInstanceClass(ABP_Steve.Class);
+
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArmComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+	SpringArmComponent->SetupAttachment(GetRootComponent());
+	SpringArmComponent->TargetArmLength = 0.f;
+	SpringArmComponent->bUsePawnControlRotation = true;
+	SpringArmComponent->bInheritPitch = true;
+	SpringArmComponent->bInheritYaw = true;
+	SpringArmComponent->bInheritRoll = false;
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
-	CameraComponent->bUsePawnControlRotation = true;
-	CameraComponent->SetupAttachment(GetRootComponent());
+	CameraComponent->SetupAttachment(SpringArmComponent);
 	
 	GetCharacterMovement()->GravityScale = 1.f;
 	GetCharacterMovement()->MaxWalkSpeed = 450.f;
@@ -85,26 +109,31 @@ void AVoxelCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AVoxelCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AVoxelCharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AVoxelCharacter::StopJumping);
 		
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &AVoxelCharacter::StartAttack);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::Attacking);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Completed, this, &AVoxelCharacter::StopAttack);
 		EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::TryPlaceBlock);
+		
+		EnhancedInputComponent->BindAction(ToggleViewModeAction, ETriggerEvent::Triggered, this, &AVoxelCharacter::ToggleViewMode);
 	}
 }
 
 void AVoxelCharacter::Move(const FInputActionValue& Value)
 {
 	const FVector2D MoveVector = Value.Get<FVector2D>();
+	LastMoveInputValue = MoveVector;
 	
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
+	
 	AddMovementInput(ForwardDirection, MoveVector.X);
 	AddMovementInput(RightDirection, MoveVector.Y);
 }
@@ -119,51 +148,59 @@ void AVoxelCharacter::Look(const FInputActionValue& Value)
 
 void AVoxelCharacter::StartAttack()
 {
-	// TODO : 블럭 크랙 내기
-	FIntVector HitChunkIndex, HitBlockIndex;
-	if (LineTraceCrackBlock(HitChunkIndex, HitBlockIndex))
+	CurrentAttackTime = TargetAttackTime;
+}
+
+void AVoxelCharacter::Attacking()
+{
+	CurrentAttackTime += GetWorld()->DeltaTimeSeconds;
+	if (CurrentAttackTime >= TargetAttackTime)
 	{
-		FVector WorldCenterPos = UVoxelFunctionLibrary::GetBlockCenterWorldPos(HitChunkIndex, HitBlockIndex);
-		CrackDecalBox->SetVisibility(EBlockState::Crack1);
-		CrackDecalBox->SetActorLocation(WorldCenterPos);
+		CurrentAttackTime = 0.f;
+		TryCrackBlock();
 	}
-	if (AttackTimerHandle.IsValid())
-	{
-		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
-		AttackTimerHandle.Invalidate();
-	}
-		
-	// TODO: 타이머에서도 라인트레이스해서 블록을 해제 & 변경해야함
-	GetWorldTimerManager().SetTimer(AttackTimerHandle, [this, HitChunkIndex, HitBlockIndex]()
-	{
-		EBlockState NewBlockState = static_cast<EBlockState>((static_cast<int32>(CrackDecalBox->GetBlockState()) + 1) % static_cast<int32>(EBlockState::Count));
-		if (NewBlockState == EBlockState::NoCrack)
-		{
-			VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Air);
-			StopAttack();
-		}
-		else
-		{
-			CrackDecalBox->SetVisibility(NewBlockState);
-		}
-	}, 0.25f, true);
 }
 
 void AVoxelCharacter::StopAttack()
 {
-	if (AttackTimerHandle.IsValid())
-	{
-		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
-		AttackTimerHandle.Invalidate();
-	}
-	
 	CrackDecalBox->SetVisibility(EBlockState::NoCrack);
+}
+
+void AVoxelCharacter::TryCrackBlock()
+{
+	FIntVector HitChunkIndex, HitBlockIndex;
+	if (FindBlockAndCanCrackBlock(HitChunkIndex, HitBlockIndex))
+	{
+		FVector WorldCenterPos = UVoxelFunctionLibrary::GetBlockCenterWorldPos(HitChunkIndex, HitBlockIndex);
+		if (CrackDecalBox->GetActorLocation() != WorldCenterPos)
+		{
+			CrackDecalBox->SetVisibility(EBlockState::Crack1);
+			CrackDecalBox->SetActorLocation(WorldCenterPos);
+		}
+		else
+		{
+			EBlockState NewBlockState = static_cast<EBlockState>(static_cast<int32>(CrackDecalBox->GetBlockState()) + 1);
+			if (NewBlockState == EBlockState::Count)
+			{
+				VoxelGameMode->UpdateBlockType(HitChunkIndex, HitBlockIndex, EBlockType::Air);
+				CrackDecalBox->SetVisibility(EBlockState::NoCrack);
+			}
+			else
+			{
+				CrackDecalBox->SetVisibility(NewBlockState);
+			}
+		}
+	}
+	else
+	{
+		CrackDecalBox->SetVisibility(EBlockState::NoCrack);
+	}
 }
 
 void AVoxelCharacter::TryPlaceBlock()
 {
 	FHitResult ChunkHitResult;
-	if (LineTraceChunk(ChunkHitResult))
+	if (LineTrace(ChunkHitResult))
 	{
 		const FVector& BlockLocation = ChunkHitResult.ImpactPoint + (ChunkHitResult.ImpactNormal * (FVoxel::BlockSize / 2.f));
 		const FIntVector& HitChunkIndex = UVoxelFunctionLibrary::WorldPosToChunkIndex(BlockLocation);
@@ -182,6 +219,17 @@ void AVoxelCharacter::TryPlaceBlock()
 	}
 }
 
+void AVoxelCharacter::ToggleViewMode()
+{
+	ViewMode = static_cast<EViewMode>((static_cast<int32>(ViewMode) + 1) % static_cast<int32>(EViewMode::Count));
+
+	switch (ViewMode)
+	{
+	case EViewMode::First: SpringArmComponent->TargetArmLength = 0.f;	GetMesh()->SetOwnerNoSee(true);	 break;
+	case EViewMode::Third: SpringArmComponent->TargetArmLength = 350.f; GetMesh()->SetOwnerNoSee(false); break;
+	}
+}
+
 void AVoxelCharacter::CheckTeleportPlayerToCenter()
 {
 	if (GetActorLocation().Z < 0)
@@ -195,9 +243,9 @@ void AVoxelCharacter::CheckTeleportPlayerToCenter()
 	}
 }
 
-bool AVoxelCharacter::LineTraceChunk(FHitResult& OutHitResult)
+bool AVoxelCharacter::LineTrace(FHitResult& OutHitResult)
 {
-	FVector Start = CameraComponent->GetComponentLocation();
+	FVector Start = SpringArmComponent->GetComponentLocation();
 	FVector End = Start + UKismetMathLibrary::GetForwardVector(CameraComponent->GetComponentRotation()) * LineTraceHitRange;
 	TArray<AActor*> ActorsToIgnore = { this };
 	FHitResult HitResult;
@@ -212,10 +260,10 @@ bool AVoxelCharacter::LineTraceChunk(FHitResult& OutHitResult)
 	return false;
 }
 
-bool AVoxelCharacter::LineTraceCrackBlock(FIntVector& OutHitChunkIndex, FIntVector& OutHitBlockIndex)
+bool AVoxelCharacter::FindBlockAndCanCrackBlock(FIntVector& OutHitChunkIndex, FIntVector& OutHitBlockIndex)
 {
 	FHitResult ChunkHitResult;
-	if (LineTraceChunk(ChunkHitResult))
+	if (LineTrace(ChunkHitResult))
 	{
 		const FVector& BlockLocation = ChunkHitResult.ImpactPoint + (-ChunkHitResult.ImpactNormal * (FVoxel::BlockSize / 2.f));
 		OutHitChunkIndex = UVoxelFunctionLibrary::WorldPosToChunkIndex(BlockLocation);
