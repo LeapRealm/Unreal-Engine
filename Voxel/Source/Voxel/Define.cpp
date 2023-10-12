@@ -3,8 +3,7 @@
 DEFINE_LOG_CATEGORY(LogCustom);
 
 const FIntVector FVoxel::BlockCount = FIntVector(32, 32, 32);
-const FIntVector FVoxel::ChunkCount = FIntVector(10, 10, 8);
-// const FIntVector FVoxel::ChunkCount = FIntVector(20, 20, 8);
+const FIntVector FVoxel::ChunkCount = FIntVector(20, 20, 8);
 const int32	FVoxel::BlockSize = 100.f;
 
 const int32 FVoxel::DX[] = { +0, +0, -1, +1, +0, +0 };
@@ -15,7 +14,7 @@ const float FVoxel::CoalPercent = 6.f;
 const float FVoxel::IronPercent = 3.f;
 const float FVoxel::GoldPercent = 1.5f;
 const float FVoxel::DiamondPercent = 0.75f;
-const float FVoxel::CavePercent = 10.f;
+const float FVoxel::CavePercent = 0.f;
 
 const float FVoxel::StoneHeightOffset = 15.f;
 const float FVoxel::DiamondHeightMin = 4;

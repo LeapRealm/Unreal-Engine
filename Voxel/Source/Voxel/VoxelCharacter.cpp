@@ -93,6 +93,16 @@ void AVoxelCharacter::BeginPlay()
 
 	VoxelGameMode = Cast<AVoxelGameMode>(UGameplayStatics::GetGameMode(this));
 	CrackDecalBox = GetWorld()->SpawnActor<ACrackDecalBox>();
+
+	// TODO: For Test
+	{
+		const FIntVector& ChunkCount = FVoxel::ChunkCount;
+		const FIntVector& BlockCount = FVoxel::BlockCount;
+		int32 BlockSize = FVoxel::BlockSize;
+		FIntVector ChunkSize = FIntVector(BlockCount.X * BlockSize, BlockCount.Y * BlockSize, BlockCount.Z * BlockSize);
+		FVector MaxLocation = FVector(ChunkSize.X * ChunkCount.X, ChunkSize.Y * ChunkCount.Y, ChunkSize.Z * ChunkCount.Z);
+		SetActorLocation(FVector(MaxLocation.X / 2.f, MaxLocation.Y / 2.f, MaxLocation.Z + 2500.f));
+	}
 }
 
 void AVoxelCharacter::Tick(float DeltaTime)
