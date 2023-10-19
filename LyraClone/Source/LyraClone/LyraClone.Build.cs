@@ -14,6 +14,8 @@ public class LyraClone : ModuleRules
 			"CoreUObject", 
 			"Engine", 
 			"InputCore",
+			"GameplayTags",
+			"ModularGameplay",
 		});
 	}
 }

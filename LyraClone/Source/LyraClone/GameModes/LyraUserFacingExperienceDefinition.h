@@ -3,7 +3,7 @@
 #include "LyraUserFacingExperienceDefinition.generated.h"
 
 UCLASS(BlueprintType)
-class ULyraUserFacingExperienceDefinition : public UObject
+class ULyraUserFacingExperienceDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 	

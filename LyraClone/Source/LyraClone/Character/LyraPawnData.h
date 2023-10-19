@@ -9,4 +9,8 @@ class ULyraPawnData : public UPrimaryDataAsset
 	
 public:
 	ULyraPawnData(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Lyra|Pawn")
+	TSubclassOf<APawn> PawnClass;
 };

@@ -26,7 +26,7 @@ public:
 	
 	void AddLoadedAsset(const UObject* Asset);
 
-	virtual void StartInitialLoading() final;
+	virtual void StartInitialLoading() override;
 	
 private:
 	UPROPERTY()
