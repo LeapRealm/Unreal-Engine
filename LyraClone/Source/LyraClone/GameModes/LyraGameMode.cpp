@@ -1,5 +1,6 @@
 ﻿#include "LyraGameMode.h"
 
+#include "LyraExperienceDefinition.h"
 #include "LyraExperienceManagerComponent.h"
 #include "LyraClone/GameModes/LyraGameState.h"
 #include "LyraClone/Player/LyraPlayerController.h"
@@ -42,6 +43,19 @@ void ALyraGameMode::HandleStartingNewPlayer_Implementation(APlayerController* Ne
 	}
 }
 
+UClass* ALyraGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
+{
+	if (const ULyraPawnData* PawnData = GetPawnDataForController(InController))
+	{
+		if (PawnData->PawnClass)
+		{
+			return PawnData->PawnClass;
+		}
+	}
+	
+	return Super::GetDefaultPawnClassForController_Implementation(InController);
+}
+
 void ALyraGameMode::HandleMatchAssignmentIfNotExpectingOne()
 {
 	FPrimaryAssetId ExperienceId;
@@ -73,5 +87,44 @@ bool ALyraGameMode::IsExperienceLoaded() const
 
 void ALyraGameMode::OnExperienceLoaded(const ULyraExperienceDefinition* CurrentExperience)
 {
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* PC = Cast<APlayerController>(*Iterator);
+		if (PC && PC->GetPawn() == nullptr)
+		{
+			if (PlayerCanRestart(PC))
+			{
+				RestartPlayer(PC);
+			}
+		}
+	}
+}
+
+const ULyraPawnData* ALyraGameMode::GetPawnDataForController(const AController* InController) const
+{
+	if (InController)
+	{
+		if (const ALyraPlayerState* LyraPS = InController->GetPlayerState<ALyraPlayerState>())
+		{
+			if (const ULyraPawnData* PawnData = LyraPS->GetPawnData<ULyraPawnData>())
+			{
+				return PawnData;
+			}
+		}
+	}
 	
+	check(GameState);
+	ULyraExperienceManagerComponent* ExperienceManagerComponent = GameState->FindComponentByClass<ULyraExperienceManagerComponent>();
+	check(ExperienceManagerComponent);
+	
+	if (ExperienceManagerComponent->IsExperienceLoaded())
+	{
+		const ULyraExperienceDefinition* Experience = ExperienceManagerComponent->GetCurrentExperienceChecked();
+		if (Experience->DefaultPawnData)
+		{
+			return Experience->DefaultPawnData;
+		}
+	}
+	
+	return nullptr;
 }

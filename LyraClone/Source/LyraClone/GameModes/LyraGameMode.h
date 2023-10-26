@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "GameFramework/GameModeBase.h"
+#include "LyraClone/Character/LyraPawnData.h"
 #include "LyraGameMode.generated.h"
 
 class ULyraExperienceDefinition;
@@ -17,11 +18,14 @@ public:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void InitGameState() override;
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
-
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
+	
 public:
 	void HandleMatchAssignmentIfNotExpectingOne();
 	void OnMatchAssignmentGiven(FPrimaryAssetId ExperienceId);
 	
 	bool IsExperienceLoaded() const;
 	void OnExperienceLoaded(const ULyraExperienceDefinition* CurrentExperience);
+
+	const ULyraPawnData* GetPawnDataForController(const AController* InController) const;
 };

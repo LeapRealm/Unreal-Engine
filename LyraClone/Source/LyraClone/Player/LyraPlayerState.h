@@ -18,6 +18,10 @@ public:
 	virtual void PostInitializeComponents() override;
 	
 public:
+	template<class T>
+	const T* GetPawnData() const  { return Cast<T>(PawnData); }
+	void SetPawnData(const ULyraPawnData* InPawnData);
+
 	void OnExperienceLoaded(const ULyraExperienceDefinition* CurrentExperience);
 	
 public:
