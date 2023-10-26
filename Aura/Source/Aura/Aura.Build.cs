@@ -1,10 +1,8 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 using UnrealBuildTool;
 
-public class LyraClone : ModuleRules
+public class Aura : ModuleRules
 {
-	public LyraClone(ReadOnlyTargetRules Target) : base(Target)
+	public Aura(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
@@ -14,9 +12,6 @@ public class LyraClone : ModuleRules
 			"CoreUObject", 
 			"Engine", 
 			"InputCore",
-			"GameplayTags",
-			"ModularGameplay",
-			"GameFeatures",
 		});
 	}
 }

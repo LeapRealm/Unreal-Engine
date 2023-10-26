@@ -26,11 +26,16 @@ public:
 public:
 	bool IsExperienceLoaded() { return (LoadState == ELyraExperienceLoadState::Loaded) && (CurrentExperience != nullptr); }
 	void CallOrRegister_OnExperienceLoaded(FOnLyraExperienceLoaded::FDelegate&& Delegate);
-	
+
+	void ServerSetCurrentExperience(FPrimaryAssetId ExperienceId);
+	void StartExperienceLoad();
+	void OnExperienceLoadComplete();
+	void OnExperienceFullLoadCompleted();
+
 private:
 	UPROPERTY()
 	TObjectPtr<const ULyraExperienceDefinition> CurrentExperience;
 
-	ELyraExperienceLoadState LoadState = ELyraExperienceLoadState::Unloaded;
 	FOnLyraExperienceLoaded OnExperienceLoaded;
+	ELyraExperienceLoadState LoadState = ELyraExperienceLoadState::Unloaded;
 };

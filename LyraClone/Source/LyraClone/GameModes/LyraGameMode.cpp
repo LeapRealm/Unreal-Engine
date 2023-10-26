@@ -44,7 +44,22 @@ void ALyraGameMode::HandleStartingNewPlayer_Implementation(APlayerController* Ne
 
 void ALyraGameMode::HandleMatchAssignmentIfNotExpectingOne()
 {
+	FPrimaryAssetId ExperienceId;
+	if (ExperienceId.IsValid() == false)
+	{
+		ExperienceId = FPrimaryAssetId(FPrimaryAssetType("LyraExperienceDefinition"), FName("B_LyraDefaultExperience"));
+	}
 	
+	OnMatchAssignmentGiven(ExperienceId);
+}
+
+void ALyraGameMode::OnMatchAssignmentGiven(FPrimaryAssetId ExperienceId)
+{
+	check(ExperienceId.IsValid());
+
+	ULyraExperienceManagerComponent* ExperienceManagerComponent = GameState->FindComponentByClass<ULyraExperienceManagerComponent>();
+	check(ExperienceManagerComponent);
+	ExperienceManagerComponent->ServerSetCurrentExperience(ExperienceId);
 }
 
 bool ALyraGameMode::IsExperienceLoaded() const
