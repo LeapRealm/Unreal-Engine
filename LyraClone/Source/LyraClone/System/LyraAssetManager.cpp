@@ -1,4 +1,6 @@
 ﻿#include "LyraAssetManager.h"
+
+#include "LyraClone/LyraGameplayTags.h"
 #include "LyraClone/LyraLogChannels.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraAssetManager)
@@ -62,5 +64,5 @@ void ULyraAssetManager::StartInitialLoading()
 {
 	Super::StartInitialLoading();
 
-	UE_LOG(LogLyra, Display, TEXT("ULyraAssetManager::StartInitialLoading"));
+	FLyraGameplayTags::InitializeNativeTags();
 }
