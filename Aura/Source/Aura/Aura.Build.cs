@@ -12,6 +12,7 @@ public class Aura : ModuleRules
 			"CoreUObject", 
 			"Engine", 
 			"InputCore",
+			"EnhancedInput",
 		});
 	}
 }

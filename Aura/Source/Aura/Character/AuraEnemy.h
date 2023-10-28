@@ -1,0 +1,18 @@
+﻿#pragma once
+#include "AuraCharacterBase.h"
+#include "..\Interface\HighlightInterface.h"
+
+#include "AuraEnemy.generated.h"
+
+UCLASS()
+class AAuraEnemy : public AAuraCharacterBase, public IHighlightInterface
+{
+	GENERATED_BODY()
+	
+public:
+	AAuraEnemy(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+public:
+	virtual void HighlightActor() override;
+	virtual void UnHighlightActor() override;
+};
