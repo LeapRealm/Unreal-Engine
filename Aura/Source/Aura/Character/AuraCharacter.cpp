@@ -4,7 +4,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
+#include "UI/AuraHUD.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraCharacter)
 
@@ -26,7 +28,7 @@ AAuraCharacter::AAuraCharacter(const FObjectInitializer& ObjectInitializer)
 
 	SpringArm->SetRelativeRotation(FRotator(-45.f, 0.f, 0.f));
 	SpringArm->bEnableCameraLag = true;
-	SpringArm->TargetArmLength = 750.f;
+	SpringArm->TargetArmLength = 450.f;
 	SpringArm->bUsePawnControlRotation = false;
 	SpringArm->bInheritPitch = false;
 	SpringArm->bInheritRoll = false;
@@ -60,4 +62,12 @@ void AAuraCharacter::InitAbilityActorInfo()
 
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuraPlayerState->GetAttributeSet();
+
+	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
+	{
+		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
+		{
+			AuraHUD->Init();
+		}
+	}
 }

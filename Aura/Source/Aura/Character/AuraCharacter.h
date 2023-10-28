@@ -22,9 +22,9 @@ private:
 	void InitAbilityActorInfo();
 
 private:
-	UPROPERTY(VisibleAnywhere, Category="Camera")
+	UPROPERTY(VisibleAnywhere, Category="Component")
 	TObjectPtr<UCameraComponent> Camera;
 	
-	UPROPERTY(VisibleAnywhere, Category="Camera")
+	UPROPERTY(VisibleAnywhere, Category="Component")
 	TObjectPtr<USpringArmComponent> SpringArm;
 };

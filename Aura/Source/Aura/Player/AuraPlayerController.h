@@ -25,13 +25,13 @@ private:
 	void Move(const FInputActionValue& Value);
 	
 private:
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditAnywhere, Category="Asset|Input")
 	TObjectPtr<UInputMappingContext> AuraMappingContext;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditAnywhere, Category="Asset|Input")
 	TObjectPtr<UInputAction> MoveAction;
 
 private:
-	IHighlightInterface* LastHighlightedActor = nullptr;
-	IHighlightInterface* CurrHighlightedActor = nullptr;
+	TObjectPtr<IHighlightInterface> LastHighlightedActor = nullptr;
+	TObjectPtr<IHighlightInterface> CurrHighlightedActor = nullptr;
 };

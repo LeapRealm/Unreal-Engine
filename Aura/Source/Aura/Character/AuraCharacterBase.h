@@ -23,7 +23,7 @@ public:
 	virtual UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	
 protected:
-	UPROPERTY(VisibleAnywhere, Category="Combat")
+	UPROPERTY(VisibleAnywhere, Category="Component")
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
 
 	UPROPERTY()
