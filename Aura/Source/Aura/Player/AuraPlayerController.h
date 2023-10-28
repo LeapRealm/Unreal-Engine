@@ -24,7 +24,7 @@ private:
 	void CursorTrace();
 	void Move(const FInputActionValue& Value);
 	
-public:
+private:
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputMappingContext> AuraMappingContext;
 
@@ -32,6 +32,6 @@ public:
 	TObjectPtr<UInputAction> MoveAction;
 
 private:
-	IHighlightInterface* LastHighlightedActor;
-	IHighlightInterface* CurrHighlightedActor;
+	IHighlightInterface* LastHighlightedActor = nullptr;
+	IHighlightInterface* CurrHighlightedActor = nullptr;
 };

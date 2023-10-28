@@ -13,6 +13,14 @@ public class Aura : ModuleRules
 			"Engine", 
 			"InputCore",
 			"EnhancedInput",
+			"GameplayAbilities",
+			"GameplayTags",
+			"GameplayTasks",
+		});
+		
+		PrivateIncludePaths.AddRange(new string[]
+		{
+			"Aura/",
 		});
 	}
 }

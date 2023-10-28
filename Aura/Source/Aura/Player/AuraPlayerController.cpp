@@ -2,7 +2,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Aura/Interface/HighlightInterface.h"
+#include "Interface/HighlightInterface.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraPlayerController)
 
@@ -36,7 +36,7 @@ void AAuraPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 }
 
 void AAuraPlayerController::PlayerTick(float DeltaTime)

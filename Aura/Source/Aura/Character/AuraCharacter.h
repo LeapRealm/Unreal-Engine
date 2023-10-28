@@ -14,7 +14,14 @@ class AAuraCharacter : public AAuraCharacterBase
 public:
 	AAuraCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-public:
+protected:
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+
+private:
+	void InitAbilityActorInfo();
+
+private:
 	UPROPERTY(VisibleAnywhere, Category="Camera")
 	TObjectPtr<UCameraComponent> Camera;
 	
