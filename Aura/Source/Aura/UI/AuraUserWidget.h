@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-#include "AbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "GameplayEffectTypes.h"
 #include "AuraUserWidget.generated.h"
 
-class AAuraPlayerState;
-class AAuraPlayerController;
 class UAbilitySystemComponent;
-class UAttributeSet;
+class UAuraAttributeSet;
+
+#define ATTRIBUTE_DELEGATE_FUNCTION(Property) void On##Property##Changed(const FOnAttributeChangeData& Data) { On##Property##Changed(Data.NewValue); }
 
 UCLASS()
 class UAuraUserWidget : public UUserWidget
@@ -21,15 +21,9 @@ protected:
 	virtual void NativeConstruct() override;
 	
 protected:
-	UPROPERTY(BlueprintReadOnly, Category="Cache")
-	TObjectPtr<AAuraPlayerController> PlayerController;
-
-	UPROPERTY(BlueprintReadOnly, Category="Cache")
-	TObjectPtr<AAuraPlayerState> PlayerState;
-
-	UPROPERTY(BlueprintReadOnly, Category="Cache")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
-	UPROPERTY(BlueprintReadOnly, Category="Cache")
-	TObjectPtr<const UAttributeSet> AttributeSet;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<const UAuraAttributeSet> AttributeSet;
 };

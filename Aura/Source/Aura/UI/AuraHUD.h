@@ -3,6 +3,7 @@
 #include "GameFramework/HUD.h"
 #include "AuraHUD.generated.h"
 
+class UAuraSceneWidget;
 class UAuraUserWidget;
 
 UCLASS()
@@ -14,12 +15,12 @@ public:
 	AAuraHUD(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init();
+	void NativeInitialize();
 
 public:
 	UPROPERTY()
-	TObjectPtr<UAuraUserWidget> OverlayWidget;
+	TObjectPtr<UAuraSceneWidget> SceneWidget;
 	
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UAuraUserWidget> OverlayWidgetClass;
+	TSubclassOf<UAuraSceneWidget> SceneWidgetClass;
 };

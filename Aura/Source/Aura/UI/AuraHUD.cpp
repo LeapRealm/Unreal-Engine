@@ -1,6 +1,6 @@
 ﻿#include "AuraHUD.h"
 
-#include "AuraUserWidget.h"
+#include "AuraSceneWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraHUD)
 
@@ -10,10 +10,9 @@ AAuraHUD::AAuraHUD(const FObjectInitializer& ObjectInitializer)
     
 }
 
-void AAuraHUD::Init()
+void AAuraHUD::NativeInitialize()
 {
-	check(OverlayWidgetClass);
-	
-	OverlayWidget = CreateWidget<UAuraUserWidget>(GetWorld(), OverlayWidgetClass);
-	OverlayWidget->AddToViewport();
+	check(SceneWidgetClass);
+	SceneWidget = CreateWidget<UAuraSceneWidget>(GetWorld(), SceneWidgetClass);
+	SceneWidget->AddToViewport();
 }
