@@ -23,8 +23,8 @@ private:
 
 private:
 	UPROPERTY(VisibleAnywhere, Category="Component")
-	TObjectPtr<UCameraComponent> Camera;
+	TObjectPtr<UCameraComponent> CameraComponent;
 	
 	UPROPERTY(VisibleAnywhere, Category="Component")
-	TObjectPtr<USpringArmComponent> SpringArm;
+	TObjectPtr<USpringArmComponent> SpringArmComponent;
 };

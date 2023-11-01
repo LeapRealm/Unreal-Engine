@@ -1,7 +1,10 @@
 ﻿#pragma once
+#include "ActiveGameplayEffectHandle.h"
 
 #include "AuraEffectActor.generated.h"
 
+class UAbilitySystemComponent;
+class UGameplayEffect;
 class USphereComponent;
 
 UCLASS()
@@ -21,11 +24,30 @@ private:
 
 	UFUNCTION()
 	void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+protected:
+	UPROPERTY(EditAnywhere, Category="Effect")
+	TSubclassOf<UGameplayEffect> InstantGameplayEffectClass;
+
+	UPROPERTY(EditAnywhere, Category="Effect")
+	bool bDestroyActorAfterEffectApplied = true;
+
+	UPROPERTY(EditAnywhere, Category="Effect")
+	bool bCancelEffectWhenEndOverlap = false;
+
+	UPROPERTY(EditAnywhere, Category="Effect")
+	float Level = 1.f;
+	
+	UPROPERTY()
+	TMap<TObjectPtr<UAbilitySystemComponent>, FActiveGameplayEffectHandle> ActiveEffectHandles;
 	
 private:
+	UPROPERTY(VisibleAnywhere, Category="Component")
+	TObjectPtr<USceneComponent> SceneComponent;
+	
 	UPROPERTY(VisibleAnywhere, Category="Component")
 	TObjectPtr<USphereComponent> SphereComponent;
 
 	UPROPERTY(VisibleAnywhere, Category="Component")
-	TObjectPtr<UStaticMeshComponent> Mesh;
+	TObjectPtr<UStaticMeshComponent> MeshComponent;
 };

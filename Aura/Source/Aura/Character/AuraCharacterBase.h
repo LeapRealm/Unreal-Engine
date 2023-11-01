@@ -24,7 +24,7 @@ public:
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Component")
-	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
+	TObjectPtr<USkeletalMeshComponent> WeaponMeshComponent;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

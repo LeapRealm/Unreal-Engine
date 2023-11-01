@@ -14,14 +14,14 @@ UAuraSceneWidget::UAuraSceneWidget(const FObjectInitializer& ObjectInitializer)
 void UAuraSceneWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ThisClass::OnHealthChanged);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxHealthAttribute()).AddUObject(this, &ThisClass::OnMaxHealthChanged);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetManaAttribute()).AddUObject(this, &ThisClass::OnManaChanged);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxManaAttribute()).AddUObject(this, &ThisClass::OnMaxManaChanged);
 
 	OnHealthChanged(AttributeSet->GetHealth());
 	OnMaxHealthChanged(AttributeSet->GetMaxHealth());
 	OnManaChanged(AttributeSet->GetMana());
 	OnMaxManaChanged(AttributeSet->GetMaxMana());
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ThisClass::OnHealthChanged);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxHealthAttribute()).AddUObject(this, &ThisClass::OnMaxHealthChanged);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetManaAttribute()).AddUObject(this, &ThisClass::OnManaChanged);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxManaAttribute()).AddUObject(this, &ThisClass::OnMaxManaChanged);
 }

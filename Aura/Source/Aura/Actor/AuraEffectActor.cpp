@@ -1,6 +1,6 @@
 ﻿#include "AuraEffectActor.h"
 
-#include "AbilitySystemInterface.h"
+#include "AbilitySystemGlobals.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "Components/SphereComponent.h"
 
@@ -11,9 +11,12 @@ AAuraEffectActor::AAuraEffectActor(const FObjectInitializer& ObjectInitializer)
 {
     PrimaryActorTick.bCanEverTick = false;
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	SetRootComponent(Mesh);
-
+	SceneComponent = CreateDefaultSubobject<USceneComponent>("Scene");
+	SetRootComponent(SceneComponent);
+	
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	MeshComponent->SetupAttachment(GetRootComponent());
+	
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("Sphere");
 	SphereComponent->SetupAttachment(GetRootComponent());
 }
@@ -29,18 +32,38 @@ void AAuraEffectActor::BeginPlay()
 void AAuraEffectActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (IAbilitySystemInterface* AbilitySystemInterface = Cast<IAbilitySystemInterface>(OtherActor))
+	check(InstantGameplayEffectClass);	
+	
+	if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(OtherActor))
 	{
-		const UAuraAttributeSet* AuraAttributeSet = Cast<UAuraAttributeSet>(AbilitySystemInterface->GetAbilitySystemComponent()->GetAttributeSet(UAuraAttributeSet::StaticClass()));
-		UAuraAttributeSet* MutableAuraAttributeSet = const_cast<UAuraAttributeSet*>(AuraAttributeSet);
-		MutableAuraAttributeSet->SetHealth(AuraAttributeSet->GetHealth() - 50.f);
-		MutableAuraAttributeSet->SetMana(AuraAttributeSet->GetMana() - 25.f);
-		Destroy();
+		FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+		EffectContextHandle.AddSourceObject(this);
+		const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(InstantGameplayEffectClass, Level, EffectContextHandle);
+		const FActiveGameplayEffectHandle ActiveEffectHandle = TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+
+		const bool bInfinite = (EffectSpecHandle.Data->Def->DurationPolicy == EGameplayEffectDurationType::Infinite);
+		if (bInfinite && bCancelEffectWhenEndOverlap)
+		{
+			ActiveEffectHandles.Add(TargetASC, ActiveEffectHandle);
+		}
+
+		if (bDestroyActorAfterEffectApplied)
+		{
+			Destroy();
+		}
 	}
 }
 
 void AAuraEffectActor::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	
+	if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(OtherActor))
+	{
+		FActiveGameplayEffectHandle* ActiveEffectHandle = ActiveEffectHandles.Find(TargetASC);
+		if (ActiveEffectHandle)
+		{
+			TargetASC->RemoveActiveGameplayEffect(*ActiveEffectHandle, 1);
+			ActiveEffectHandles.Remove(TargetASC);
+		}
+	}
 }
