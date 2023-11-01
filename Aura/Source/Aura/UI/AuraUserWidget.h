@@ -7,7 +7,7 @@
 class UAbilitySystemComponent;
 class UAuraAttributeSet;
 
-#define ATTRIBUTE_DELEGATE_FUNCTION(Property) void On##Property##Changed(const FOnAttributeChangeData& Data) { On##Property##Changed(Data.NewValue); }
+#define BIND_ATTRIBUTE_CHANGE_DELEGATE(PropertyName) AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->Get##PropertyName##Attribute()).AddLambda([this](const FOnAttributeChangeData& Data){ On##PropertyName##Changed(Data.NewValue); });
 
 UCLASS()
 class UAuraUserWidget : public UUserWidget

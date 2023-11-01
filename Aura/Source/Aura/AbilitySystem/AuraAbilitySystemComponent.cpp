@@ -7,3 +7,16 @@ UAuraAbilitySystemComponent::UAuraAbilitySystemComponent(const FObjectInitialize
 {
     
 }
+
+void UAuraAbilitySystemComponent::BindEffectAppliedDelegate()
+{
+	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::OnEffectApplied);
+}
+
+void UAuraAbilitySystemComponent::OnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
+{
+	FGameplayTagContainer TagContainer;
+	EffectSpec.GetAllAssetTags(TagContainer);
+
+	EffectAssetTags.Broadcast(TagContainer);
+}

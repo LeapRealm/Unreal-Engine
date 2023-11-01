@@ -1,6 +1,7 @@
 ﻿#include "AuraSceneWidget.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraSceneWidget)
@@ -15,13 +16,26 @@ void UAuraSceneWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	BIND_ATTRIBUTE_CHANGE_DELEGATE(Health);
+	BIND_ATTRIBUTE_CHANGE_DELEGATE(MaxHealth);
+	BIND_ATTRIBUTE_CHANGE_DELEGATE(Mana);
+	BIND_ATTRIBUTE_CHANGE_DELEGATE(MaxMana);
+
 	OnHealthChanged(AttributeSet->GetHealth());
 	OnMaxHealthChanged(AttributeSet->GetMaxHealth());
 	OnManaChanged(AttributeSet->GetMana());
 	OnMaxManaChanged(AttributeSet->GetMaxMana());
-	
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ThisClass::OnHealthChanged);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxHealthAttribute()).AddUObject(this, &ThisClass::OnMaxHealthChanged);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetManaAttribute()).AddUObject(this, &ThisClass::OnManaChanged);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxManaAttribute()).AddUObject(this, &ThisClass::OnMaxManaChanged);
+
+	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda([this](const FGameplayTagContainer& AssetTags)
+	{
+		for (const FGameplayTag& Tag : AssetTags)
+		{
+			FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+			if (Tag.MatchesTag(MessageTag))
+			{
+				const FMessageWidgetRow* Row = GetDataTableRowByTag<FMessageWidgetRow>(MessageWidgetDataTable, Tag);
+				DisplayMessage(*Row);
+			}
+		}
+	});
 }

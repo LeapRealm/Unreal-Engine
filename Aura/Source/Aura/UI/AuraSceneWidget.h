@@ -3,6 +3,18 @@
 #include "AuraUserWidget.h"
 #include "AuraSceneWidget.generated.h"
 
+USTRUCT(BlueprintType)
+struct FMessageWidgetRow : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText Message = FText();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UTexture2D* Image = nullptr;
+};
+
 UCLASS()
 class UAuraSceneWidget : public UAuraUserWidget
 {
@@ -13,6 +25,10 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
+
+protected:
+	template<typename T>
+	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
 	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
@@ -26,10 +42,17 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnMaxManaChanged(float NewValue);
-	
-private:
-	ATTRIBUTE_DELEGATE_FUNCTION(Health);
-	ATTRIBUTE_DELEGATE_FUNCTION(MaxHealth);
-	ATTRIBUTE_DELEGATE_FUNCTION(Mana);
-	ATTRIBUTE_DELEGATE_FUNCTION(MaxMana);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void DisplayMessage(FMessageWidgetRow Row);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="DataTable")
+	TObjectPtr<UDataTable> MessageWidgetDataTable;
 };
+
+template <typename T>
+T* UAuraSceneWidget::GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag)
+{
+	return DataTable->FindRow<T>(Tag.GetTagName(), TEXT(""));
+}
