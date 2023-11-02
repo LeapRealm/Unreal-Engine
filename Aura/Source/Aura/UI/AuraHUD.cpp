@@ -10,7 +10,7 @@ AAuraHUD::AAuraHUD(const FObjectInitializer& ObjectInitializer)
     
 }
 
-void AAuraHUD::NativeInitialize()
+void AAuraHUD::Init()
 {
 	check(SceneWidgetClass);
 	SceneWidget = CreateWidget<UAuraSceneWidget>(GetWorld(), SceneWidgetClass);

@@ -15,7 +15,7 @@ public:
 	AAuraHUD(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void NativeInitialize();
+	void Init();
 
 public:
 	UPROPERTY()
