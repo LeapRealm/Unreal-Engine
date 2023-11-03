@@ -21,4 +21,16 @@ void UAuraUserWidget::NativeConstruct()
 	
 	AttributeSet = Cast<UAuraAttributeSet>(AbilitySystemComponent->GetAttributeSet(UAuraAttributeSet::StaticClass()));
 	check(AttributeSet);
+
+	for (FGameplayTag& Tag : WatchingAttributes)
+	{
+		if (auto AttributeFunc = AttributeSet->TagToAttributeFunc.Find(Tag))
+		{
+			OnAttributeChanged(Tag, (*AttributeFunc)().GetNumericValue(AttributeSet));
+			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate((*AttributeFunc)()).AddLambda([this, Tag](const FOnAttributeChangeData& Data)
+			{
+				OnAttributeChanged(Tag, Data.NewValue);
+			});
+		}
+	}
 }

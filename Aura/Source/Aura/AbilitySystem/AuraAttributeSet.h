@@ -10,6 +10,9 @@
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName)				\
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+template<class T>
+using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+
 USTRUCT()
 struct FEffectProperties
 {
@@ -112,7 +115,10 @@ private:
 	void OnRep_MaxMana(const FGameplayAttributeData& OldValue) const;
 
 private:
-	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties OutProps) const;
+	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& OutProps) const;
+
+public:
+	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagToAttributeFunc;
 	
 public:
 	// Base

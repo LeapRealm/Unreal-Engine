@@ -2,6 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+#include "AuraGameplayTags.h"
 #include "GameplayEffectExtension.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
@@ -11,7 +12,32 @@
 UAuraAttributeSet::UAuraAttributeSet(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+
+	// Base
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Base_Level,						GetLevelAttribute);
 	
+	// Vital
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Vital_Health,						GetHealthAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Vital_Mana,						GetManaAttribute);
+	
+	// Primary
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Primary_Strength,					GetStrengthAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Primary_Intelligence,				GetIntelligenceAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Primary_Resilience,				GetResilienceAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Primary_Vigor,					GetVigorAttribute);
+	
+	// Secondary
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_Armor,					GetArmorAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_ArmorPenetration,		GetArmorPenetrationAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_BlockChance,			GetBlockChanceAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_CriticalHitChange,		GetCriticalHitChangeAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_CriticalHitDamage,		GetCriticalHitDamageAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_CriticalHitResistance,	GetCriticalHitResistanceAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_HealthRegeneration,		GetHealthRegenerationAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_ManaRegeneration,		GetManaRegenerationAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_MaxHealth,				GetMaxHealthAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_MaxMana,				GetMaxManaAttribute);
 }
 
 void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -19,29 +45,29 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// Base
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Level, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Level,					COND_None, REPNOTIFY_Always);
 	
 	// Vital
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Health, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Health,					COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana,						COND_None, REPNOTIFY_Always);
 
 	// Primary
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Strength, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Intelligence, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Resilience, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Vigor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Strength,					COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Intelligence,				COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Resilience,				COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Vigor,					COND_None, REPNOTIFY_Always);
 
 	// Secondary
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Armor, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, ArmorPenetration, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BlockChance, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, CriticalHitChange, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, CriticalHitDamage, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, CriticalHitResistance, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, HealthRegeneration, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, ManaRegeneration, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxHealth, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxMana, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Armor,					COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, ArmorPenetration,			COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BlockChance,				COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, CriticalHitChange,		COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, CriticalHitDamage,		COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, CriticalHitResistance,	COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, HealthRegeneration,		COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, ManaRegeneration,			COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxHealth,				COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxMana,					COND_None, REPNOTIFY_Always);
 }
 
 void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -160,7 +186,7 @@ void UAuraAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue) co
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MaxMana, OldValue);
 }
 
-void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties OutProps) const
+void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& OutProps) const
 {
 	OutProps.EffectContextHandle = Data.EffectSpec.GetContext();
 	OutProps.SourceASC = OutProps.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();

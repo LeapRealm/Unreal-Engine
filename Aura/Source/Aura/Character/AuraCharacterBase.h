@@ -47,7 +47,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category="Component")
 	TObjectPtr<USkeletalMeshComponent> WeaponMeshComponent;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category="Component")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(VisibleAnywhere)

@@ -10,9 +10,13 @@ AAuraHUD::AAuraHUD(const FObjectInitializer& ObjectInitializer)
     
 }
 
-void AAuraHUD::Init()
+void AAuraHUD::ShowSceneWidget()
 {
 	check(SceneWidgetClass);
-	SceneWidget = CreateWidget<UAuraSceneWidget>(GetWorld(), SceneWidgetClass);
-	SceneWidget->AddToViewport();
+
+	if (IsValid(SceneWidget) == false)
+	{
+		SceneWidget = CreateWidget<UAuraSceneWidget>(GetWorld(), SceneWidgetClass);
+		SceneWidget->AddToViewport();
+	}
 }

@@ -63,5 +63,5 @@ void UAuraAssetManager::StartInitialLoading()
 {
 	Super::StartInitialLoading();
 
-	FAuraGameplayTags::Get().InitializeNativeTags();
+	FAuraGameplayTags::InitializeNativeTags();
 }

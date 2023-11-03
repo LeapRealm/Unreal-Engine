@@ -7,8 +7,6 @@
 class UAbilitySystemComponent;
 class UAuraAttributeSet;
 
-#define BIND_ATTRIBUTE_CHANGE_DELEGATE(PropertyName) AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->Get##PropertyName##Attribute()).AddLambda([this](const FOnAttributeChangeData& Data){ On##PropertyName##Changed(Data.NewValue); });
-
 UCLASS()
 class UAuraUserWidget : public UUserWidget
 {
@@ -19,7 +17,15 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
+
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnAttributeChanged(const FGameplayTag& Tag, float NewValue);
 	
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FGameplayTag> WatchingAttributes;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

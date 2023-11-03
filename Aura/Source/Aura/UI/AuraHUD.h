@@ -4,7 +4,6 @@
 #include "AuraHUD.generated.h"
 
 class UAuraSceneWidget;
-class UAuraUserWidget;
 
 UCLASS()
 class AAuraHUD : public AHUD
@@ -15,7 +14,7 @@ public:
 	AAuraHUD(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init();
+	void ShowSceneWidget();
 
 public:
 	UPROPERTY()

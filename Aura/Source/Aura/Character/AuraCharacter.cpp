@@ -58,11 +58,11 @@ void AAuraCharacter::OnRep_PlayerState()
 void AAuraCharacter::InitAbilityActorInfo()
 {
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	check(AuraPlayerState);
-	AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
-	Cast<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent())->BindEffectAppliedDelegate();
-	
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
+	
+	AbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
+	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->BindEffectAppliedDelegate();
+	
 	AttributeSet = AuraPlayerState->GetAttributeSet();
 	InitDefaultAttributes();
 
@@ -70,7 +70,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 	{
 		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
 		{
-			AuraHUD->Init();
+			AuraHUD->ShowSceneWidget();
 		}
 	}
 }

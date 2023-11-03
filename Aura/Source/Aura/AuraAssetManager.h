@@ -13,20 +13,20 @@ public:
 
 public:
 	static UAuraAssetManager& Get();
-	
-	static bool ShouldLogAssetLoads();
-
-	static UObject* SynchronousLoadAsset(const FSoftObjectPath& AssetPath);
 
 	template<typename AssetType>
 	static AssetType* GetAsset(const TSoftObjectPtr<AssetType>& AssetPointer, bool bKeepInMemory = true);
 
 	template<typename AssetType>
 	static TSubclassOf<AssetType> GetSubclass(const TSoftClassPtr<AssetType>& AssetPointer, bool bKeepInMemory = true);
-	
-	void AddLoadedAsset(const UObject* Asset);
 
+protected:
 	virtual void StartInitialLoading() override;
+	
+private:
+	static bool ShouldLogAssetLoads();
+	static UObject* SynchronousLoadAsset(const FSoftObjectPath& AssetPath);
+	void AddLoadedAsset(const UObject* Asset);
 	
 private:
 	UPROPERTY()

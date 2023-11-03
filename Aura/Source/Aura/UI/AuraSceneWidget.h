@@ -3,6 +3,8 @@
 #include "AuraUserWidget.h"
 #include "AuraSceneWidget.generated.h"
 
+class UAuraAttributeWidget;
+
 USTRUCT(BlueprintType)
 struct FMessageWidgetRow : public FTableRowBase
 {
@@ -27,32 +29,13 @@ protected:
 	virtual void NativeConstruct() override;
 
 protected:
-	template<typename T>
-	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
-	
-protected:
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnHealthChanged(float NewValue);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnMaxHealthChanged(float NewValue);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnManaChanged(float NewValue);
-	
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnMaxManaChanged(float NewValue);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void DisplayMessage(FMessageWidgetRow Row);
+	void DisplayMessage(const FMessageWidgetRow& Row);
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="DataTable")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAuraAttributeWidget> AttributeWidget;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Data")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
 };
-
-template <typename T>
-T* UAuraSceneWidget::GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag)
-{
-	return DataTable->FindRow<T>(Tag.GetTagName(), TEXT(""));
-}
