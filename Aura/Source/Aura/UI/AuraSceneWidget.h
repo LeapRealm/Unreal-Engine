@@ -30,6 +30,18 @@ protected:
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
+	void OnHealthChanged(float NewValue);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMaxHealthChanged(float NewValue);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnManaChanged(float NewValue);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMaxManaChanged(float NewValue);
+	
+	UFUNCTION(BlueprintImplementableEvent)
 	void DisplayMessage(const FMessageWidgetRow& Row);
 
 protected:

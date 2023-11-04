@@ -2,6 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraCharacterBase)
 
@@ -42,4 +43,13 @@ void AAuraCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> Gameplay
 	ContextHandle.AddSourceObject(this);
 	FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+}
+
+void AAuraCharacterBase::AddStartupAbilities()
+{
+	if (HasAuthority() == false)
+		return;
+
+	UAuraAbilitySystemComponent* AuraASC = CastChecked<UAuraAbilitySystemComponent>(AbilitySystemComponent);
+	AuraASC->AddStartupAbilities(StartupAbilities);
 }

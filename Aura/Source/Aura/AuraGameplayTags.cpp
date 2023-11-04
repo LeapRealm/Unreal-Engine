@@ -45,6 +45,14 @@ void FAuraGameplayTags::AddInitialTags()
 	AddTag(Message_HealthPotion,							"Message.HealthPotion",							"Message HealthPotion");
 	AddTag(Message_ManaCrystal,							"Message.ManaCrystal",							"Message ManaCrystal");
 	AddTag(Message_ManaPotion,							"Message.ManaPotion",							"Message ManaPotion");
+
+	// Input
+	AddTag(Input_LMB,									"Input.LMB",									"Input LMB");
+	AddTag(Input_RMB,									"Input.RMB",									"Input RMB");
+	AddTag(Input_1,										"Input.1",										"Input 1");
+	AddTag(Input_2,										"Input.2",										"Input 2");
+	AddTag(Input_3,										"Input.3",										"Input 3");
+	AddTag(Input_4,										"Input.4",										"Input 4");
 }
 
 void FAuraGameplayTags::AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName, const ANSICHAR* TagComment)

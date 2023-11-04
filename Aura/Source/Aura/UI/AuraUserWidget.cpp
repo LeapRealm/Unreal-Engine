@@ -22,15 +22,21 @@ void UAuraUserWidget::NativeConstruct()
 	AttributeSet = Cast<UAuraAttributeSet>(AbilitySystemComponent->GetAttributeSet(UAuraAttributeSet::StaticClass()));
 	check(AttributeSet);
 
-	for (FGameplayTag& Tag : WatchingAttributes)
+	for (const FGameplayTag& Tag : WatchingAttributeTags)
 	{
 		if (auto AttributeFunc = AttributeSet->TagToAttributeFunc.Find(Tag))
 		{
-			OnAttributeChanged(Tag, (*AttributeFunc)().GetNumericValue(AttributeSet));
-			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate((*AttributeFunc)()).AddLambda([this, Tag](const FOnAttributeChangeData& Data)
+			const FGameplayAttribute& Attribute = (*AttributeFunc)(); 
+			OnAttributeChanged(Tag, Attribute.GetNumericValue(AttributeSet));
+			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attribute).AddLambda([this, Tag](const FOnAttributeChangeData& Data)
 			{
 				OnAttributeChanged(Tag, Data.NewValue);
 			});
 		}
 	}
+}
+
+void UAuraUserWidget::BindAttributeChangeGeneralFunction(const TArray<FGameplayTag>& Tags)
+{
+	WatchingAttributeTags.Append(Tags);
 }

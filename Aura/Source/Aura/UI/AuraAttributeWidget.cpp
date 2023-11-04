@@ -8,7 +8,7 @@ UAuraAttributeWidget::UAuraAttributeWidget(const FObjectInitializer& ObjectIniti
 	: Super(ObjectInitializer)
 {
 	FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
-    WatchingAttributes.Append({
+    BindAttributeChangeGeneralFunction({
     	GameplayTags.Attribute_Primary_Strength,
 		GameplayTags.Attribute_Primary_Intelligence,
 		GameplayTags.Attribute_Primary_Resilience,

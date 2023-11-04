@@ -45,4 +45,12 @@ public:
 	FGameplayTag Message_HealthPotion;
 	FGameplayTag Message_ManaCrystal;
 	FGameplayTag Message_ManaPotion;
+
+	// Input
+	FGameplayTag Input_LMB;
+	FGameplayTag Input_RMB;
+	FGameplayTag Input_1;
+	FGameplayTag Input_2;
+	FGameplayTag Input_3;
+	FGameplayTag Input_4;
 };

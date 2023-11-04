@@ -3,7 +3,7 @@
 #include "AbilitySystemComponent.h"
 #include "AuraAbilitySystemComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnEffectAssetTags, const FGameplayTagContainer&);
 
 UCLASS()
 class UAuraAbilitySystemComponent : public UAbilitySystemComponent
@@ -15,10 +15,11 @@ public:
 
 public:
 	void BindEffectAppliedDelegate();
+	void AddStartupAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 	
 protected:
 	void OnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 
 public:
-	FEffectAssetTags EffectAssetTags;
+	FOnEffectAssetTags OnEffectAssetTags;
 };

@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "AuraCharacterBase.generated.h"
 
+class UGameplayAbility;
 class UGameplayEffect;
 class UAttributeSet;
 class UAbilitySystemComponent;
@@ -29,6 +30,9 @@ public:
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const { return AbilitySystemComponent; }
 	virtual UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+
+protected:
+	void AddStartupAbilities();
 	
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attribute")
@@ -42,6 +46,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attribute")
 	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
+	
+protected:
+	UPROPERTY(EditAnywhere, Category="Ability")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Component")
