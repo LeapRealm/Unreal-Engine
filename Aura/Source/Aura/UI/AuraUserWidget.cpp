@@ -3,6 +3,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "Player/AuraPlayerState.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraUserWidget)
 
@@ -16,7 +17,7 @@ void UAuraUserWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwningPlayerPawn());
+	AbilitySystemComponent = GetOwningPlayerState<AAuraPlayerState>()->GetAbilitySystemComponent();
 	check(AbilitySystemComponent);
 	
 	AttributeSet = Cast<UAuraAttributeSet>(AbilitySystemComponent->GetAttributeSet(UAuraAttributeSet::StaticClass()));

@@ -6,6 +6,7 @@
 #include "LyraClone/Player/LyraPlayerController.h"
 #include "LyraClone/Player/LyraPlayerState.h"
 #include "LyraClone/Character/LyraCharacter.h"
+#include "LyraClone/Character/LyraPawnExtensionComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraGameMode)
 
@@ -41,6 +42,32 @@ void ALyraGameMode::HandleStartingNewPlayer_Implementation(APlayerController* Ne
 	{
 		Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 	}
+}
+
+APawn* ALyraGameMode::SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer, const FTransform& SpawnTransform)
+{
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Instigator = GetInstigator();
+	SpawnInfo.ObjectFlags |= RF_Transient;
+	SpawnInfo.bDeferConstruction = true;
+
+	if (UClass* PawnClass = GetDefaultPawnClassForController(NewPlayer))
+	{
+		if (APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(PawnClass, SpawnTransform, SpawnInfo))
+		{
+			if (ULyraPawnExtensionComponent* PawnExtensionComponent = ULyraPawnExtensionComponent::FindPawnExtensionComponent(SpawnedPawn))
+			{
+				if (const ULyraPawnData* PawnData = GetPawnDataForController(NewPlayer))
+				{
+					PawnExtensionComponent->SetPawnData(PawnData);
+				}
+			}
+			SpawnedPawn->FinishSpawning(SpawnTransform);
+			return SpawnedPawn;
+		}
+	}
+
+	return nullptr;
 }
 
 UClass* ALyraGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)

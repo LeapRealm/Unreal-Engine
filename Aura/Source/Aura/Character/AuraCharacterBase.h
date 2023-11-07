@@ -35,20 +35,20 @@ protected:
 	void AddStartupAbilities();
 	
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attribute")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
 	TSubclassOf<UGameplayEffect> DefaultBaseAttributes;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attribute")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attribute")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attribute")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
 	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
 	
 protected:
-	UPROPERTY(EditAnywhere, Category="Ability")
+	UPROPERTY(EditAnywhere, Category="Asset|Ability")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 	
 protected:

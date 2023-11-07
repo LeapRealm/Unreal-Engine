@@ -2,9 +2,13 @@
 
 #include "AuraPlayerController.generated.h"
 
+class USplineComponent;
+class UAuraAbilitySystemComponent;
+struct FGameplayTag;
 class IHighlightInterface;
 class UInputAction;
 class UInputMappingContext;
+class UAuraInputConfig;
 struct FInputActionValue;
 
 UCLASS()
@@ -22,16 +26,44 @@ protected:
 
 private:
 	void CursorTrace();
+	void AutoRun();
+	
 	void Move(const FInputActionValue& Value);
+	void AbilityInputPressed(FGameplayTag InputTag);
+	void AbilityInputHeld(FGameplayTag InputTag);
+	void AbilityInputReleased(FGameplayTag InputTag);
+
+	UAuraAbilitySystemComponent* GetASC();
 	
 private:
-	UPROPERTY(EditAnywhere, Category="Asset|Input")
+	UPROPERTY(EditDefaultsOnly, Category="Asset|Input")
 	TObjectPtr<UInputMappingContext> AuraMappingContext;
 
-	UPROPERTY(EditAnywhere, Category="Asset|Input")
+	UPROPERTY(EditDefaultsOnly, Category="Asset|Input")
 	TObjectPtr<UInputAction> MoveAction;
-
+	
+	UPROPERTY(EditDefaultsOnly, Category="Asset|Input")
+	TObjectPtr<UAuraInputConfig> InputConfig;
+	
 private:
 	TObjectPtr<IHighlightInterface> LastHighlightedActor = nullptr;
 	TObjectPtr<IHighlightInterface> CurrHighlightedActor = nullptr;
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
+
+private:
+	FVector CachedDestination = FVector::ZeroVector;
+	float FollowTime = 0.f;
+	float ShortPressThreshold = 0.5f;
+	bool bAutoRunning = false;
+	bool bTargeting = false;
+	FHitResult CursorHit;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float AutoRunAcceptanceRadius = 50.f;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USplineComponent> SplineComponent;
 };

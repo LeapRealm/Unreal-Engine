@@ -11,4 +11,19 @@ class ULyraHeroComponent : public UPawnComponent, public IGameFrameworkInitState
 	
 public:
 	ULyraHeroComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+public:
+	virtual void OnRegister() override;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	virtual FName GetFeatureName() const override { return NAME_ActorFeatureName; }
+
+	virtual void OnActorInitStateChanged(const FActorInitStateChangedParams& Params) override;
+	virtual bool CanChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) const override;
+	virtual void CheckDefaultInitialization() override;
+	virtual void HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) override;
+	
+public:
+	static const FName NAME_ActorFeatureName;
 };

@@ -21,7 +21,7 @@ void UAuraSceneWidget::NativeConstruct()
 	BIND_ATTRIBUTE_CHANGE_SEPARATE_FUNCTION(Mana);
 	BIND_ATTRIBUTE_CHANGE_SEPARATE_FUNCTION(MaxMana);
 	
-	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->OnEffectAssetTags.AddLambda([this](const FGameplayTagContainer& AssetTags)
+	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->OnEffectApplied_AssetTags.AddLambda([this](const FGameplayTagContainer& AssetTags)
 	{
 		for (const FGameplayTag& Tag : AssetTags)
 		{

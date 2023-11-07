@@ -19,6 +19,7 @@ public class Aura : ModuleRules
 			"GameplayAbilities",
 			"GameplayTags",
 			"GameplayTasks",
+			"NavigationSystem",
 		});
 		
 		PrivateIncludePaths.AddRange(new string[]

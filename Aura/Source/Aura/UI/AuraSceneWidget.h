@@ -48,6 +48,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAuraAttributeWidget> AttributeWidget;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Data")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Asset|Data")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
 };

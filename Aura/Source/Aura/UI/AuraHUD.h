@@ -17,9 +17,9 @@ public:
 	void ShowSceneWidget();
 
 public:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAuraSceneWidget> SceneWidget;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly, Category="Asset|Class")
 	TSubclassOf<UAuraSceneWidget> SceneWidgetClass;
 };

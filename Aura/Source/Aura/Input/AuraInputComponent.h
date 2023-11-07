@@ -16,11 +16,11 @@ public:
 
 public:
 	template<class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
-	void BindAbilityActions(const UAuraInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc);
+	void BindAbilityActions(const UAuraInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, HeldFuncType HeldFunc, ReleasedFuncType ReleasedFunc);
 };
 
 template <class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
-void UAuraInputComponent::BindAbilityActions(const UAuraInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc)
+void UAuraInputComponent::BindAbilityActions(const UAuraInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, HeldFuncType HeldFunc, ReleasedFuncType ReleasedFunc)
 {
 	check(InputConfig);
 
@@ -35,14 +35,14 @@ void UAuraInputComponent::BindAbilityActions(const UAuraInputConfig* InputConfig
 				BindAction(InputAction, ETriggerEvent::Started, Object, PressedFunc, Tag);
 			}
 
-			if (ReleasedFunc)
-			{
-				BindAction(InputAction, ETriggerEvent::Completed, Object, ReleasedFunc, Tag);
-			}
-
 			if (HeldFunc)
 			{
 				BindAction(InputAction, ETriggerEvent::Triggered, Object, HeldFunc, Tag);
+			}
+
+			if (ReleasedFunc)
+			{
+				BindAction(InputAction, ETriggerEvent::Completed, Object, ReleasedFunc, Tag);
 			}
 		}
 	}

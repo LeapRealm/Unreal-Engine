@@ -10,4 +10,8 @@ class UAuraGameplayAbility : public UGameplayAbility
 	
 public:
 	UAuraGameplayAbility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category="Asset|Input")
+	FGameplayTag InputTag;
 };
