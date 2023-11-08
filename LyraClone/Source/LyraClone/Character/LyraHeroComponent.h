@@ -4,6 +4,8 @@
 #include "Components/PawnComponent.h"
 #include "LyraHeroComponent.generated.h"
 
+class ULyraCameraMode;
+
 UCLASS(Blueprintable, meta=(BlueprintSpawnableComponent))
 class ULyraHeroComponent : public UPawnComponent, public IGameFrameworkInitStateInterface
 {
@@ -23,6 +25,9 @@ public:
 	virtual bool CanChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) const override;
 	virtual void CheckDefaultInitialization() override;
 	virtual void HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) override;
+
+public:
+	TSubclassOf<ULyraCameraMode> DetermineCameraMode() const;
 	
 public:
 	static const FName NAME_ActorFeatureName;

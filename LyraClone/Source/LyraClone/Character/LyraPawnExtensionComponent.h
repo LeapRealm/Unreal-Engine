@@ -5,6 +5,7 @@
 #include "Components/PawnComponent.h"
 #include "LyraPawnExtensionComponent.generated.h"
 
+class ULyraCameraMode;
 class ULyraPawnData;
 
 UCLASS()
@@ -30,6 +31,8 @@ public:
 	virtual void CheckDefaultInitialization() override;
 
 public:
+	template<class T>
+	const T* GetPawnData() const { return Cast<T>(PawnData); }
 	void SetPawnData(const ULyraPawnData* InPawnData);
 	void SetupPlayerInputComponent();
 	

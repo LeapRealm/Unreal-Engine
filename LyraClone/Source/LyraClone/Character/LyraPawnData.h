@@ -2,6 +2,8 @@
 
 #include "LyraPawnData.generated.h"
 
+class ULyraCameraMode;
+
 UCLASS()
 class ULyraPawnData : public UPrimaryDataAsset
 {
@@ -13,4 +15,7 @@ public:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Lyra|Pawn")
 	TSubclassOf<APawn> PawnClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Lyra|Camera")
+	TSubclassOf<ULyraCameraMode> DefaultCameraMode;
 };
