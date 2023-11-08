@@ -12,3 +12,11 @@ ALyraCharacter::ALyraCharacter(const FObjectInitializer& ObjectInitializer)
 	
 	PawnExtensionComponent = CreateDefaultSubobject<ULyraPawnExtensionComponent>(TEXT("PawnExtensionComponent"));
 }
+
+void ALyraCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	// Pawn에 Possess하고 난 뒤 Controller와 PlayerState가 준비되었으니 InitState를 계속 진행합니다.
+	PawnExtensionComponent->SetupPlayerInputComponent();
+}

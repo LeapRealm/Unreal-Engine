@@ -146,3 +146,9 @@ void ULyraPawnExtensionComponent::SetPawnData(const ULyraPawnData* InPawnData)
 
 	PawnData = InPawnData;
 }
+
+void ULyraPawnExtensionComponent::SetupPlayerInputComponent()
+{
+	// ForceUpdate로 다시 InitState 상태 변환을 시작합니다. (연결 고리)
+	CheckDefaultInitialization();
+}

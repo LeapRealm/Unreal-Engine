@@ -31,6 +31,7 @@ public:
 
 public:
 	void SetPawnData(const ULyraPawnData* InPawnData);
+	void SetupPlayerInputComponent();
 	
 public:
 	static const FName NAME_ActorFeatureName;

@@ -128,5 +128,18 @@ void ULyraHeroComponent::CheckDefaultInitialization()
 
 void ULyraHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState)
 {
-	
+	const FLyraGameplayTags& InitTags = FLyraGameplayTags::Get();
+
+	// DataAvailable -> DataInitialized 단계
+	if (CurrentState == InitTags.InitState_DataAvailable && DesiredState == InitTags.InitState_DataInitialized)
+	{
+		APawn* Pawn = GetPawn<APawn>();
+		ALyraPlayerState* LyraPS = GetPlayerState<ALyraPlayerState>();
+		if (ensure(Pawn && LyraPS) == false)
+		{
+			return;
+		}
+
+		// TODO: Input과 Camera 핸들링
+	}
 }
