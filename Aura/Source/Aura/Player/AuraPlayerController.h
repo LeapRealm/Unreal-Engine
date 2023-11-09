@@ -29,6 +29,10 @@ private:
 	void AutoRun();
 	
 	void Move(const FInputActionValue& Value);
+
+	void ShiftPressed() { bShiftKeyDown = true; }
+	void ShiftReleased() { bShiftKeyDown = false; }
+	
 	void AbilityInputPressed(FGameplayTag InputTag);
 	void AbilityInputHeld(FGameplayTag InputTag);
 	void AbilityInputReleased(FGameplayTag InputTag);
@@ -41,6 +45,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Asset|Input")
 	TObjectPtr<UInputAction> MoveAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Asset|Input")
+	TObjectPtr<UInputAction> ShiftAction;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Asset|Input")
 	TObjectPtr<UAuraInputConfig> InputConfig;
@@ -60,6 +67,8 @@ private:
 	bool bAutoRunning = false;
 	bool bTargeting = false;
 	FHitResult CursorHit;
+
+	bool bShiftKeyDown = false;
 	
 	UPROPERTY(EditDefaultsOnly)
 	float AutoRunAcceptanceRadius = 50.f;

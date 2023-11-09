@@ -53,4 +53,7 @@ public:
 	FGameplayTag Input_2;
 	FGameplayTag Input_3;
 	FGameplayTag Input_4;
+
+	// Event
+	FGameplayTag Event_Montage_FireBolt;
 };

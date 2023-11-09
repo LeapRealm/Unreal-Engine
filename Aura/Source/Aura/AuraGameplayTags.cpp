@@ -53,6 +53,9 @@ void FAuraGameplayTags::AddInitialTags()
 	AddTag(Input_2,										"Input.2",										"Input 2");
 	AddTag(Input_3,										"Input.3",										"Input 3");
 	AddTag(Input_4,										"Input.4",										"Input 4");
+
+	// Event
+	AddTag(Event_Montage_FireBolt,						"Event.Montage.FireBolt",						"Event Montage FireBolt");
 }
 
 void FAuraGameplayTags::AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName, const ANSICHAR* TagComment)
