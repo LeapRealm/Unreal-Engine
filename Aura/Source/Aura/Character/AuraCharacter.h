@@ -19,7 +19,21 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual void InitAbilityActorInfo() override;
+	virtual void InitDefaultAttributes() const override;
 
+protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
+	TSubclassOf<UGameplayEffect> DefaultBaseAttributes;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
+	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
+	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
+	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Component")
 	TObjectPtr<UCameraComponent> CameraComponent;

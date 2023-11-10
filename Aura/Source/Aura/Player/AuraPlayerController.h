@@ -53,8 +53,8 @@ private:
 	TObjectPtr<UAuraInputConfig> InputConfig;
 	
 private:
-	TObjectPtr<IHighlightInterface> LastHighlightedActor = nullptr;
-	TObjectPtr<IHighlightInterface> CurrHighlightedActor = nullptr;
+	IHighlightInterface* LastHighlightedActor = nullptr;
+	IHighlightInterface* CurrHighlightedActor = nullptr;
 
 private:
 	UPROPERTY(VisibleAnywhere)

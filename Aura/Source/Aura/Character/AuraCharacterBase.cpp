@@ -40,10 +40,7 @@ void AAuraCharacterBase::InitAbilityActorInfo()
 
 void AAuraCharacterBase::InitDefaultAttributes() const
 {
-	ApplyEffectToSelf(DefaultBaseAttributes, 1.f);
-	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
-	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
-	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
+	
 }
 
 void AAuraCharacterBase::InitWidgetComponent()

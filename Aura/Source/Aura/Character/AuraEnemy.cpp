@@ -1,10 +1,10 @@
 ﻿#include "AuraEnemy.h"
 
 #include "Aura.h"
+#include "AuraSystemLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/WidgetComponent.h"
 #include "UI/AuraUserWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraEnemy)
@@ -40,6 +40,13 @@ void AAuraEnemy::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->BindEffectAppliedDelegate();
 	InitDefaultAttributes();
+}
+
+void AAuraEnemy::InitDefaultAttributes() const
+{
+	Super::InitDefaultAttributes();
+	
+	UAuraSystemLibrary::InitDefaultAttributes(this, CharacterClass, AbilitySystemComponent);
 }
 
 void AAuraEnemy::HighlightActor()

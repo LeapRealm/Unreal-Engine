@@ -24,7 +24,7 @@ protected:
 
 protected:
 	virtual void InitAbilityActorInfo();
-	void InitDefaultAttributes() const;
+	virtual void InitDefaultAttributes() const;
 	void InitWidgetComponent();
 
 public:
@@ -37,19 +37,6 @@ public:
 	
 protected:
 	void AddStartupAbilities();
-	
-protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
-	TSubclassOf<UGameplayEffect> DefaultBaseAttributes;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
-	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
-	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Asset|Attribute")
-	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
 	
 protected:
 	UPROPERTY(EditAnywhere, Category="Asset|Ability")

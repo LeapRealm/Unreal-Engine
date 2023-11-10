@@ -85,3 +85,13 @@ void AAuraCharacter::InitAbilityActorInfo()
 	AttributeSet = AuraPlayerState->GetAttributeSet();
 	InitDefaultAttributes();
 }
+
+void AAuraCharacter::InitDefaultAttributes() const
+{
+	Super::InitDefaultAttributes();
+
+	ApplyEffectToSelf(DefaultBaseAttributes, 1.f);
+	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
+	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
+	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
+}
