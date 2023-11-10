@@ -13,7 +13,7 @@ UAuraUserWidget::UAuraUserWidget(const FObjectInitializer& ObjectInitializer)
 	
 }
 
-void UAuraUserWidget::TryInit(UAbilitySystemComponent* ASC)
+void UAuraUserWidget::Init(UAbilitySystemComponent* ASC)
 {
 	if (IsValid(ASC) == false || IsValid(AbilitySystemComponent))
 		return;

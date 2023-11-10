@@ -25,6 +25,7 @@ protected:
 protected:
 	virtual void InitAbilityActorInfo();
 	void InitDefaultAttributes() const;
+	void InitWidgetComponent();
 
 public:
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;

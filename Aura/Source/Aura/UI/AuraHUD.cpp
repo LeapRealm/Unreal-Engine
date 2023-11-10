@@ -19,6 +19,6 @@ void AAuraHUD::ShowSceneWidget()
 	{
 		SceneWidget = CreateWidget<UAuraSceneWidget>(GetWorld(), SceneWidgetClass);
 		SceneWidget->AddToViewport();
-		SceneWidget->TryInit(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwningPawn()));
+		SceneWidget->Init(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwningPawn()));
 	}
 }

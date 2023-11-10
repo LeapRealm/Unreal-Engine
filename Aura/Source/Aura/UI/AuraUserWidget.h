@@ -20,7 +20,7 @@ public:
 	UAuraUserWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void TryInit(UAbilitySystemComponent* ASC = nullptr);
+	void Init(UAbilitySystemComponent* ASC = nullptr);
 	
 protected:
 	virtual void BindDelegates();

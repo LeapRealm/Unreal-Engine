@@ -30,11 +30,7 @@ void AAuraEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	InitAbilityActorInfo();
-
-	if (UAuraUserWidget* HealthBarWidget = Cast<UAuraUserWidget>(HealthBarWidgetComponent->GetWidget()))
-	{
-		HealthBarWidget->TryInit(AbilitySystemComponent);
-	}
+	InitWidgetComponent();
 }
 
 void AAuraEnemy::InitAbilityActorInfo()

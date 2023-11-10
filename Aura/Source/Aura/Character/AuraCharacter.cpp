@@ -47,10 +47,7 @@ void AAuraCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (UAuraUserWidget* HealthBarWidget = Cast<UAuraUserWidget>(HealthBarWidgetComponent->GetWidget()))
-	{
-		HealthBarWidget->TryInit(AbilitySystemComponent);
-	}
+	InitWidgetComponent();
 }
 
 void AAuraCharacter::PossessedBy(AController* NewController)
@@ -66,6 +63,7 @@ void AAuraCharacter::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 
 	InitAbilityActorInfo();
+	InitWidgetComponent();
 
 	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
 	{
@@ -73,11 +71,6 @@ void AAuraCharacter::OnRep_PlayerState()
 		{
 			AuraHUD->ShowSceneWidget();
 		}
-	}
-
-	if (UAuraUserWidget* HealthBarWidget = Cast<UAuraUserWidget>(HealthBarWidgetComponent->GetWidget()))
-	{
-		HealthBarWidget->TryInit(AbilitySystemComponent);
 	}
 }
 
