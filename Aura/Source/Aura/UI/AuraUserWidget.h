@@ -19,9 +19,12 @@ class UAuraUserWidget : public UUserWidget
 public:
 	UAuraUserWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+public:
+	void TryInit(UAbilitySystemComponent* ASC = nullptr);
+	
 protected:
-	virtual void NativeConstruct() override;
-
+	virtual void BindDelegates();
+	
 protected:
 	void BindAttributeChangeGeneralFunction(const TArray<FGameplayTag>& Tags);
 	

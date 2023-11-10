@@ -1,5 +1,8 @@
 ﻿#include "AuraProjectile.h"
 
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
+#include "Aura.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
@@ -16,6 +19,7 @@ AAuraProjectile::AAuraProjectile(const FObjectInitializer& ObjectInitializer)
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("Sphere");
 	SetRootComponent(SphereComponent);
+	SphereComponent->SetCollisionObjectType(ECC_Projectile);
 	SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphereComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SphereComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
@@ -26,6 +30,8 @@ AAuraProjectile::AAuraProjectile(const FObjectInitializer& ObjectInitializer)
 	ProjectileMovementComponent->InitialSpeed = 550.f;
 	ProjectileMovementComponent->MaxSpeed = 550.f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
+
+	LoopingAudioComponent = CreateDefaultSubobject<UAudioComponent>("Audio");
 }
 
 void AAuraProjectile::BeginPlay()
@@ -35,7 +41,11 @@ void AAuraProjectile::BeginPlay()
 	SetLifeSpan(LifeSpan);
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
 
-	LoopingAudioComponent = UGameplayStatics::SpawnSoundAttached(LoopingSound, GetRootComponent());
+	if (LoopingAudioComponent)
+	{
+		LoopingAudioComponent->SetSound(LoopingSound);
+		LoopingAudioComponent->Play();
+	}
 }
 
 void AAuraProjectile::Destroyed()
@@ -44,7 +54,6 @@ void AAuraProjectile::Destroyed()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-		LoopingAudioComponent->Stop();
 	}
 	
 	Super::Destroyed();
@@ -58,10 +67,14 @@ void AAuraProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	
 	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-	LoopingAudioComponent->Stop();
 	
 	if (HasAuthority())
 	{
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(OtherActor))
+		{
+			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+		}
+		
 		Destroy();
 	}
 	else

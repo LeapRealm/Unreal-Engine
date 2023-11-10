@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "GameplayEffectTypes.h"
 
 #include "AuraProjectile.generated.h"
 
@@ -23,7 +24,7 @@ public:
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
-private:
+public:
 	bool bHit = false;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -46,4 +47,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAudioComponent> LoopingAudioComponent;
+
+	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn=true))
+	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 };

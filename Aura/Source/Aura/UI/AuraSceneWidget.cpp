@@ -12,10 +12,10 @@ UAuraSceneWidget::UAuraSceneWidget(const FObjectInitializer& ObjectInitializer)
 	
 }
 
-void UAuraSceneWidget::NativeConstruct()
+void UAuraSceneWidget::BindDelegates()
 {
-	Super::NativeConstruct();
-
+	Super::BindDelegates();
+	
 	BIND_ATTRIBUTE_CHANGE_SEPARATE_FUNCTION(Health);
 	BIND_ATTRIBUTE_CHANGE_SEPARATE_FUNCTION(MaxHealth);
 	BIND_ATTRIBUTE_CHANGE_SEPARATE_FUNCTION(Mana);

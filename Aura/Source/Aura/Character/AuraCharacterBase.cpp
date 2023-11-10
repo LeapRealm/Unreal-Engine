@@ -1,9 +1,11 @@
 ﻿#include "AuraCharacterBase.h"
 
 #include "AbilitySystemComponent.h"
+#include "Aura.h"
 #include "GameplayEffectTypes.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraCharacterBase)
 
@@ -13,11 +15,16 @@ AAuraCharacterBase::AAuraCharacterBase(const FObjectInitializer& ObjectInitializ
     PrimaryActorTick.bCanEverTick = false;
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
+	
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	
 	WeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	WeaponMeshComponent->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
 	WeaponMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	HealthBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
+	HealthBarWidgetComponent->SetupAttachment(GetRootComponent());
 }
 
 void AAuraCharacterBase::BeginPlay()

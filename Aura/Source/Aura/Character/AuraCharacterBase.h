@@ -5,6 +5,7 @@
 #include "Interface/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UWidgetComponent;
 class UGameplayAbility;
 class UGameplayEffect;
 class UAttributeSet;
@@ -65,4 +66,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UWidgetComponent> HealthBarWidgetComponent;
 };

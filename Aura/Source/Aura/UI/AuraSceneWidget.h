@@ -26,7 +26,7 @@ public:
 	UAuraSceneWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void BindDelegates() override;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)

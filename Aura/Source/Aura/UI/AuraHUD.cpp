@@ -1,5 +1,6 @@
 ﻿#include "AuraHUD.h"
 
+#include "AbilitySystemGlobals.h"
 #include "AuraSceneWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraHUD)
@@ -18,5 +19,6 @@ void AAuraHUD::ShowSceneWidget()
 	{
 		SceneWidget = CreateWidget<UAuraSceneWidget>(GetWorld(), SceneWidgetClass);
 		SceneWidget->AddToViewport();
+		SceneWidget->TryInit(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwningPawn()));
 	}
 }

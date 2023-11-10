@@ -3,11 +3,13 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
 #include "UI/AuraHUD.h"
+#include "UI/AuraUserWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraCharacter)
 
@@ -41,6 +43,16 @@ AAuraCharacter::AAuraCharacter(const FObjectInitializer& ObjectInitializer)
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 }
 
+void AAuraCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (UAuraUserWidget* HealthBarWidget = Cast<UAuraUserWidget>(HealthBarWidgetComponent->GetWidget()))
+	{
+		HealthBarWidget->TryInit(AbilitySystemComponent);
+	}
+}
+
 void AAuraCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -54,6 +66,19 @@ void AAuraCharacter::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 
 	InitAbilityActorInfo();
+
+	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
+	{
+		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
+		{
+			AuraHUD->ShowSceneWidget();
+		}
+	}
+
+	if (UAuraUserWidget* HealthBarWidget = Cast<UAuraUserWidget>(HealthBarWidgetComponent->GetWidget()))
+	{
+		HealthBarWidget->TryInit(AbilitySystemComponent);
+	}
 }
 
 void AAuraCharacter::InitAbilityActorInfo()
@@ -66,12 +91,4 @@ void AAuraCharacter::InitAbilityActorInfo()
 	
 	AttributeSet = AuraPlayerState->GetAttributeSet();
 	InitDefaultAttributes();
-
-	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
-	{
-		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
-		{
-			AuraHUD->ShowSceneWidget();
-		}
-	}
 }

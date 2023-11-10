@@ -13,16 +13,22 @@ UAuraUserWidget::UAuraUserWidget(const FObjectInitializer& ObjectInitializer)
 	
 }
 
-void UAuraUserWidget::NativeConstruct()
+void UAuraUserWidget::TryInit(UAbilitySystemComponent* ASC)
 {
-	Super::NativeConstruct();
+	if (IsValid(ASC) == false || IsValid(AbilitySystemComponent))
+		return;
 	
-	AbilitySystemComponent = GetOwningPlayerState<AAuraPlayerState>()->GetAbilitySystemComponent();
+	AbilitySystemComponent = ASC;
 	check(AbilitySystemComponent);
 	
 	AttributeSet = Cast<UAuraAttributeSet>(AbilitySystemComponent->GetAttributeSet(UAuraAttributeSet::StaticClass()));
 	check(AttributeSet);
+	
+	BindDelegates();
+}
 
+void UAuraUserWidget::BindDelegates()
+{
 	for (const FGameplayTag& Tag : WatchingAttributeTags)
 	{
 		if (auto AttributeFunc = AttributeSet->TagToAttributeFunc.Find(Tag))
