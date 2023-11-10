@@ -20,6 +20,7 @@ public:
 	UAuraUserWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
+	UFUNCTION(BlueprintCallable)
 	void Init(UAbilitySystemComponent* ASC = nullptr);
 	
 protected:
