@@ -2,8 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
-#include "Camera/CameraComponent.h"
-#include "Components/WidgetComponent.h"
+#include "Camera/CameraComponent.h"   
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/AuraPlayerController.h"

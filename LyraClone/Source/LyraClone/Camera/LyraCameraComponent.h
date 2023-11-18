@@ -22,16 +22,15 @@ public:
 	virtual void GetCameraView(float DeltaTime, FMinimalViewInfo& DesiredView) override;
 
 private:
-	void UpdateCameraMode();
+	void UpdateCameraModes();
 
 public:
 	static ULyraCameraComponent* FindCameraComponent(const AActor* Actor) { return (Actor ? Actor->FindComponentByClass<ULyraCameraComponent>() : nullptr); }
+	AActor* GetTargetActor() const { return GetOwner(); }
 	
 public:
-	// 카메라의 블랜딩 기능을 지원하는 스택
 	UPROPERTY()
 	TObjectPtr<ULyraCameraModeStack> CameraModeStack;
-
-	// 현재 CameraMode를 가져오는 Delegate
+	
 	FLyraCameraModeDelegate DetermineCameraModeDelegate;
 };

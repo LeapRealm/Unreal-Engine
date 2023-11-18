@@ -4,6 +4,8 @@
 #include "Components/PawnComponent.h"
 #include "LyraHeroComponent.generated.h"
 
+struct FInputActionValue;
+struct FLyraMappableConfigPair;
 class ULyraCameraMode;
 
 UCLASS(Blueprintable, meta=(BlueprintSpawnableComponent))
@@ -27,8 +29,16 @@ public:
 	virtual void HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) override;
 
 public:
+	void InitializePlayerInput(UInputComponent* PlayerInputComponent);
+	void Input_Move(const FInputActionValue& InputActionValue);
+	void Input_LookMouse(const FInputActionValue& InputActionValue);
+
+public:
 	TSubclassOf<ULyraCameraMode> DetermineCameraMode() const;
 	
 public:
 	static const FName NAME_ActorFeatureName;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FLyraMappableConfigPair> DefaultInputConfigs;
 };
