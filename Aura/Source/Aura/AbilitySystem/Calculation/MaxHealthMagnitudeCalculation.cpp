@@ -1,10 +1,10 @@
-﻿#include "MaxHealthCalculation.h"
+﻿#include "MaxHealthMagnitudeCalculation.h"
 
 #include "AbilitySystem/AuraAttributeSet.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(MaxHealthCalculation)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(MaxHealthMagnitudeCalculation)
 
-UMaxHealthCalculation::UMaxHealthCalculation(const FObjectInitializer& ObjectInitializer)
+UMaxHealthMagnitudeCalculation::UMaxHealthMagnitudeCalculation(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     VigorCapture.AttributeToCapture = UAuraAttributeSet::GetVigorAttribute();
@@ -18,7 +18,7 @@ UMaxHealthCalculation::UMaxHealthCalculation(const FObjectInitializer& ObjectIni
 	RelevantAttributesToCapture.Add(LevelCapture);
 }
 
-float UMaxHealthCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
+float UMaxHealthMagnitudeCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
 	FAggregatorEvaluateParameters EvaluateParameters;
 	EvaluateParameters.SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();

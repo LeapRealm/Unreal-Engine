@@ -1,10 +1,10 @@
-﻿#include "MaxManaCalculation.h"
+﻿#include "MaxManaMagnitudeCalculation.h"
 
 #include "AbilitySystem/AuraAttributeSet.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(MaxManaCalculation)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(MaxManaMagnitudeCalculation)
 
-UMaxManaCalculation::UMaxManaCalculation(const FObjectInitializer& ObjectInitializer)
+UMaxManaMagnitudeCalculation::UMaxManaMagnitudeCalculation(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	IntelligenceCapture.AttributeToCapture = UAuraAttributeSet::GetIntelligenceAttribute();
@@ -18,7 +18,7 @@ UMaxManaCalculation::UMaxManaCalculation(const FObjectInitializer& ObjectInitial
 	RelevantAttributesToCapture.Add(LevelCapture);
 }
 
-float UMaxManaCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
+float UMaxManaMagnitudeCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
 	FAggregatorEvaluateParameters EvaluateParameters;
 	EvaluateParameters.SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();

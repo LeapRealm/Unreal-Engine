@@ -15,4 +15,7 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
  	static void InitDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, UAbilitySystemComponent* ASC);
+
+	UFUNCTION(BlueprintCallable)
+	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
 };

@@ -56,6 +56,12 @@ void FAuraGameplayTags::AddInitialTags()
 
 	// Event
 	AddTag(Event_Montage_FireBolt,						"Event.Montage.FireBolt",						"Event Montage FireBolt");
+	
+	// Damage
+	AddTag(Damage,										"Damage",										"Damage");
+
+	// Effect
+	AddTag(Effect_HitReact,								"Effect.HitReact",								"Effect HitReact");
 }
 
 void FAuraGameplayTags::AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName, const ANSICHAR* TagComment)

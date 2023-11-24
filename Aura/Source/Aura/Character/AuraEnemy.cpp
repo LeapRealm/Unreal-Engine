@@ -1,10 +1,12 @@
 ﻿#include "AuraEnemy.h"
 
 #include "Aura.h"
+#include "AuraGameplayTags.h"
 #include "AuraSystemLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "UI/AuraUserWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraEnemy)
@@ -29,8 +31,13 @@ void AAuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+	
 	InitAbilityActorInfo();
 	InitWidgetComponent();
+
+	AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Effect_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ThisClass::HitReactTagChanged);
+	UAuraSystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 }
 
 void AAuraEnemy::InitAbilityActorInfo()
@@ -62,4 +69,17 @@ void AAuraEnemy::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	WeaponMeshComponent->SetRenderCustomDepth(false);
+}
+
+void AAuraEnemy::HitReactTagChanged(const FGameplayTag Tag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+}
+
+void AAuraEnemy::Death()
+{
+	SetLifeSpan(LifeSpan);
+	
+	Super::Death();
 }

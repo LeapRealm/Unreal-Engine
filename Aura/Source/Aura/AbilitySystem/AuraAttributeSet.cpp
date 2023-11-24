@@ -5,7 +5,9 @@
 #include "AuraGameplayTags.h"
 #include "GameplayEffectExtension.h"
 #include "GameFramework/Character.h"
+#include "Interface/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/AuraPlayerController.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraAttributeSet)
 
@@ -98,6 +100,32 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	else if (Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		const float LocalIncomingDamage = GetIncomingDamage();
+		SetIncomingDamage(0.f);
+		if (LocalIncomingDamage > 0.f)
+		{
+			const float NewHealth = GetHealth() - LocalIncomingDamage;
+			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+			if (NewHealth <= 0.f)
+			{
+				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Properties.TargetAvatarActor))
+				{
+					CombatInterface->Death();
+				}
+			}
+			else
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FAuraGameplayTags::Get().Effect_HitReact);
+				Properties.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
+
+			ShowFloatingText(Properties, LocalIncomingDamage);
+		}
 	}
 }
 
@@ -216,5 +244,16 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 		OutProps.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
 		OutProps.TargetCharacter = Cast<ACharacter>(OutProps.TargetAvatarActor);
 		OutProps.TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(OutProps.TargetAvatarActor);
+	}
+}
+
+void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Properties, float Damage) const
+{
+	if (Properties.SourceCharacter != Properties.TargetCharacter)
+	{
+		if (AAuraPlayerController* APC = Cast<AAuraPlayerController>(Properties.SourceCharacter->GetController()))
+		{
+			APC->ShowDamageNumber(Damage, Properties.TargetCharacter);
+		}
 	}
 }

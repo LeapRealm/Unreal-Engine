@@ -19,33 +19,46 @@ class AAuraCharacterBase : public ACharacter, public IAbilitySystemInterface, pu
 public:
 	AAuraCharacterBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-protected:
+public:
 	virtual void BeginPlay() override;
 
-protected:
+public:
 	virtual void InitAbilityActorInfo();
 	virtual void InitDefaultAttributes() const;
 	void InitWidgetComponent();
 
 public:
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
+
+	virtual void Death() override;
+
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void Multicast_Death();
 	
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const { return AbilitySystemComponent; }
 	virtual UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	virtual FVector GetCombatSocketLocation() override;
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	
-protected:
+public:
 	void AddStartupAbilities();
+	void Dissolve();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
 	
-protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartWeaponDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
+	
+public:
 	UPROPERTY(EditAnywhere, Category="Asset|Ability")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 
 	UPROPERTY(EditAnywhere, Category="Asset|Combat")
 	FName WeaponCombatSocketName;
 	
-protected:
+public:
 	UPROPERTY(VisibleAnywhere, Category="Component")
 	TObjectPtr<USkeletalMeshComponent> WeaponMeshComponent;
 
@@ -55,7 +68,17 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAttributeSet> AttributeSet;
 
-protected:
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBarWidgetComponent;
+
+public:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> HitReactMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
 };

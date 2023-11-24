@@ -56,4 +56,10 @@ public:
 
 	// Event
 	FGameplayTag Event_Montage_FireBolt;
+
+	// Damage
+	FGameplayTag Damage;
+
+	// Effect
+	FGameplayTag Effect_HitReact;
 };
