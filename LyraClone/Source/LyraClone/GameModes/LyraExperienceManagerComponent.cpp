@@ -90,13 +90,10 @@ void ULyraExperienceManagerComponent::StartExperienceLoad()
 			OnAssetsLoadedDelegate.ExecuteIfBound();
 		}));
 	}
-
-	static int32 StartExperienceLoad_FrameNumber = GFrameNumber;
 }
 
 void ULyraExperienceManagerComponent::OnExperienceLoadComplete()
 {
-	static int32 OnExperienceLoadComplete_FrameNumber = GFrameNumber;
 	OnExperienceFullLoadCompleted();
 }
 

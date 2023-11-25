@@ -4,7 +4,6 @@
 
 class ULyraCameraComponent;
 
-// [0~1]을 BlendFunction에 맞게 재매핑하기 위한 타입
 UENUM(BlueprintType)
 enum class ELyraCameraModeBlendFunction : uint8
 {
@@ -47,7 +46,6 @@ public:
 	ULyraCameraComponent* GetLyraCameraComponent() const;
 
 public:
-	// CameraMode에 의해 생성된 CameraModeView
 	FLyraCameraModeView View;
 
 	UPROPERTY(EditDefaultsOnly, Category="View", meta=(UIMin="5.0", UIMax="170", ClampMin="5.0", ClampMax="170.0"))
@@ -61,15 +59,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="Blending")
 	float BlendTime;
-
-	// 선형적인 Blend 값 [0~1]
+	
 	float BlendAlpha;
-
-	// 해당 CameraMode의 최종 Blend 값
-	// BlendAlpha의 선형 값을 매핑하여 최종 BlendWeight를 계산
 	float BlendWeight;
-
-	// EaseIn/Out에 사용할 Exponent
+	
 	UPROPERTY(EditDefaultsOnly, Category="Blending")
 	float BlendExponent;
 

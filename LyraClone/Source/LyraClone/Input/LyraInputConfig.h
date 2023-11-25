@@ -5,7 +5,6 @@
 
 class UInputAction;
 
-// GameplayTag와 InputAction을 연결하는 레퍼 구조체
 USTRUCT(BlueprintType)
 struct FLyraInputAction
 {
@@ -19,7 +18,6 @@ public:
 	FGameplayTag InputTag;
 };
 
-// 활성화 가능한 InputAction들을 가지고 있는 클래스
 UCLASS(BlueprintType)
 class ULyraInputConfig : public UDataAsset
 {

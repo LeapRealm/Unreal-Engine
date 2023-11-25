@@ -38,8 +38,7 @@ template <class UserClass, typename PressedFuncType, typename ReleasedFuncType>
 void ULyraInputComponent::BindAbilityActions(const ULyraInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, TArray<uint32>& BindHandles)
 {
 	check(InputConfig);
-
-	// AbilityAction에 대해서는 TriggerEvent가 같다면 같은 함수에 모두 바인딩 시킵니다.
+	
 	for (const FLyraInputAction& Action : InputConfig->AbilityInputActions)
 	{
 		if (Action.InputAction && Action.InputTag.IsValid())
