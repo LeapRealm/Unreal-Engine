@@ -2,6 +2,7 @@
 
 #include "LyraExperienceDefinition.h"
 #include "LyraExperienceManagerComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "LyraClone/GameModes/LyraGameState.h"
 #include "LyraClone/Player/LyraPlayerController.h"
 #include "LyraClone/Player/LyraPlayerState.h"
@@ -86,6 +87,14 @@ UClass* ALyraGameMode::GetDefaultPawnClassForController_Implementation(AControll
 void ALyraGameMode::HandleMatchAssignmentIfNotExpectingOne()
 {
 	FPrimaryAssetId ExperienceId;
+
+	if (ExperienceId.IsValid() == false && UGameplayStatics::HasOption(OptionsString, TEXT("Experience")))
+	{
+		// Experience의 Value를 가져와서 PrimaryAssetId를 생성합니다.
+		const FString ExperienceFromOptions = UGameplayStatics::ParseOption(OptionsString, TEXT("Experience"));
+		ExperienceId = FPrimaryAssetId(FPrimaryAssetType(ULyraExperienceDefinition::StaticClass()->GetFName()), FName(*ExperienceFromOptions));
+	}
+	
 	if (ExperienceId.IsValid() == false)
 	{
 		ExperienceId = FPrimaryAssetId(FPrimaryAssetType("LyraExperienceDefinition"), FName("B_LyraDefaultExperience"));
