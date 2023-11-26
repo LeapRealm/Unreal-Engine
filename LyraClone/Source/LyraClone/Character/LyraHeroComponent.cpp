@@ -14,6 +14,7 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraHeroComponent)
 
 const FName ULyraHeroComponent::NAME_ActorFeatureName("Hero");
+const FName ULyraHeroComponent::NAME_BindInputsNow("BindInputsNow");
 
 ULyraHeroComponent::ULyraHeroComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -195,6 +196,8 @@ void ULyraHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompo
 			}
 		}
 	}
+
+	UGameFrameworkComponentManager::SendGameFrameworkComponentExtensionEvent(const_cast<APawn*>(Pawn), NAME_BindInputsNow);
 }
 
 void ULyraHeroComponent::Input_Move(const FInputActionValue& InputActionValue)

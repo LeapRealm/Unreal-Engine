@@ -38,6 +38,7 @@ public:
 	
 public:
 	static const FName NAME_ActorFeatureName;
+	static const FName NAME_BindInputsNow;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FLyraMappableConfigPair> DefaultInputConfigs;
