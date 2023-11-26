@@ -1,6 +1,9 @@
 ﻿#include "LyraExperienceManagerComponent.h"
 
+#include "GameFeatureAction.h"
+#include "GameFeaturesSubsystem.h"
 #include "GameFeaturesSubsystemSettings.h"
+#include "LyraExperienceActionSet.h"
 #include "LyraExperienceDefinition.h"
 #include "LyraClone/System/LyraAssetManager.h"
 
@@ -94,15 +97,97 @@ void ULyraExperienceManagerComponent::StartExperienceLoad()
 
 void ULyraExperienceManagerComponent::OnExperienceLoadComplete()
 {
-	OnExperienceFullLoadCompleted();
+	check(LoadState == ELyraExperienceLoadState::Loading);
+	check(CurrentExperience);
+
+	// 이전에 활성화시킨 GameFeature Plugin들의 URL을 클리어해줍니다.
+	GameFeaturePluginURLs.Reset();
+
+	auto CollectGameFeaturePluginURLs = [This = this](const UPrimaryDataAsset* Context, const TArray<FString>& FeaturePluginList)
+	{
+		// FeaturePluginList를 순회하면서 PluginURL을 ExperienceManagerComponent의 GameFeaturePluginURLs에 추가해줍니다.
+		for (const FString& PluginName : FeaturePluginList)
+		{
+			FString PluginURL;
+			if (UGameFeaturesSubsystem::Get().GetPluginURLByName(PluginName, PluginURL))
+			{
+				This->GameFeaturePluginURLs.AddUnique(PluginURL);
+			}
+		}
+	};
+
+	// CurrentExperience의 GameFeaturesToEnable에 있는 Plugin만 활성화할 GameFeature Plugin 후보군으로 등록합니다.
+	CollectGameFeaturePluginURLs(CurrentExperience, CurrentExperience->GameFeaturesToEnable);
+
+	// GameFeaturePluginURLs에 등록된 Plugin을 로딩 및 활성화합니다.
+	NumGameFeaturePluginsLoading = GameFeaturePluginURLs.Num();
+	if (NumGameFeaturePluginsLoading)
+	{
+		LoadState = ELyraExperienceLoadState::LoadingGameFeatures;
+		for (const FString& PluginURL : GameFeaturePluginURLs)
+		{
+			// Plugin을 로딩 및 활성화시키고, 완료된 이후 실행될 콜백 함수를 등록합니다.
+			UGameFeaturesSubsystem::Get().LoadAndActivateGameFeaturePlugin(PluginURL, FGameFeaturePluginLoadComplete::CreateUObject(this, &ThisClass::OnGameFeaturePluginLoadComplete));
+		}
+	}
+	else
+	{
+		OnExperienceFullLoadCompleted();
+	}
+}
+
+void ULyraExperienceManagerComponent::OnGameFeaturePluginLoadComplete(const UE::GameFeatures::FResult& Result)
+{
+	// GameFeature Plugin이 로딩 될 때마다 이 함수가 콜백으로 불립니다.
+	NumGameFeaturePluginsLoading--;
+	if (NumGameFeaturePluginsLoading == 0)
+	{
+		// GameFeature Plugin 로딩이 다 끝났을 경우, OnExperienceFullLoadCompleted를 호출합니다.
+		OnExperienceFullLoadCompleted();
+	}
 }
 
 void ULyraExperienceManagerComponent::OnExperienceFullLoadCompleted()
 {
 	check(LoadState != ELyraExperienceLoadState::Loaded);
 
+	// GameFeature Plugin의 로딩과 활성화 이후에 GameFeature Action들을 활성화시킵니다.
+	LoadState = ELyraExperienceLoadState::ExecutingActions;
+
+	// GameFeatureAction 활성화를 위한 Context를 준비합니다.
+	FGameFeatureActivatingContext Context;
+
+	// 월드의 핸들을 세팅해줍니다.
+	const FWorldContext* ExistingWorldContext = GEngine->GetWorldContextFromWorld(GetWorld());
+	if (ExistingWorldContext)
+	{
+		Context.SetRequiredWorldContextHandle(ExistingWorldContext->ContextHandle);
+	}
+
+	auto ActivateListOfActions = [&Context](const TArray<UGameFeatureAction*>& ActionList)
+	{
+		for (UGameFeatureAction* Action : ActionList)
+		{
+			// 명시적으로 GameFeatureAction에 대해 Registering -> Loading -> Activating 순으로 호출합니다.
+			if (Action)
+			{
+				Action->OnGameFeatureRegistering();
+				Action->OnGameFeatureLoading();
+				Action->OnGameFeatureActivating(Context);
+			}
+		}
+	};
+
+	// 1. Experience의 Actions
+	ActivateListOfActions(CurrentExperience->Actions);
+
+	// 2. Experience의 ActionSets
+	for (const TObjectPtr<ULyraExperienceActionSet>& ActionSet : CurrentExperience->ActionSets)
+	{
+		ActivateListOfActions(ActionSet->Actions);
+	}
+
 	LoadState = ELyraExperienceLoadState::Loaded;
-	
 	OnExperienceLoaded.Broadcast(CurrentExperience);
 	OnExperienceLoaded.Clear();
 }
