@@ -33,7 +33,7 @@ UAuraAttributeSet::UAuraAttributeSet(const FObjectInitializer& ObjectInitializer
 	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_Armor,					GetArmorAttribute);
 	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_ArmorPenetration,		GetArmorPenetrationAttribute);
 	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_BlockChance,			GetBlockChanceAttribute);
-	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_CriticalHitChange,		GetCriticalHitChangeAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_CriticalHitChance,		GetCriticalHitChanceAttribute);
 	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_CriticalHitDamage,		GetCriticalHitDamageAttribute);
 	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_CriticalHitResistance,	GetCriticalHitResistanceAttribute);
 	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_HealthRegeneration,		GetHealthRegenerationAttribute);
@@ -63,7 +63,7 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Armor,					COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, ArmorPenetration,			COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BlockChance,				COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, CriticalHitChange,		COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, CriticalHitChance,		COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, CriticalHitDamage,		COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, CriticalHitResistance,	COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, HealthRegeneration,		COND_None, REPNOTIFY_Always);
@@ -179,9 +179,9 @@ void UAuraAttributeSet::OnRep_BlockChance(const FGameplayAttributeData& OldValue
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BlockChance, OldValue);
 }
 
-void UAuraAttributeSet::OnRep_CriticalHitChange(const FGameplayAttributeData& OldValue) const
+void UAuraAttributeSet::OnRep_CriticalHitChance(const FGameplayAttributeData& OldValue) const
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, CriticalHitChange, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, CriticalHitChance, OldValue);
 }
 
 void UAuraAttributeSet::OnRep_CriticalHitDamage(const FGameplayAttributeData& OldValue) const

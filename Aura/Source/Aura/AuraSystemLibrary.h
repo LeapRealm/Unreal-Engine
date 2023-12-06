@@ -18,4 +18,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
+
+	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContextObject);
 };

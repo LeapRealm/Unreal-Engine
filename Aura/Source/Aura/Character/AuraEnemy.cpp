@@ -37,7 +37,9 @@ void AAuraEnemy::BeginPlay()
 	InitWidgetComponent();
 
 	AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Effect_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ThisClass::HitReactTagChanged);
-	UAuraSystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+
+	if (HasAuthority())
+		UAuraSystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 }
 
 void AAuraEnemy::InitAbilityActorInfo()
@@ -46,7 +48,9 @@ void AAuraEnemy::InitAbilityActorInfo()
 	
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->BindEffectAppliedDelegate();
-	InitDefaultAttributes();
+
+	if (HasAuthority())
+		InitDefaultAttributes();
 }
 
 void AAuraEnemy::InitDefaultAttributes() const

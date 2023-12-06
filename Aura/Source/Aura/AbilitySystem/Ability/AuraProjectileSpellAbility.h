@@ -1,18 +1,18 @@
 ﻿#pragma once
 
 #include "AuraGameplayAbility.h"
-#include "AuraProjectileSpell.generated.h"
+#include "AuraProjectileSpellAbility.generated.h"
 
 class UGameplayEffect;
 class AAuraProjectile;
 
 UCLASS()
-class UAuraProjectileSpell : public UAuraGameplayAbility
+class UAuraProjectileSpellAbility : public UAuraGameplayAbility
 {
 	GENERATED_BODY()
 	
 public:
-	UAuraProjectileSpell(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAuraProjectileSpellAbility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	UFUNCTION(BlueprintCallable)

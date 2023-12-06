@@ -49,4 +49,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UCurveTable> DamageCalculationCoefficients;
 };

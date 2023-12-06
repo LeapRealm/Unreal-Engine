@@ -32,7 +32,7 @@ void FAuraGameplayTags::AddInitialTags()
 	AddTag(Attribute_Secondary_Armor,					"Attribute.Secondary.Armor",					"Attribute Secondary Armor");
 	AddTag(Attribute_Secondary_ArmorPenetration,			"Attribute.Secondary.ArmorPenetration",			"Attribute Secondary ArmorPenetration");
 	AddTag(Attribute_Secondary_BlockChance,				"Attribute.Secondary.BlockChance",				"Attribute Secondary BlockChance");
-	AddTag(Attribute_Secondary_CriticalHitChange,		"Attribute.Secondary.CriticalHitChange",		"Attribute Secondary CriticalHitChange");
+	AddTag(Attribute_Secondary_CriticalHitChance,		"Attribute.Secondary.CriticalHitChance",		"Attribute Secondary CriticalHitChance");
 	AddTag(Attribute_Secondary_CriticalHitDamage,		"Attribute.Secondary.CriticalHitDamage",		"Attribute Secondary CriticalHitDamage");
 	AddTag(Attribute_Secondary_CriticalHitResistance,	"Attribute.Secondary.CriticalHitResistance",	"Attribute Secondary CriticalHitResistance");
 	AddTag(Attribute_Secondary_HealthRegeneration,		"Attribute.Secondary.HealthRegeneration",		"Attribute Secondary HealthRegeneration");

@@ -98,7 +98,7 @@ private:
 	void OnRep_BlockChance(const FGameplayAttributeData& OldValue) const;
 	
 	UFUNCTION()
-	void OnRep_CriticalHitChange(const FGameplayAttributeData& OldValue) const;
+	void OnRep_CriticalHitChance(const FGameplayAttributeData& OldValue) const;
 	
 	UFUNCTION()
 	void OnRep_CriticalHitDamage(const FGameplayAttributeData& OldValue) const;
@@ -171,9 +171,9 @@ public:
 	FGameplayAttributeData BlockChance;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, BlockChance);
 	
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_CriticalHitChange, Category="Attributes|Secondary")
-	FGameplayAttributeData CriticalHitChange;
-	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, CriticalHitChange);
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_CriticalHitChance, Category="Attributes|Secondary")
+	FGameplayAttributeData CriticalHitChance;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, CriticalHitChance);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_CriticalHitDamage, Category="Attributes|Secondary")
 	FGameplayAttributeData CriticalHitDamage;

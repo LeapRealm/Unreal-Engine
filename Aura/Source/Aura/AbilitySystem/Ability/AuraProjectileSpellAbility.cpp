@@ -1,4 +1,4 @@
-﻿#include "AuraProjectileSpell.h"
+﻿#include "AuraProjectileSpellAbility.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
@@ -6,15 +6,15 @@
 #include "Actor/AuraProjectile.h"
 #include "Interface/CombatInterface.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(AuraProjectileSpell)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(AuraProjectileSpellAbility)
 
-UAuraProjectileSpell::UAuraProjectileSpell(const FObjectInitializer& ObjectInitializer)
+UAuraProjectileSpellAbility::UAuraProjectileSpellAbility(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation)
+void UAuraProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileTargetLocation)
 {
 	if (GetAvatarActorFromActorInfo()->HasAuthority() == false)
 		return;
@@ -36,7 +36,18 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		);
 
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetAvatarActorFromActorInfo());
-		const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+
+		FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
+		EffectContextHandle.SetAbility(this);
+		EffectContextHandle.AddSourceObject(Projectile);
+		TArray<TWeakObjectPtr<AActor>> Actors;
+		Actors.Add(Projectile);
+		EffectContextHandle.AddActors(Actors);
+		FHitResult HitResult;
+		HitResult.Location = ProjectileTargetLocation;
+		EffectContextHandle.AddHitResult(HitResult);
+		
+		const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
 
 		const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
 		// const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
