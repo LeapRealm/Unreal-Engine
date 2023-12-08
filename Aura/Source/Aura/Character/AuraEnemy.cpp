@@ -2,7 +2,7 @@
 
 #include "Aura.h"
 #include "AuraGameplayTags.h"
-#include "AuraSystemLibrary.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "Components/CapsuleComponent.h"
@@ -39,7 +39,7 @@ void AAuraEnemy::BeginPlay()
 	AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Effect_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ThisClass::HitReactTagChanged);
 
 	if (HasAuthority())
-		UAuraSystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+		UAuraAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 }
 
 void AAuraEnemy::InitAbilityActorInfo()
@@ -57,7 +57,7 @@ void AAuraEnemy::InitDefaultAttributes() const
 {
 	Super::InitDefaultAttributes();
 	
-	UAuraSystemLibrary::InitDefaultAttributes(this, CharacterClass, AbilitySystemComponent);
+	UAuraAbilitySystemLibrary::InitDefaultAttributes(this, CharacterClass, AbilitySystemComponent);
 }
 
 void AAuraEnemy::HighlightActor()

@@ -13,5 +13,5 @@ public:
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void SetDamageText(float Damage);
+	void SetDamageText(float Damage, bool bIsBlockedHit, bool bIsCriticalHit);
 };

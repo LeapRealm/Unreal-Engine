@@ -40,6 +40,12 @@ void FAuraGameplayTags::AddInitialTags()
 	AddTag(Attribute_Secondary_MaxHealth,				"Attribute.Secondary.MaxHealth",				"Attribute Secondary MaxHealth");
 	AddTag(Attribute_Secondary_MaxMana,					"Attribute.Secondary.MaxMana",					"Attribute Secondary MaxMana");
 
+	// Resistance
+	AddTag(Attribute_Resistance_Fire,					"Attribute.Resistance.Fire",					"Attribute Resistance Fire");
+	AddTag(Attribute_Resistance_Lightning,				"Attribute.Resistance.Lightning",				"Attribute Resistance Lightning");
+	AddTag(Attribute_Resistance_Arcane,					"Attribute.Resistance.Arcane",					"Attribute Resistance Arcane");
+	AddTag(Attribute_Resistance_Physical,				"Attribute.Resistance.Physical",				"Attribute Resistance Physical");
+	
 	// Message
 	AddTag(Message_HealthCrystal,						"Message.HealthCrystal",						"Message HealthCrystal");
 	AddTag(Message_HealthPotion,							"Message.HealthPotion",							"Message HealthPotion");
@@ -59,9 +65,19 @@ void FAuraGameplayTags::AddInitialTags()
 	
 	// Damage
 	AddTag(Damage,										"Damage",										"Damage");
-
+	AddTag(Damage_Fire,									"Damage.Fire",									"Damage Fire");
+	AddTag(Damage_Lightning,								"Damage.Lightning",								"Damage Lightning");
+	AddTag(Damage_Arcane,								"Damage.Arcane",								"Damage Arcane");
+	AddTag(Damage_Physical,								"Damage.Physical",								"Damage Physical");
+	
 	// Effect
 	AddTag(Effect_HitReact,								"Effect.HitReact",								"Effect HitReact");
+
+	// Map of DamageType to Resistance
+	DamageTypeToResistance.Add(Damage_Fire,			Attribute_Resistance_Fire);
+	DamageTypeToResistance.Add(Damage_Lightning,	Attribute_Resistance_Lightning);
+	DamageTypeToResistance.Add(Damage_Arcane,		Attribute_Resistance_Arcane);
+	DamageTypeToResistance.Add(Damage_Physical,		Attribute_Resistance_Physical);
 }
 
 void FAuraGameplayTags::AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName, const ANSICHAR* TagComment)

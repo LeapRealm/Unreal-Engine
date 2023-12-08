@@ -40,6 +40,12 @@ public:
 	FGameplayTag Attribute_Secondary_MaxHealth;
 	FGameplayTag Attribute_Secondary_MaxMana;
 
+	// Resistance
+	FGameplayTag Attribute_Resistance_Fire;
+	FGameplayTag Attribute_Resistance_Lightning;
+	FGameplayTag Attribute_Resistance_Arcane;
+	FGameplayTag Attribute_Resistance_Physical;
+	
 	// Message
 	FGameplayTag Message_HealthCrystal;
 	FGameplayTag Message_HealthPotion;
@@ -59,6 +65,12 @@ public:
 
 	// Damage
 	FGameplayTag Damage;
+	FGameplayTag Damage_Fire;
+	FGameplayTag Damage_Lightning;
+	FGameplayTag Damage_Arcane;
+	FGameplayTag Damage_Physical;
+
+	TMap<FGameplayTag, FGameplayTag> DamageTypeToResistance;
 
 	// Effect
 	FGameplayTag Effect_HitReact;

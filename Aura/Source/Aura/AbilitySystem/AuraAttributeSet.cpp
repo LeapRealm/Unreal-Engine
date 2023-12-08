@@ -2,6 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+#include "AuraAbilitySystemLibrary.h"
 #include "AuraGameplayTags.h"
 #include "GameplayEffectExtension.h"
 #include "GameFramework/Character.h"
@@ -40,6 +41,12 @@ UAuraAttributeSet::UAuraAttributeSet(const FObjectInitializer& ObjectInitializer
 	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_ManaRegeneration,		GetManaRegenerationAttribute);
 	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_MaxHealth,				GetMaxHealthAttribute);
 	TagToAttributeFunc.Add(GameplayTags.Attribute_Secondary_MaxMana,				GetMaxManaAttribute);
+
+	// Resistance
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Resistance_Fire,					GetFireResistanceAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Resistance_Lightning,				GetLightningResistanceAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Resistance_Arcane,				GetArcaneResistanceAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Resistance_Physical,				GetPhysicalResistanceAttribute);
 }
 
 void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -70,6 +77,12 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, ManaRegeneration,			COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxHealth,				COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxMana,					COND_None, REPNOTIFY_Always);
+
+	// Resistance
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, FireResistance,			COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, LightningResistance,		COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, ArcaneResistance,			COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, PhysicalResistance,		COND_None, REPNOTIFY_Always);
 }
 
 void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -124,7 +137,53 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				Properties.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
 
-			ShowFloatingText(Properties, LocalIncomingDamage);
+			const bool bIsBlockedHit = UAuraAbilitySystemLibrary::IsBlockedHit(Properties.EffectContextHandle);
+			const bool bIsCriticalHit = UAuraAbilitySystemLibrary::IsCriticalHit(Properties.EffectContextHandle);
+			ShowFloatingText(Properties, LocalIncomingDamage, bIsBlockedHit, bIsCriticalHit);
+		}
+	}
+}
+
+void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& OutProps) const
+{
+	OutProps.EffectContextHandle = Data.EffectSpec.GetContext();
+	OutProps.SourceASC = OutProps.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+
+	if (IsValid(OutProps.SourceASC) && OutProps.SourceASC->AbilityActorInfo.IsValid() && OutProps.SourceASC->AbilityActorInfo->AvatarActor.IsValid())
+	{
+		OutProps.SourceAvatarActor = OutProps.SourceASC->AbilityActorInfo->AvatarActor.Get();
+		OutProps.SourceController = OutProps.SourceASC->AbilityActorInfo->PlayerController.Get();
+
+		if (OutProps.SourceController == nullptr && OutProps.SourceAvatarActor != nullptr)
+		{
+			if (const APawn* Pawn = Cast<APawn>(OutProps.SourceAvatarActor))
+			{
+				OutProps.SourceController = Pawn->GetController();
+			}
+		}
+
+		if (OutProps.SourceController)
+		{
+			OutProps.SourceCharacter = Cast<ACharacter>(OutProps.SourceController->GetPawn());
+		}
+	}
+
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	{
+		OutProps.TargetAvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		OutProps.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		OutProps.TargetCharacter = Cast<ACharacter>(OutProps.TargetAvatarActor);
+		OutProps.TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(OutProps.TargetAvatarActor);
+	}
+}
+
+void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Properties, float Damage, bool bIsBlockedHit, bool bIsCriticalHit) const
+{
+	if (Properties.SourceCharacter != Properties.TargetCharacter)
+	{
+		if (AAuraPlayerController* APC = Cast<AAuraPlayerController>(Properties.SourceCharacter->GetController()))
+		{
+			APC->ShowDamageNumber(Damage, Properties.TargetCharacter, bIsBlockedHit, bIsCriticalHit);
 		}
 	}
 }
@@ -214,46 +273,22 @@ void UAuraAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue) co
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MaxMana, OldValue);
 }
 
-void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& OutProps) const
+void UAuraAttributeSet::OnRep_FireResistance(const FGameplayAttributeData& OldValue) const
 {
-	OutProps.EffectContextHandle = Data.EffectSpec.GetContext();
-	OutProps.SourceASC = OutProps.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
-
-	if (IsValid(OutProps.SourceASC) && OutProps.SourceASC->AbilityActorInfo.IsValid() && OutProps.SourceASC->AbilityActorInfo->AvatarActor.IsValid())
-	{
-		OutProps.SourceAvatarActor = OutProps.SourceASC->AbilityActorInfo->AvatarActor.Get();
-		OutProps.SourceController = OutProps.SourceASC->AbilityActorInfo->PlayerController.Get();
-
-		if (OutProps.SourceController == nullptr && OutProps.SourceAvatarActor != nullptr)
-		{
-			if (const APawn* Pawn = Cast<APawn>(OutProps.SourceAvatarActor))
-			{
-				OutProps.SourceController = Pawn->GetController();
-			}
-		}
-
-		if (OutProps.SourceController)
-		{
-			OutProps.SourceCharacter = Cast<ACharacter>(OutProps.SourceController->GetPawn());
-		}
-	}
-
-	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
-	{
-		OutProps.TargetAvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
-		OutProps.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
-		OutProps.TargetCharacter = Cast<ACharacter>(OutProps.TargetAvatarActor);
-		OutProps.TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(OutProps.TargetAvatarActor);
-	}
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, FireResistance, OldValue);
 }
 
-void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Properties, float Damage) const
+void UAuraAttributeSet::OnRep_LightningResistance(const FGameplayAttributeData& OldValue) const
 {
-	if (Properties.SourceCharacter != Properties.TargetCharacter)
-	{
-		if (AAuraPlayerController* APC = Cast<AAuraPlayerController>(Properties.SourceCharacter->GetController()))
-		{
-			APC->ShowDamageNumber(Damage, Properties.TargetCharacter);
-		}
-	}
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, LightningResistance, OldValue);
+}
+
+void UAuraAttributeSet::OnRep_ArcaneResistance(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, ArcaneResistance, OldValue);
+}
+
+void UAuraAttributeSet::OnRep_PhysicalResistance(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, PhysicalResistance, OldValue);
 }

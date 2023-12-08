@@ -23,5 +23,9 @@ UAuraAttributeWidget::UAuraAttributeWidget(const FObjectInitializer& ObjectIniti
 		GameplayTags.Attribute_Secondary_ManaRegeneration,
 		GameplayTags.Attribute_Secondary_MaxHealth,
 		GameplayTags.Attribute_Secondary_MaxMana,
+		GameplayTags.Attribute_Resistance_Fire,
+		GameplayTags.Attribute_Resistance_Lightning,
+		GameplayTags.Attribute_Resistance_Arcane,
+		GameplayTags.Attribute_Resistance_Physical,
     });
 }

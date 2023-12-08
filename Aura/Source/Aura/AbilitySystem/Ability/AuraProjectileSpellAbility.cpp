@@ -2,7 +2,6 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
-#include "AuraGameplayTags.h"
 #include "Actor/AuraProjectile.h"
 #include "Interface/CombatInterface.h"
 
@@ -48,14 +47,13 @@ void UAuraProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileTarge
 		EffectContextHandle.AddHitResult(HitResult);
 		
 		const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
+		for (auto& Pair : DamageTypes)
+		{
+			const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
+			EffectSpecHandle.Data->SetSetByCallerMagnitude(Pair.Key, ScaledDamage);
+		}
 
-		const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
-		// const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
-		const float ScaledDamage = Damage.GetValueAtLevel(10);
-
-		EffectSpecHandle.Data->SetSetByCallerMagnitude(GameplayTags.Damage, ScaledDamage);
 		Projectile->DamageEffectSpecHandle = EffectSpecHandle;
-
 		Projectile->FinishSpawning(SpawnTransform);
 	}
 }
