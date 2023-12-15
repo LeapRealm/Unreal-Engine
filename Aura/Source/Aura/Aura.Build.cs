@@ -21,6 +21,7 @@ public class Aura : ModuleRules
 			"GameplayTasks",
 			"NavigationSystem",
 			"Niagara",
+			"AIModule",
 		});
 		
 		PrivateIncludePaths.AddRange(new string[]

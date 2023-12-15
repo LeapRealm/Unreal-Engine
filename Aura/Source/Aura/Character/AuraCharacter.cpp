@@ -63,14 +63,6 @@ void AAuraCharacter::OnRep_PlayerState()
 
 	InitAbilityActorInfo();
 	InitWidgetComponent();
-
-	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
-	{
-		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
-		{
-			AuraHUD->ShowSceneWidget();
-		}
-	}
 }
 
 void AAuraCharacter::InitAbilityActorInfo()
@@ -83,6 +75,14 @@ void AAuraCharacter::InitAbilityActorInfo()
 	
 	AttributeSet = AuraPlayerState->GetAttributeSet();
 	InitDefaultAttributes();
+
+	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
+	{
+		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
+		{
+			AuraHUD->ShowSceneWidget();
+		}
+	}
 }
 
 void AAuraCharacter::InitDefaultAttributes() const

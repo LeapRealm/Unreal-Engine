@@ -6,7 +6,7 @@ class UDamageTextComponent;
 class USplineComponent;
 class UAuraAbilitySystemComponent;
 struct FGameplayTag;
-class IHighlightInterface;
+class IEnemyInterface;
 class UInputAction;
 class UInputMappingContext;
 class UAuraInputConfig;
@@ -58,8 +58,8 @@ private:
 	TObjectPtr<UAuraInputConfig> InputConfig;
 	
 private:
-	IHighlightInterface* LastHighlightedActor = nullptr;
-	IHighlightInterface* CurrHighlightedActor = nullptr;
+	IEnemyInterface* LastHighlightedActor = nullptr;
+	IEnemyInterface* CurrHighlightedActor = nullptr;
 
 private:
 	UPROPERTY(VisibleAnywhere)

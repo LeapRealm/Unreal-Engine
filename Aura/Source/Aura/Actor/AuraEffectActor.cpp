@@ -33,6 +33,9 @@ void AAuraEffectActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, 
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	check(InstantGameplayEffectClass);	
+
+	if (OtherActor->ActorHasTag(FName("Enemy")) && bApplyEffectToEnemy == false)
+		return;
 	
 	if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(OtherActor))
 	{
@@ -56,6 +59,9 @@ void AAuraEffectActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, 
 
 void AAuraEffectActor::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if (OtherActor->ActorHasTag(FName("Enemy")) && bApplyEffectToEnemy == false)
+		return;
+	
 	if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(OtherActor))
 	{
 		FActiveGameplayEffectHandle* ActiveEffectHandle = ActiveEffectHandles.Find(TargetASC);

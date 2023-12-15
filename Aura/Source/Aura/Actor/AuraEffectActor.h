@@ -36,6 +36,9 @@ protected:
 	bool bCancelEffectWhenEndOverlap = false;
 
 	UPROPERTY(EditAnywhere, Category="Effect")
+	bool bApplyEffectToEnemy = false;
+
+	UPROPERTY(EditAnywhere, Category="Effect")
 	float Level = 1.f;
 	
 	UPROPERTY()

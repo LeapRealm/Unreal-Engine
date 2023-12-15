@@ -10,7 +10,7 @@
 #include "Components/SplineComponent.h"
 #include "GameFramework/Character.h"
 #include "Input/AuraInputComponent.h"
-#include "Interface/HighlightInterface.h"
+#include "..\Interface\EnemyInterface.h"
 #include "UI/DamageTextComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraPlayerController)
@@ -81,7 +81,7 @@ void AAuraPlayerController::CursorTrace()
 		return;
 
 	LastHighlightedActor = CurrHighlightedActor;
-	CurrHighlightedActor = Cast<IHighlightInterface>(CursorHit.GetActor());
+	CurrHighlightedActor = Cast<IEnemyInterface>(CursorHit.GetActor());
 
 	if (LastHighlightedActor != CurrHighlightedActor)
 	{

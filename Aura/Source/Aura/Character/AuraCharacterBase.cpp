@@ -26,6 +26,8 @@ AAuraCharacterBase::AAuraCharacterBase(const FObjectInitializer& ObjectInitializ
 
 	HealthBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
 	HealthBarWidgetComponent->SetupAttachment(GetRootComponent());
+
+	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 }
 
 void AAuraCharacterBase::BeginPlay()
@@ -83,12 +85,23 @@ void AAuraCharacterBase::Multicast_Death_Implementation()
 
 	HealthBarWidgetComponent->SetVisibility(false);
 	Dissolve();
+	bIsDead = true;
 }
 
-FVector AAuraCharacterBase::GetCombatSocketLocation()
+FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation()
 {
 	check(WeaponMeshComponent);
 	return WeaponMeshComponent->GetSocketLocation(WeaponCombatSocketName);
+}
+
+bool AAuraCharacterBase::IsDead_Implementation() const
+{
+	return bIsDead;
+}
+
+AActor* AAuraCharacterBase::GetAvatar_Implementation()
+{
+	return this;
 }
 
 UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()

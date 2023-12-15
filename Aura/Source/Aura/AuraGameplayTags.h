@@ -12,7 +12,7 @@ public:
 
 private:
 	void AddInitialTags();
-	void AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName, const ANSICHAR* TagComment);
+	void AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName);
 
 public:
 	// Base
@@ -62,6 +62,7 @@ public:
 
 	// Event
 	FGameplayTag Event_Montage_FireBolt;
+	FGameplayTag Event_Montage_Melee;
 
 	// Damage
 	FGameplayTag Damage;
@@ -69,9 +70,17 @@ public:
 	FGameplayTag Damage_Lightning;
 	FGameplayTag Damage_Arcane;
 	FGameplayTag Damage_Physical;
-
+	
 	TMap<FGameplayTag, FGameplayTag> DamageTypeToResistance;
 
 	// Effect
 	FGameplayTag Effect_HitReact;
+
+	// Ability
+	FGameplayTag Ability_Attack;
+
+	// Montage
+	FGameplayTag Montage_Attack_Weapon;
+	FGameplayTag Montage_Attack_RightHand;
+	FGameplayTag Montage_Attack_LeftHand;
 };
