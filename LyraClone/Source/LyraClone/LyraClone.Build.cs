@@ -13,10 +13,11 @@ public class LyraClone : ModuleRules
 			"Engine", 
 			"InputCore",
 			"GameplayTags",
-			"ModularGameplay",
-			"GameFeatures",
 			"EnhancedInput",
 			"CommonUser",
+			"GameFeatures",
+			"ModularGameplay",
+			"ModularGameplayActors",
 		});
 	}
 }

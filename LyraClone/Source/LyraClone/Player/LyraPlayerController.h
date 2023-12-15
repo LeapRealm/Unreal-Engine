@@ -1,9 +1,10 @@
 ﻿#pragma once
 
+#include "ModularPlayerController.h"
 #include "LyraPlayerController.generated.h"
 
 UCLASS()
-class ALyraPlayerController : public APlayerController
+class ALyraPlayerController : public AModularPlayerController
 {
 	GENERATED_BODY()
 	

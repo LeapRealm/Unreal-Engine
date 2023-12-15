@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-#include "GameFramework/Character.h"
+#include "ModularCharacter.h"
 #include "LyraCharacter.generated.h"
 
 class ULyraCameraComponent;
 class ULyraPawnExtensionComponent;
 
 UCLASS()
-class ALyraCharacter : public ACharacter
+class ALyraCharacter : public AModularCharacter
 {
 	GENERATED_BODY()
 	

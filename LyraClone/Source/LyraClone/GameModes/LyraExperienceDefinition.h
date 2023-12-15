@@ -25,6 +25,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category=GamePlay)
 	TArray<TObjectPtr<ULyraExperienceActionSet>> ActionSets;
 
-	UPROPERTY(EditDefaultsOnly, Category=Actions)
+	UPROPERTY(EditDefaultsOnly, Instanced, Category=Actions)
 	TArray<TObjectPtr<UGameFeatureAction>> Actions;
 };
