@@ -62,7 +62,6 @@ void FAuraGameplayTags::AddInitialTags()
 
 	// Event
 	AddTag(Event_Montage_FireBolt,						"Event.Montage.FireBolt");
-	AddTag(Event_Montage_Melee,							"Event.Montage.Melee");
 	
 	// Damage
 	AddTag(Damage,										"Damage");

@@ -62,7 +62,6 @@ public:
 
 	// Event
 	FGameplayTag Event_Montage_FireBolt;
-	FGameplayTag Event_Montage_Melee;
 
 	// Damage
 	FGameplayTag Damage;

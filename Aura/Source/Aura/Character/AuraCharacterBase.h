@@ -36,13 +36,14 @@ public:
 	virtual void Multicast_Death();
 	
 public:
-	FVector GetCombatSocketLocation_Implementation() override;
+	FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatar_Implementation() override;
 	
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const { return AbilitySystemComponent; }
 	virtual UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
+	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
 	
 public:
 	void AddStartupAbilities();
@@ -60,8 +61,13 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Asset|Combat")
 	FName WeaponCombatSocketName;
+
+	UPROPERTY(EditAnywhere, Category="Asset|Combat")
+	FName LeftHandSocketName;
+
+	UPROPERTY(EditAnywhere, Category="Asset|Combat")
+	FName RightHandSocketName;
 	
-public:
 	UPROPERTY(VisibleAnywhere, Category="Component")
 	TObjectPtr<USkeletalMeshComponent> WeaponMeshComponent;
 
@@ -70,14 +76,13 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAttributeSet> AttributeSet;
-
-public:
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBarWidgetComponent;
 
-	bool bIsDead = false;
-
-public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FTaggedMontage> AttackMontages;
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> HitReactMontage;
 
@@ -86,4 +91,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+
+	bool bIsDead = false;
 };

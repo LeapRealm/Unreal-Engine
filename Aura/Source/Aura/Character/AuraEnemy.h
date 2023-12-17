@@ -3,8 +3,7 @@
 #include "AuraCharacterBase.h"
 #include "GameplayTagContainer.h"
 #include "Data/CharacterClassInfo.h"
-#include "..\Interface\EnemyInterface.h"
-
+#include "Interface/EnemyInterface.h"
 #include "AuraEnemy.generated.h"
 
 class AAuraAIController;
@@ -42,7 +41,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bHitReacting = false;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float BaseWalkSpeed = 250.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

@@ -14,6 +14,9 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	void CauseDamage(AActor* TargetActor);
+
+	UFUNCTION(BlueprintCallable)
+	FTaggedMontage GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages);
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

@@ -2,6 +2,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "Interface/CombatInterface.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AuraDamageGameplayAbility)
 
@@ -21,4 +22,15 @@ void UAuraDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 	}
 	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(),
 		UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor));
+}
+
+FTaggedMontage UAuraDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages)
+{
+	FTaggedMontage TaggedMontage;
+	if (TaggedMontages.Num() > 0)
+	{
+		const int32 Selection = FMath::RandRange(0, TaggedMontages.Num() - 1);
+		TaggedMontage = TaggedMontages[Selection];
+	}
+	return TaggedMontage;
 }
