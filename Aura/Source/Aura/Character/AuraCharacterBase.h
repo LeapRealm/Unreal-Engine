@@ -5,6 +5,7 @@
 #include "Interface/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UNiagaraSystem;
 class UWidgetComponent;
 class UGameplayAbility;
 class UGameplayEffect;
@@ -36,7 +37,7 @@ public:
 	virtual void Multicast_Death();
 	
 public:
-	FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
+	FVector GetCombatSocketLocation_Implementation(const FGameplayTag& SocketTag) override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatar_Implementation() override;
 	
@@ -44,6 +45,8 @@ public:
 	virtual UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
+	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
+	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
 	
 public:
 	void AddStartupAbilities();
@@ -68,7 +71,7 @@ public:
 	UPROPERTY(EditAnywhere, Category="Asset|Combat")
 	FName RightHandSocketName;
 	
-	UPROPERTY(VisibleAnywhere, Category="Component")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
 	TObjectPtr<USkeletalMeshComponent> WeaponMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, Category="Component")
@@ -91,6 +94,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UNiagaraSystem> BloodEffect;
 
 	bool bIsDead = false;
 };

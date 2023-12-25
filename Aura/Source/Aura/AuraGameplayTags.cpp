@@ -82,10 +82,19 @@ void FAuraGameplayTags::AddInitialTags()
 	// Ability
 	AddTag(Ability_Attack,								"Ability.Attack");
 
+	// Combat Socket
+	AddTag(CombatSocket_Weapon,							"CombatSocket.Weapon");
+	AddTag(CombatSocket_RightHand,						"CombatSocket.RightHand");
+	AddTag(CombatSocket_LeftHand,						"CombatSocket.LeftHand");
+
 	// Montage
-	AddTag(Montage_Attack_Weapon,						"Montage.Attack.Weapon");
-	AddTag(Montage_Attack_RightHand,						"Montage.Attack.RightHand");
-	AddTag(Montage_Attack_LeftHand,						"Montage.Attack.LeftHand");
+	AddTag(Montage_Attack_1,								"Montage.Attack.1");
+	AddTag(Montage_Attack_2,								"Montage.Attack.2");
+	AddTag(Montage_Attack_3,								"Montage.Attack.3");
+	AddTag(Montage_Attack_4,								"Montage.Attack.4");
+
+	// Gameplay Cue
+	AddTag(GameplayCue_MeleeImpact,						"GameplayCue.MeleeImpact");
 }
 
 void FAuraGameplayTags::AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName)
