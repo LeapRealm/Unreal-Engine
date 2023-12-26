@@ -57,6 +57,7 @@ void AAuraProjectile::Destroyed()
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
 		if (LoopingAudioComponent)
 			LoopingAudioComponent->Stop();
+		bHit = true;
 	}
 	
 	Super::Destroyed();
@@ -79,6 +80,7 @@ void AAuraProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
 		if (LoopingAudioComponent)
 			LoopingAudioComponent->Stop();
+		bHit = true;
 	}
 	
 	if (HasAuthority())

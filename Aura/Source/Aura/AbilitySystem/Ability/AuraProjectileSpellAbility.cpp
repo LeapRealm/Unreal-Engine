@@ -14,14 +14,14 @@ UAuraProjectileSpellAbility::UAuraProjectileSpellAbility(const FObjectInitialize
     
 }
 
-void UAuraProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileTargetLocation)
+void UAuraProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag)
 {
 	if (GetAvatarActorFromActorInfo()->HasAuthority() == false)
 		return;
 
 	if (Cast<ICombatInterface>(GetAvatarActorFromActorInfo()))
 	{
-		const FVector Location = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), FAuraGameplayTags::Get().CombatSocket_Weapon);
+		const FVector Location = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
 		FRotator Rotation = (ProjectileTargetLocation - Location).Rotation();
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(Location);

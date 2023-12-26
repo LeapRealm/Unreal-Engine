@@ -70,6 +70,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Asset|Combat")
 	FName RightHandSocketName;
+
+	UPROPERTY(EditAnywhere, Category="Asset|Combat")
+	FName TailSocketName;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
 	TObjectPtr<USkeletalMeshComponent> WeaponMeshComponent;
@@ -97,6 +100,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraSystem> BloodEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<USoundBase> DeathSound;
 
 	bool bIsDead = false;
 };
