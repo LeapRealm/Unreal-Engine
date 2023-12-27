@@ -30,7 +30,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 15.f;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TObjectPtr<USphereComponent> SphereComponent;
 
 	UPROPERTY(VisibleAnywhere)

@@ -2,7 +2,6 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
-#include "AuraGameplayTags.h"
 #include "Actor/AuraProjectile.h"
 #include "Interface/CombatInterface.h"
 
@@ -14,7 +13,7 @@ UAuraProjectileSpellAbility::UAuraProjectileSpellAbility(const FObjectInitialize
     
 }
 
-void UAuraProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag)
+void UAuraProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch, float PitchOverride)
 {
 	if (GetAvatarActorFromActorInfo()->HasAuthority() == false)
 		return;
@@ -23,6 +22,11 @@ void UAuraProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileTarge
 	{
 		const FVector Location = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
 		FRotator Rotation = (ProjectileTargetLocation - Location).Rotation();
+		if (bOverridePitch)
+		{
+			Rotation.Pitch = PitchOverride;
+		}
+		
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(Location);
 		SpawnTransform.SetRotation(Rotation.Quaternion());

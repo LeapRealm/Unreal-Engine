@@ -15,6 +15,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FVector> GetSpawnLocations();
 
+	UFUNCTION(BlueprintPure)
+	TSubclassOf<APawn> GetRandomMinionClass();
+	
+public:
+
 	UPROPERTY(EditDefaultsOnly)
 	int32 NumMinions = 5;
 
