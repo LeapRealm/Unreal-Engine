@@ -78,6 +78,7 @@ public:
 	// Ability
 	FGameplayTag Ability_Attack;
 	FGameplayTag Ability_Summon;
+	FGameplayTag Ability_Fire_FireBolt;
 
 	// Combat Socket
 	FGameplayTag CombatSocket_Weapon;

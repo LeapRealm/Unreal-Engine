@@ -4,6 +4,7 @@
 #include "GameplayEffectTypes.h"
 #include "AuraUserWidget.generated.h"
 
+struct FAuraAbilityInfoEntry;
 class UAbilitySystemComponent;
 class UAuraAttributeSet;
 
@@ -24,18 +25,27 @@ public:
 	void Init(UAbilitySystemComponent* ASC = nullptr);
 	
 protected:
-	virtual void BindDelegates();
+	void AddWatchingAttributeTags(const TArray<FGameplayTag>& Tags);
 	
+	void BindAttributeChangedDelegates();
+	void BindUnitedAttributeChangedDelegates();
+	virtual void BindSeparatedAttributeChangedDelegates();
+	
+	void BindAbilityChangedDelegate();
+	
+	virtual void BindCustomDelegates();
+
 protected:
-	void BindAttributeChangeGeneralFunction(const TArray<FGameplayTag>& Tags);
-	
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnAttributeChanged(const FGameplayTag& Tag, float NewValue);
 	
-private:
-	UPROPERTY(EditDefaultsOnly)
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnAbilityChanged(const TArray<FAuraAbilityInfoEntry>& AbilityInfos);
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<FGameplayTag> WatchingAttributeTags;
-
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

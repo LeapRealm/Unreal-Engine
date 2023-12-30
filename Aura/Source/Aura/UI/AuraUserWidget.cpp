@@ -1,7 +1,7 @@
 ﻿#include "AuraUserWidget.h"
 
-#include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "Player/AuraPlayerState.h"
 
@@ -23,11 +23,24 @@ void UAuraUserWidget::Init(UAbilitySystemComponent* ASC)
 	
 	AttributeSet = Cast<UAuraAttributeSet>(AbilitySystemComponent->GetAttributeSet(UAuraAttributeSet::StaticClass()));
 	check(AttributeSet);
-	
-	BindDelegates();
+
+	BindAttributeChangedDelegates();
+	BindAbilityChangedDelegate();
+	BindCustomDelegates();
 }
 
-void UAuraUserWidget::BindDelegates()
+void UAuraUserWidget::AddWatchingAttributeTags(const TArray<FGameplayTag>& Tags)
+{
+	WatchingAttributeTags.Append(Tags);
+}
+
+void UAuraUserWidget::BindAttributeChangedDelegates()
+{
+	BindUnitedAttributeChangedDelegates();
+	BindSeparatedAttributeChangedDelegates();
+}
+
+void UAuraUserWidget::BindUnitedAttributeChangedDelegates()
 {
 	for (const FGameplayTag& Tag : WatchingAttributeTags)
 	{
@@ -43,7 +56,24 @@ void UAuraUserWidget::BindDelegates()
 	}
 }
 
-void UAuraUserWidget::BindAttributeChangeGeneralFunction(const TArray<FGameplayTag>& Tags)
+void UAuraUserWidget::BindSeparatedAttributeChangedDelegates()
 {
-	WatchingAttributeTags.Append(Tags);
+	
+}
+
+void UAuraUserWidget::BindAbilityChangedDelegate()
+{
+	if (UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		TArray<FAuraAbilityInfoEntry> AbilityInfos;
+		AuraASC->GetAbilityInfos(AbilityInfos);
+		OnAbilityChanged(AbilityInfos);
+		
+		AuraASC->AbilityChangedDelegate.AddUObject(this, &ThisClass::OnAbilityChanged);
+	}
+}
+
+void UAuraUserWidget::BindCustomDelegates()
+{
+	
 }

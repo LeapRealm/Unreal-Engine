@@ -12,7 +12,7 @@ public:
 	UAuraHealthBar(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void BindDelegates() override;
+	virtual void BindSeparatedAttributeChangedDelegates() override;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)

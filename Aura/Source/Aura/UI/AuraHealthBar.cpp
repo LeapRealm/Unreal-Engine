@@ -10,9 +10,9 @@ UAuraHealthBar::UAuraHealthBar(const FObjectInitializer& ObjectInitializer)
     
 }
 
-void UAuraHealthBar::BindDelegates()
+void UAuraHealthBar::BindSeparatedAttributeChangedDelegates()
 {
-	Super::BindDelegates();
+	Super::BindSeparatedAttributeChangedDelegates();
 
 	BIND_ATTRIBUTE_CHANGE_SEPARATE_FUNCTION(Health);
 	BIND_ATTRIBUTE_CHANGE_SEPARATE_FUNCTION(MaxHealth);

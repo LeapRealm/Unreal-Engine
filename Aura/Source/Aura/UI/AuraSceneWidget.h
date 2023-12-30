@@ -3,8 +3,6 @@
 #include "AuraUserWidget.h"
 #include "AuraSceneWidget.generated.h"
 
-class UAuraAttributeWidget;
-
 USTRUCT(BlueprintType)
 struct FMessageWidgetRow : public FTableRowBase
 {
@@ -26,7 +24,8 @@ public:
 	UAuraSceneWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void BindDelegates() override;
+	virtual void BindSeparatedAttributeChangedDelegates() override;
+	virtual void BindCustomDelegates() override;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
@@ -46,7 +45,7 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAuraAttributeWidget> AttributeWidget;
+	TObjectPtr<UAuraUserWidget> AttributeWidget;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Asset|Data")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;

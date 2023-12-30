@@ -12,15 +12,20 @@ UAuraSceneWidget::UAuraSceneWidget(const FObjectInitializer& ObjectInitializer)
 	
 }
 
-void UAuraSceneWidget::BindDelegates()
+void UAuraSceneWidget::BindSeparatedAttributeChangedDelegates()
 {
-	Super::BindDelegates();
-	
+	Super::BindSeparatedAttributeChangedDelegates();
+
 	BIND_ATTRIBUTE_CHANGE_SEPARATE_FUNCTION(Health);
 	BIND_ATTRIBUTE_CHANGE_SEPARATE_FUNCTION(MaxHealth);
 	BIND_ATTRIBUTE_CHANGE_SEPARATE_FUNCTION(Mana);
 	BIND_ATTRIBUTE_CHANGE_SEPARATE_FUNCTION(MaxMana);
-	
+}
+
+void UAuraSceneWidget::BindCustomDelegates()
+{
+	Super::BindCustomDelegates();
+
 	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->OnEffectApplied_AssetTags.AddLambda([this](const FGameplayTagContainer& AssetTags)
 	{
 		for (const FGameplayTag& Tag : AssetTags)
