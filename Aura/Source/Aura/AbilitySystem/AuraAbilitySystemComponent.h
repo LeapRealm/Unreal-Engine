@@ -7,7 +7,7 @@ class UAuraAbilityInfoSet;
 struct FAuraAbilityInfoEntry;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEffectApplied_AssetTags, const FGameplayTagContainer&);
-DECLARE_MULTICAST_DELEGATE_OneParam(FAbilityChangedDelegate, const TArray<FAuraAbilityInfoEntry>&);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FAbilityChangedDelegate, bool, const FAuraAbilityInfoEntry&);
 
 UCLASS()
 class UAuraAbilitySystemComponent : public UAbilitySystemComponent
@@ -20,7 +20,6 @@ public:
 public:
 	void BindEffectAppliedDelegate();
 	void AddStartupAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
-	void GetAbilityInfos(TArray<FAuraAbilityInfoEntry>& OutAbilityInfos);
 	
 	void AbilityInputHeld(const FGameplayTag& InputTag);
 	void AbilityInputReleased(const FGameplayTag& InputTag);
@@ -28,9 +27,13 @@ public:
 	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	
-protected:
-	virtual void OnRep_ActivateAbilities() override;
-	
+public:
+	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec) override;
+	virtual void OnRemoveAbility(FGameplayAbilitySpec& AbilitySpec) override;
+	FAuraAbilityInfoEntry GetAbilityInfoForSpec(const FGameplayAbilitySpec& AbilitySpec);
+	void GetAllAbilityInfos(TArray<FAuraAbilityInfoEntry>& OutAbilityInfos);
+
+public:
 	void OnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 
 	UFUNCTION(Client, Reliable)

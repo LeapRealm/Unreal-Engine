@@ -33,22 +33,6 @@ void UAuraAbilitySystemComponent::AddStartupAbilities(const TArray<TSubclassOf<U
 	}
 }
 
-void UAuraAbilitySystemComponent::GetAbilityInfos(TArray<FAuraAbilityInfoEntry>& OutAbilityInfos)
-{
-	OutAbilityInfos.Empty();
-	
-	ABILITYLIST_SCOPE_LOCK();
-	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
-	{
-		FAuraAbilityInfoEntry AbilityInfo = AbilityInfoSet->FindAbilityInfoForTag(UAuraAbilitySystemComponent::GetAbilityTagFromSpec(AbilitySpec));
-		if (AbilityInfo.AbilityTag.IsValid())
-		{
-			AbilityInfo.InputTag = UAuraAbilitySystemComponent::GetInputTagFromSpec(AbilitySpec);
-			OutAbilityInfos.Add(AbilityInfo);
-		}
-	}
-}
-
 void UAuraAbilitySystemComponent::AbilityInputHeld(const FGameplayTag& InputTag)
 {
 	if (InputTag.IsValid() == false)
@@ -108,13 +92,53 @@ FGameplayTag UAuraAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbi
 	return FGameplayTag();
 }
 
-void UAuraAbilitySystemComponent::OnRep_ActivateAbilities()
+void UAuraAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)
 {
-	Super::OnRep_ActivateAbilities();
+	Super::OnGiveAbility(AbilitySpec);
 
-	TArray<FAuraAbilityInfoEntry> AbilityInfos;
-	GetAbilityInfos(AbilityInfos);
-	AbilityChangedDelegate.Broadcast(AbilityInfos);
+	FAuraAbilityInfoEntry AbilityInfo = GetAbilityInfoForSpec(AbilitySpec);
+	if (AbilityInfo.AbilityTag.IsValid())
+	{
+		AbilityChangedDelegate.Broadcast(true, AbilityInfo);
+	}
+}
+
+void UAuraAbilitySystemComponent::OnRemoveAbility(FGameplayAbilitySpec& AbilitySpec)
+{
+	Super::OnRemoveAbility(AbilitySpec);
+
+	FAuraAbilityInfoEntry AbilityInfo = GetAbilityInfoForSpec(AbilitySpec);
+	if (AbilityInfo.AbilityTag.IsValid())
+	{
+		AbilityChangedDelegate.Broadcast(false, AbilityInfo);
+	}
+}
+
+FAuraAbilityInfoEntry UAuraAbilitySystemComponent::GetAbilityInfoForSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	FAuraAbilityInfoEntry AbilityInfo = AbilityInfoSet->FindAbilityInfoForTag(UAuraAbilitySystemComponent::GetAbilityTagFromSpec(AbilitySpec));
+	if (AbilityInfo.AbilityTag.IsValid())
+	{
+		AbilityInfo.InputTag = UAuraAbilitySystemComponent::GetInputTagFromSpec(AbilitySpec);
+		return AbilityInfo;
+	}
+	return FAuraAbilityInfoEntry();
+}
+
+void UAuraAbilitySystemComponent::GetAllAbilityInfos(TArray<FAuraAbilityInfoEntry>& OutAbilityInfos)
+{
+	OutAbilityInfos.Empty();
+	
+	ABILITYLIST_SCOPE_LOCK();
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		FAuraAbilityInfoEntry AbilityInfo = AbilityInfoSet->FindAbilityInfoForTag(UAuraAbilitySystemComponent::GetAbilityTagFromSpec(AbilitySpec));
+		if (AbilityInfo.AbilityTag.IsValid())
+		{
+			AbilityInfo.InputTag = UAuraAbilitySystemComponent::GetInputTagFromSpec(AbilitySpec);
+			OutAbilityInfos.Add(AbilityInfo);
+		}
+	}
 }
 
 void UAuraAbilitySystemComponent::OnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)

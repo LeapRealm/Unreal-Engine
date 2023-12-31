@@ -40,7 +40,7 @@ protected:
 	void OnAttributeChanged(const FGameplayTag& Tag, float NewValue);
 	
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnAbilityChanged(const TArray<FAuraAbilityInfoEntry>& AbilityInfos);
+	void OnAbilityChanged(bool bGiven, const FAuraAbilityInfoEntry& AbilityInfo);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)

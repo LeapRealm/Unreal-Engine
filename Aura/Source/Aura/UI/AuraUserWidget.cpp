@@ -66,9 +66,11 @@ void UAuraUserWidget::BindAbilityChangedDelegate()
 	if (UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent))
 	{
 		TArray<FAuraAbilityInfoEntry> AbilityInfos;
-		AuraASC->GetAbilityInfos(AbilityInfos);
-		OnAbilityChanged(AbilityInfos);
-		
+		AuraASC->GetAllAbilityInfos(AbilityInfos);
+		for (const FAuraAbilityInfoEntry& AbilityInfo : AbilityInfos)
+		{
+			OnAbilityChanged(true, AbilityInfo);
+		}
 		AuraASC->AbilityChangedDelegate.AddUObject(this, &ThisClass::OnAbilityChanged);
 	}
 }
