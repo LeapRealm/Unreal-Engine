@@ -1,0 +1,8 @@
+{
+	"BuildId": "27405482",
+	"Modules": 
+	{
+		"L1": "UnrealEditor-L1-Win64-DebugGame.dll",
+		"L1Game": "UnrealEditor-L1Game-Win64-DebugGame.dll"
+	}
+}

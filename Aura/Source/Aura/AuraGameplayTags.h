@@ -17,6 +17,7 @@ private:
 public:
 	// Base
 	FGameplayTag Attribute_Base_Level;
+	FGameplayTag Attribute_Base_Experience;
 
 	// Vital
 	FGameplayTag Attribute_Vital_Health;

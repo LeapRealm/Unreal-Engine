@@ -1,0 +1,14 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\leaprealm\\desktop\\repository\\unreal-engine\\l1\\source\\l1\\l1.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\users\\leaprealm\\desktop\\repository\\unreal-engine\\l1\\intermediate\\build\\win64\\x64\\l1editor\\debuggame\\engine\\sharedpch.engine.nonoptimized.cpp20.h.pch",
+        "Includes": [
+            "c:\\users\\leaprealm\\desktop\\repository\\unreal-engine\\l1\\intermediate\\build\\win64\\x64\\unrealeditor\\debuggame\\l1\\definitions.l1.h",
+            "c:\\users\\leaprealm\\desktop\\repository\\unreal-engine\\l1\\source\\l1\\l1.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

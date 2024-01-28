@@ -1,0 +1,3 @@
+﻿#pragma once
+
+L1GAME_API DECLARE_LOG_CATEGORY_EXTERN(LogL1, Log, All);

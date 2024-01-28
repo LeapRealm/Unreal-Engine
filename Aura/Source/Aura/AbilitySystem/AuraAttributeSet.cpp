@@ -19,6 +19,7 @@ UAuraAttributeSet::UAuraAttributeSet(const FObjectInitializer& ObjectInitializer
 
 	// Base
 	TagToAttributeFunc.Add(GameplayTags.Attribute_Base_Level,						GetLevelAttribute);
+	TagToAttributeFunc.Add(GameplayTags.Attribute_Base_Experience,					GetExperienceAttribute);
 	
 	// Vital
 	TagToAttributeFunc.Add(GameplayTags.Attribute_Vital_Health,						GetHealthAttribute);
@@ -55,6 +56,7 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	// Base
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Level,					COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Experience,				COND_None, REPNOTIFY_Always);
 	
 	// Vital
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Health,					COND_None, REPNOTIFY_Always);
@@ -196,6 +198,11 @@ void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Properties, fl
 void UAuraAttributeSet::OnRep_Level(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Level, OldValue);
+}
+
+void UAuraAttributeSet::OnRep_Experience(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Experience, OldValue);
 }
 
 void UAuraAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue) const

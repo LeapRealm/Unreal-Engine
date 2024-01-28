@@ -17,6 +17,7 @@ void FAuraGameplayTags::AddInitialTags()
 {
 	// Base
 	AddTag(Attribute_Base_Level,							"Attribute.Base.Level");
+	AddTag(Attribute_Base_Experience,					"Attribute.Base.Experience");
 
 	// Vital
 	AddTag(Attribute_Vital_Health,						"Attribute.Vital.Health");

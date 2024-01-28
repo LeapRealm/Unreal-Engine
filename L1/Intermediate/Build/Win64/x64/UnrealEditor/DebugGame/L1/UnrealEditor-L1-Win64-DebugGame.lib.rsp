@@ -1,0 +1,14 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-L1-Win64-DebugGame.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Users\LeapRealm\Desktop\Repository\Unreal-Engine\L1\Intermediate\Build\Win64\x64\L1Editor\DebugGame\Engine\SharedPCH.Engine.NonOptimized.Cpp20.h.obj"
+"C:\Users\LeapRealm\Desktop\Repository\Unreal-Engine\L1\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\L1\L1.init.gen.cpp.obj"
+"C:\Users\LeapRealm\Desktop\Repository\Unreal-Engine\L1\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\L1\L1.cpp.obj"
+"C:\Users\LeapRealm\Desktop\Repository\Unreal-Engine\L1\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\L1\L1UserFacingExperienceDefinition.cpp.obj"
+"C:\Users\LeapRealm\Desktop\Repository\Unreal-Engine\L1\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\L1\Default.rc2.res"
+/OUT:"C:\Users\LeapRealm\Desktop\Repository\Unreal-Engine\L1\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\L1\UnrealEditor-L1-Win64-DebugGame.lib"

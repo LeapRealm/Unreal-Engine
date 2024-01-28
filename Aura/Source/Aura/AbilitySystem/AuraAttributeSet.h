@@ -66,6 +66,9 @@ private:
 	// Base
 	UFUNCTION()
 	void OnRep_Level(const FGameplayAttributeData& OldValue) const;
+
+	UFUNCTION()
+	void OnRep_Experience(const FGameplayAttributeData& OldValue) const;
 	
 	// Vital
 	UFUNCTION()
@@ -139,6 +142,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Level, Category="Attributes|Base")
 	FGameplayAttributeData Level;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Level);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Experience, Category="Attributes|Base")
+	FGameplayAttributeData Experience;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Experience);
 	
 	// Vital
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Health, Category="Attributes|Vital")
